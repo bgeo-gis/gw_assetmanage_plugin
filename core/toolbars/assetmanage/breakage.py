@@ -58,7 +58,7 @@ class AmBreakage(dialog.GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['CARGA INCREMENTAL', 'ASIGNACIÓN']
+        actions = ['CARGA INCREMENTAL', 'ASIGNACIÓN', 'CALCULO PRIORIDADES']
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -71,6 +71,9 @@ class AmBreakage(dialog.GwAction):
             self.incremental_load()
         elif name == 'ASIGNACIÓN':
             self.assignation()
+        else:
+            msg = f"No action found"
+            tools_qgis.show_warning(msg, parameter=name)
 
 
     def incremental_load(self):
@@ -94,12 +97,7 @@ class AmBreakage(dialog.GwAction):
 
     def _fill_assign_combos(self):
         # Combo method
-        rows = [['buffer-500', 'buffer-500'],
-                ['buffer-1000', 'buffer-1000'],
-                ['otros', 'otros']]
+        rows = [['buffer-50', 'buffer-50'],
+                ['buffer-100', 'buffer-100'],
+                ['buffer-150', 'buffer-150']]
         tools_qt.fill_combo_values(self.dlg_assignation.cmb_method, rows, 1)
-
-        # Combo mode
-        rows = [['todas', 'Todas'],
-                ['utima_carga', 'Ultima carga']]
-        tools_qt.fill_combo_values(self.dlg_assignation.cmb_mode, rows, 1)

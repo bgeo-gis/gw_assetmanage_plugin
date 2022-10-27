@@ -9,5 +9,4 @@ or (at your option) any later version.
 # assetmanage
 from .assetmanage.breakage import AmBreakage
 from .assetmanage.priority import AmPriority
-from .assetmanage.reporting import AmReporting
 

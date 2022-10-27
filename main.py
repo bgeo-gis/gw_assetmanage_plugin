@@ -57,11 +57,14 @@ class GWAssetPlugin(QObject):
                 button.action.setVisible(False)
                 del button
 
-        if self.plugin_toolbars:
-            for plugin_toolbar in list(self.plugin_toolbars.values()):
-                if plugin_toolbar.enabled:
-                    plugin_toolbar.toolbar.setVisible(False)
-                    del plugin_toolbar.toolbar
+        try:
+            if self.plugin_toolbars:
+                for plugin_toolbar in list(self.plugin_toolbars.values()):
+                    if plugin_toolbar.enabled:
+                        plugin_toolbar.toolbar.setVisible(False)
+                        del plugin_toolbar.toolbar
+        except Exception:
+            pass
 
 
     def initGui(self):

@@ -78,7 +78,3 @@ class AssignationUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('priority.ui', 'assetmanage')
 class PriorityUi(GwDialog, FORM_CLASS):
     pass
-
-FORM_CLASS = get_ui_class('reporting.ui', 'assetmanage')
-class ReportingUi(GwDialog, FORM_CLASS):
-    pass
