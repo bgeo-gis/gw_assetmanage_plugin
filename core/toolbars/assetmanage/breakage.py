@@ -87,9 +87,17 @@ class AmBreakage(dialog.GwAction):
     def assignation(self):
         print("ASSIGNATION")
         self.dlg_assignation = AssignationUi()
+        dlg = self.dlg_assignation
 
         # Fill combos
         self._fill_assign_combos()
+
+        tools_qt.double_validator(dlg.txt_buffer, min_=0, decimals=0)
+        tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
+
+        tools_gw.disable_tab_log(dlg)
+        
+        # TODO: Load and save user values
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_assignation, dlg_name='assignation')
@@ -97,7 +105,6 @@ class AmBreakage(dialog.GwAction):
 
     def _fill_assign_combos(self):
         # Combo method
-        rows = [['buffer-50', 'buffer-50'],
-                ['buffer-100', 'buffer-100'],
-                ['buffer-150', 'buffer-150']]
+        rows = [['linear', 'lineal'],
+                ['exponential', 'exponencial']]
         tools_qt.fill_combo_values(self.dlg_assignation.cmb_method, rows, 1)
