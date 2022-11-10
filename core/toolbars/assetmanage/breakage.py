@@ -12,14 +12,16 @@ import psycopg2
 import geopandas as gpd
 import os
 from sqlalchemy import create_engine
-import geoalchemy2
+# import geoalchemy2
 
+from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QFileDialog, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
 from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
 from .... import global_vars
 
+from ...threads.assignation import GwAssignation
 from ...ui.ui_manager import IncrementalUi, AssignationUi, PriorityConfigUi
 
 
@@ -147,6 +149,8 @@ class AmBreakage(dialog.GwAction):
         
         # TODO: Load and save user values
 
+        self._set_assignation_signals()
+
         # Open the dialog
         tools_gw.open_dialog(self.dlg_assignation, dlg_name='assignation')
 
@@ -156,6 +160,30 @@ class AmBreakage(dialog.GwAction):
         rows = [['linear', 'lineal'],
                 ['exponential', 'exponencial']]
         tools_qt.fill_combo_values(self.dlg_assignation.cmb_method, rows, 1)
+
+    def _set_assignation_signals(self):
+        dlg = self.dlg_assignation
+
+        dlg.buttonBox.accepted.disconnect()
+        dlg.buttonBox.accepted.connect(self._execute_assignation)
+
+    def _execute_assignation(self):
+        dlg = self.dlg_assignation
+
+        # TODO: validate inputs
+
+        method, _ = dlg.cmb_method.currentData()
+        buffer = int(dlg.txt_buffer.text())
+        years = int(dlg.txt_years.text())
+
+        self.thread = GwAssignation(
+            "Leak Assignation",
+            method,
+            buffer,
+            years,
+        )
+        self.thread.report.connect(partial(tools_gw.fill_tab_log, dlg))
+        QgsApplication.taskManager().addTask(self.thread)
 
     def _upload_leaks(self):
 
