@@ -28,7 +28,8 @@ session_vars = {'user_settings': None, 'user_settings_path': None, 'min_log_leve
                 'last_error': None, 'show_db_exception': True, 'dlg_info': None, 'current_user': None,
                 'dlg_docker': None, 'show_docker': None, 'docker_type': None, 'logged': None,
                 'db': None, 'postgresql_version': None, 'dao': None, 'credentials': None}
-
+# Credentials used to establish the connection with PostgreSql. Saving {db, schema, table, service, host, port, user, password, sslmode}
+db_credentials = {'host': None, 'port': None, 'db': None,  'schema': None,  'user': None,  'password': None,  'ssl': None, }
 
 def init_global(p_iface, p_canvas, p_plugin_dir, p_plugin_name, p_roaming_user_dir):
 

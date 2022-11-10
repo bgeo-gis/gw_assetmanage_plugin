@@ -78,3 +78,11 @@ class AssignationUi(GwDialog, FORM_CLASS):
 FORM_CLASS = get_ui_class('priority.ui', 'assetmanage')
 class PriorityUi(GwDialog, FORM_CLASS):
     pass
+
+FORM_CLASS = get_ui_class('priority_manager.ui', 'assetmanage')
+class PriorityManagerUi(GwDialog, FORM_CLASS):
+    pass
+
+FORM_CLASS = get_ui_class('priority_config.ui', 'assetmanage')
+class PriorityConfigUi(GwDialog, FORM_CLASS):
+    pass
