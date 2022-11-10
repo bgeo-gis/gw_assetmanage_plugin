@@ -66,6 +66,22 @@ class GwAssignation(GwTask):
                     if rleak != 0:
                         rleaks.append([arc_id, rleak])
 
+            sql = (
+                "UPDATE asset.arc_input SET rleak = NULL WHERE result_id = 0; "
+                + "INSERT INTO asset.arc_input (arc_id, result_id, rleak) VALUES "
+            )
+            for arc_id, rleak in rleaks:
+                sql += f"({arc_id}, 0, {rleak}),"
+            sql = (
+                sql[:-1]
+                + "ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
+            )
+            tools_db.execute_sql(sql)
+
+            # TODO: Report of leaks without arcs inside buffer
+            # TODO: Report of how many arcs have and don't have leaks
+            # TODO: Report of max and min rleak
+
             self.report.emit({"info": {"values": [{"message": len(rleaks)}]}})
             return True
 
