@@ -31,6 +31,10 @@ class GwAssignation(GwTask):
             )
             rows = tools_db.get_rows(sql)
 
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+
             self._emit_report("Calculating leaks per km per year (2/3)...")
             self.setProgress(60)
             leaks = {}
@@ -61,6 +65,10 @@ class GwAssignation(GwTask):
                         leaks_by_arc[arc["arc_id"]] = 0
                     leaks_by_arc[arc["arc_id"]] += arc["index"] / sum_indexes
 
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+
             sql = "SELECT arc_id, ST_LENGTH(the_geom) FROM asset.v_asset_arc_output"
             rows = tools_db.get_rows(sql)
             rleaks = []
@@ -71,6 +79,10 @@ class GwAssignation(GwTask):
                     rleak = leaks_by_arc.get(arc_id, 0) / (length * self.years)
                     if rleak != 0:
                         rleaks.append([arc_id, rleak])
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
 
             self._emit_report("Saving results to DB (3/3)...")
             self.setProgress(90)
@@ -97,6 +109,6 @@ class GwAssignation(GwTask):
         except Exception as e:
             self._emit_report(e)
             return False
-    
+
     def _emit_report(self, message):
         self.report.emit({"info": {"values": [{"message": message}]}})

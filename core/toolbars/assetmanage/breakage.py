@@ -207,13 +207,6 @@ class AmBreakage(dialog.GwAction):
         buffer = int(dlg.txt_buffer.text())
         years = int(dlg.txt_years.text())
 
-        # Set timer
-        self.t0 = time()
-        self.timer = QTimer()
-        self.timer.timeout.connect(self._update_assignation_timer)
-        self.timer.start(200)
-
-        dlg.progressBar.show()
         self.thread = GwAssignation(
             "Leak Assignation",
             method,
@@ -221,16 +214,51 @@ class AmBreakage(dialog.GwAction):
             years,
         )
         t = self.thread
+        t.taskCompleted.connect(self._assignation_ended)
+        t.taskTerminated.connect(self._assignation_ended)
+
+        # Set timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._update_assignation_timer)
+        self.timer.start(200)
+
+        # Log behavior
         t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+
+        # Progress bar behavior
+        dlg.progressBar.show()
         t.progressChanged.connect(dlg.progressBar.setValue)
-        t.taskCompleted.connect(self.timer.stop)
-        t.taskTerminated.connect(self.timer.stop)
+
+        # Button OK behavior
+        ok = dlg.buttonBox.StandardButton.Ok
+        dlg.buttonBox.button(ok).setEnabled(False)
+
+        # Button Cancel behavior
+        dlg.buttonBox.rejected.disconnect()
+        dlg.buttonBox.rejected.connect(self._cancel_assignation)
+
         QgsApplication.taskManager().addTask(t)
 
     def _update_assignation_timer(self):
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
         self.dlg_assignation.lbl_timer.setText(text)
+
+    def _cancel_assignation(self):
+        self.thread.cancel()
+        tools_gw.fill_tab_log (
+            self.dlg_assignation,
+            {"info": {"values": [{"message": "Canceling task..."}]}}, 
+            reset_text=False, 
+            close=False
+        )
+
+    def _assignation_ended(self):
+        dlg = self.dlg_assignation
+        dlg.buttonBox.rejected.disconnect()
+        dlg.buttonBox.rejected.connect(dlg.reject)
+        self.timer.stop()
 
     def _upload_leaks(self):
 
