@@ -147,7 +147,7 @@ class AmBreakage(dialog.GwAction):
 
         tools_gw.disable_tab_log(dlg)
         
-        # TODO: Load and save user values
+        self._assignation_user_values("load")
 
         self._set_assignation_signals()
 
@@ -161,11 +161,38 @@ class AmBreakage(dialog.GwAction):
                 ['exponential', 'exponencial']]
         tools_qt.fill_combo_values(self.dlg_assignation.cmb_method, rows, 1)
 
+    def _assignation_user_values(self, action):
+        widgets = [
+            "cmb_method",
+            "txt_buffer",
+            "txt_years",
+        ]
+        for widget in widgets:
+            if action == "load":
+                value = tools_gw.get_config_parser(
+                    "assignation",
+                    widget,
+                    "user",
+                    "session",
+                    plugin=global_vars.user_folder_name,
+                )
+                tools_qt.set_widget_text(self.dlg_assignation, widget, value)
+            elif action == "save":
+                value = tools_qt.get_text(self.dlg_assignation, widget, False, False)
+                value = value.replace("%", "%%")
+                tools_gw.set_config_parser(
+                    "assignation",
+                    widget,
+                    value,
+                    plugin=global_vars.user_folder_name,
+                )
+
     def _set_assignation_signals(self):
         dlg = self.dlg_assignation
 
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
+        dlg.rejected.connect(partial(self._assignation_user_values, "save"))
 
     def _execute_assignation(self):
         dlg = self.dlg_assignation
