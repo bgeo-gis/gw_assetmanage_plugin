@@ -146,6 +146,7 @@ class AmBreakage(dialog.GwAction):
         tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
 
         tools_gw.disable_tab_log(dlg)
+        dlg.progressBar.hide()
         
         self._assignation_user_values("load")
 
@@ -203,14 +204,17 @@ class AmBreakage(dialog.GwAction):
         buffer = int(dlg.txt_buffer.text())
         years = int(dlg.txt_years.text())
 
+        dlg.progressBar.show()
         self.thread = GwAssignation(
             "Leak Assignation",
             method,
             buffer,
             years,
         )
-        self.thread.report.connect(partial(tools_gw.fill_tab_log, dlg))
-        QgsApplication.taskManager().addTask(self.thread)
+        t = self.thread
+        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+        t.progressChanged.connect(dlg.progressBar.setValue)
+        QgsApplication.taskManager().addTask(t)
 
     def _upload_leaks(self):
 

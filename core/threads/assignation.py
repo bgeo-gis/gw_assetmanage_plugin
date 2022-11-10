@@ -7,6 +7,7 @@ from ...settings import tools_db
 
 class GwAssignation(GwTask):
     report = pyqtSignal(dict)
+    step = pyqtSignal(str)
 
     def __init__(self, description, method, buffer, years):
         super().__init__(description, QgsTask.CanCancel)
@@ -16,6 +17,8 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
+            self._emit_report("Getting data from DB (1/3)...")
+            self.setProgress(0)
             # TODO: Filter years
             sql = (
                 "SELECT "
@@ -27,6 +30,9 @@ class GwAssignation(GwTask):
                 + f"JOIN asset.v_asset_arc_output AS a ON ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer}) "
             )
             rows = tools_db.get_rows(sql)
+
+            self._emit_report("Calculating leaks per km per year (2/3)...")
+            self.setProgress(60)
             leaks = {}
             leaks_by_arc = {}
 
@@ -66,6 +72,8 @@ class GwAssignation(GwTask):
                     if rleak != 0:
                         rleaks.append([arc_id, rleak])
 
+            self._emit_report("Saving results to DB (3/3)...")
+            self.setProgress(90)
             sql = (
                 "UPDATE asset.arc_input SET rleak = NULL WHERE result_id = 0; "
                 + "INSERT INTO asset.arc_input (arc_id, result_id, rleak) VALUES "
@@ -77,14 +85,18 @@ class GwAssignation(GwTask):
                 + "ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
             )
             tools_db.execute_sql(sql)
+            self.setProgress(100)
 
             # TODO: Report of leaks without arcs inside buffer
             # TODO: Report of how many arcs have and don't have leaks
             # TODO: Report of max and min rleak
 
-            self.report.emit({"info": {"values": [{"message": len(rleaks)}]}})
+            self._emit_report("Task finished.")
             return True
 
         except Exception as e:
-            self.report.emit({"info": {"values": [{"message": e}]}})
+            self._emit_report(e)
             return False
+    
+    def _emit_report(self, message):
+        self.report.emit({"info": {"values": [{"message": message}]}})
