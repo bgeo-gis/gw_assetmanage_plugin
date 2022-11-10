@@ -7,6 +7,8 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from functools import partial
+from time import time
+from datetime import timedelta
 import psycopg2
 # import arcpy
 import geopandas as gpd
@@ -15,6 +17,7 @@ from sqlalchemy import create_engine
 # import geoalchemy2
 
 from qgis.core import QgsApplication
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QFileDialog, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
@@ -204,6 +207,12 @@ class AmBreakage(dialog.GwAction):
         buffer = int(dlg.txt_buffer.text())
         years = int(dlg.txt_years.text())
 
+        # Set timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._update_assignation_timer)
+        self.timer.start(200)
+
         dlg.progressBar.show()
         self.thread = GwAssignation(
             "Leak Assignation",
@@ -214,7 +223,14 @@ class AmBreakage(dialog.GwAction):
         t = self.thread
         t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
         t.progressChanged.connect(dlg.progressBar.setValue)
+        t.taskCompleted.connect(self.timer.stop)
+        t.taskTerminated.connect(self.timer.stop)
         QgsApplication.taskManager().addTask(t)
+
+    def _update_assignation_timer(self):
+        elapsed_time = time() - self.t0
+        text = str(timedelta(seconds=round(elapsed_time)))
+        self.dlg_assignation.lbl_timer.setText(text)
 
     def _upload_leaks(self):
 
