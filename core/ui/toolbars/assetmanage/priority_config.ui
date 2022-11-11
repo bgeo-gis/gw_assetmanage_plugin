@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Roturas - Carga incremental</string>
+   <string>Calculo de prioridades</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="0" rowspan="2" colspan="3">
