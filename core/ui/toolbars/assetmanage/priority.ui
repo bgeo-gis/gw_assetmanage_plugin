@@ -194,7 +194,7 @@
            </spacer>
           </item>
           <item row="0" column="0">
-           <widget class="QToolButton" name="btn_snapping">
+           <widget class="QToolButton" name="btn_select">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
               <horstretch>0</horstretch>

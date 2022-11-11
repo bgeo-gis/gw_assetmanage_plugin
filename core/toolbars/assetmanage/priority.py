@@ -71,11 +71,10 @@ class AmPriority(dialog.GwAction):
 
         # Triggers
         self.dlg_priority.btn_load.clicked.connect(self._open_manager)
-        self.dlg_priority.btn_snapping.clicked.connect(self._manage_selection)
         self.dlg_priority.cmb_mapzone.currentIndexChanged.connect(partial(self._populate_child))
 
         # Manage selection group
-        # self._manage_selection()
+        self._manage_selection()
 
         # Manage expression group
         self._manage_expr()
@@ -108,44 +107,41 @@ class AmPriority(dialog.GwAction):
 
     # region Selection
 
-    # def _manage_selection(self):
-    #     self._manage_btn_select()
-
-    # def _manage_btn_select(self):
-    #     """ Fill btn_select QMenu """
-    #
-    #     # Functions
-    #     icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg")
-    #
-    #     values = [
-    #         [0, "Select Feature(s)", os.path.join(icons_folder, "mActionSelectRectangle.svg")],
-    #         [1, "Select Features by Polygon", os.path.join(icons_folder, "mActionSelectPolygon.svg")],
-    #         [2, "Select Features by Freehand", os.path.join(icons_folder, "mActionSelectRadius.svg")],
-    #         [3, "Select Features by Radius", os.path.join(icons_folder, "mActionSelectRadius.svg")],
-    #     ]
-    #
-    #     # Create and populate QMenu
-    #     select_menu = QMenu()
-    #     for value in values:
-    #         num = value[0]
-    #         label = value[1]
-    #         icon = QIcon(value[2])
-    #         action = select_menu.addAction(icon, f"{label}")
-    #         action.triggered.connect(partial(self._trigger_action_select, num))
-    #
-    #     self.dlg_priority.btn_select.setMenu(select_menu)
-
     def _manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
 
-        print(f"11")
+        self._manage_btn_select()
+
+
+    def _manage_btn_select(self):
+        """ Fill btn_select QMenu """
+
+        # Functions
+        icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg")
+
+        values = [
+            [0, "Select Feature(s)", os.path.join(icons_folder, "mActionSelectRectangle.svg")],
+            [1, "Select Features by Polygon", os.path.join(icons_folder, "mActionSelectPolygon.svg")],
+            [2, "Select Features by Freehand", os.path.join(icons_folder, "mActionSelectRadius.svg")],
+            [3, "Select Features by Radius", os.path.join(icons_folder, "mActionSelectRadius.svg")],
+        ]
+
+        # Create and populate QMenu
+        select_menu = QMenu()
+        for value in values:
+            num = value[0]
+            label = value[1]
+            icon = QIcon(value[2])
+            action = select_menu.addAction(icon, f"{label}")
+            action.triggered.connect(partial(self._trigger_action_select, num))
+
+        self.dlg_priority.btn_select.setMenu(select_menu)
 
 
     def _trigger_action_select(self, num):
 
         # Set active layer
-        # layer = tools_qgis.get_layer_by_tablename('v_asset_output')
-        layer = tools_qgis.get_layer_by_tablename('arc_asset')
+        layer = tools_qgis.get_layer_by_tablename('v_asset_arc_output')
         self.iface.setActiveLayer(layer)
 
         if num == 0:
