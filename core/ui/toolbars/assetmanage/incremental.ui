@@ -15,9 +15,9 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" rowspan="2" colspan="3">
-    <widget class="QTabWidget" name="tabWidget">
+    <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -62,7 +62,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_loginfo">
+     <widget class="QWidget" name="tab_infolog">
       <attribute name="title">
        <string>Info Log</string>
       </attribute>

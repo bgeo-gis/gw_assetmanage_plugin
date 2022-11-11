@@ -130,6 +130,7 @@ class AmBreakage(dialog.GwAction):
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_incremental)
 
+
         # Triggers
         self.dlg_incremental.btn_load.clicked.connect(self._upload_leaks)
         self.dlg_incremental.btn_shp_path.clicked.connect(partial(self._select_file_shp))
@@ -266,10 +267,9 @@ class AmBreakage(dialog.GwAction):
 
     def _upload_leaks(self):
 
+        return
         # Get connection
-        print(f"asdf -> {global_vars.db_credentials}")
         engine = create_engine(f"postgresql://{global_vars.db_credentials['user']}:{global_vars.db_credentials['password']}@{global_vars.db_credentials['host']}:{global_vars.db_credentials['port']}/{global_vars.db_credentials['db']}")
-        print(f"ENGINE -> {engine}")
         # read in the data
         file = tools_qt.get_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path)
         leaks_shp = gpd.read_file(file)
