@@ -8,7 +8,7 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 from time import time
-# from datetime import timedelta
+from datetime import timedelta
 import psycopg2
 # import arcpy
 # import geopandas as gpd
@@ -264,10 +264,9 @@ class AmBreakage(dialog.GwAction):
         return buffer, years
 
     def _update_assignation_timer(self):
-        return
-        # elapsed_time = time() - self.t0
-        # text = str(timedelta(seconds=round(elapsed_time)))
-        # self.dlg_assignation.lbl_timer.setText(text)
+        elapsed_time = time() - self.t0
+        text = str(timedelta(seconds=round(elapsed_time)))
+        self.dlg_assignation.lbl_timer.setText(text)
 
     def _cancel_assignation(self):
         self.thread.cancel()
