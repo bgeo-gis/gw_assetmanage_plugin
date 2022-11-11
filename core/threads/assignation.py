@@ -17,8 +17,25 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
-            self._emit_report("Getting data from DB (1/3)...")
+            self._emit_report("Getting leak data from DB (1/4)...")
             self.setProgress(0)
+
+            sql = (
+                "WITH "
+                + "leak_dates AS (SELECT "
+                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
+                + "FROM asset.leaks), "
+                + "max_date AS (SELECT max(date_leak) FROM leak_dates) "
+                + "SELECT id FROM leak_dates "
+                + f"WHERE date_leak > ((select * from max_date) - interval '{self.years} year')::date "
+            )
+            all_leaks = [x[0] for x in tools_db.get_rows(sql)]
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+            self._emit_report("Getting pipe data from DB (2/4)...")
+            self.setProgress(25)
             # TODO: Check if self.years is bigger than total interval of asset.leaks
             sql = (
                 "WITH "
@@ -43,10 +60,11 @@ class GwAssignation(GwTask):
                 self._emit_report("Task canceled.")
                 return False
 
-            self._emit_report("Calculating leaks per km per year (2/3)...")
-            self.setProgress(60)
+            self._emit_report("Calculating leaks per km per year (3/4)...")
+            self.setProgress(50)
             leaks = {}
             leaks_by_arc = {}
+            orphan_leaks = set()
 
             for row in rows:
                 leak_id, arc_id, distance, length = row
@@ -60,12 +78,17 @@ class GwAssignation(GwTask):
                     leaks[leak_id] = []
                 leaks[leak_id].append({"arc_id": arc_id, "index": index})
 
+            for leak_id in all_leaks:
+                if leak_id not in leaks:
+                    orphan_leaks.add(leak_id)
+
             for leak_id, arcs in leaks.items():
                 sum_indexes = 0
                 for arc in arcs:
                     sum_indexes += arc["index"]
                 for arc in arcs:
                     if sum_indexes == 0:
+                        orphan_leaks.add(leak_id)
                         continue
                     if arc["index"] == 0:
                         continue
@@ -92,8 +115,8 @@ class GwAssignation(GwTask):
                 self._emit_report("Task canceled.")
                 return False
 
-            self._emit_report("Saving results to DB (3/3)...")
-            self.setProgress(90)
+            self._emit_report("Saving results to DB (4/4)...")
+            self.setProgress(75)
             sql = (
                 "UPDATE asset.arc_input SET rleak = NULL WHERE result_id = 0; "
                 + "INSERT INTO asset.arc_input (arc_id, result_id, rleak) VALUES "
@@ -111,12 +134,16 @@ class GwAssignation(GwTask):
             # TODO: Report of how many arcs have and don't have leaks
             # TODO: Report of max and min rleak
 
-            self._emit_report("Task finished.")
+            self._emit_report(
+                "Task finished!",
+                f"Leaks within the indicated period: {len(all_leaks)}.",
+                f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
+            )
             return True
 
         except Exception as e:
             self._emit_report(e)
             return False
 
-    def _emit_report(self, message):
-        self.report.emit({"info": {"values": [{"message": message}]}})
+    def _emit_report(self, *args):
+        self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
