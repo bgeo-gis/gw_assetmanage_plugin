@@ -100,8 +100,9 @@ class GwAssignation(GwTask):
                 self._emit_report("Task canceled.")
                 return False
 
-            sql = "SELECT arc_id, ST_LENGTH(the_geom) FROM asset.v_asset_arc_output"
+            sql = "SELECT arc_id, ST_LENGTH(the_geom) FROM asset.v_asset_arc_output WHERE result_id = 0"
             rows = tools_db.get_rows(sql)
+            total_pipes = len(rows)
             rleaks = []
             for row in rows:
                 arc_id, length = row
@@ -128,6 +129,12 @@ class GwAssignation(GwTask):
                 + "ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
             )
             tools_db.execute_sql(sql)
+
+            orphan_pipes = tools_db.get_rows(
+                "SELECT count(1) FROM asset.v_asset_arc_output "
+                + "WHERE result_id = 0 AND (rleak IS NULL or rleak = 0)"
+            )[0][0]
+
             self.setProgress(100)
 
             # TODO: Report of leaks without arcs inside buffer
@@ -138,6 +145,8 @@ class GwAssignation(GwTask):
                 "Task finished!",
                 f"Leaks within the indicated period: {len(all_leaks)}.",
                 f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
+                f"Total of pipes: {total_pipes}.",
+                f"Pipes with zero leaks per km per year: {orphan_pipes}."
             )
             return True
 
