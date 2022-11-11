@@ -207,11 +207,11 @@ class AmBreakage(dialog.GwAction):
     def _execute_assignation(self):
         dlg = self.dlg_assignation
 
-        # TODO: validate inputs
-
+        inputs = self._validate_assignation_input()
+        if not inputs:
+            return
         method, _ = dlg.cmb_method.currentData()
-        buffer = int(dlg.txt_buffer.text())
-        years = int(dlg.txt_years.text())
+        buffer, years = inputs
 
         self.thread = GwAssignation(
             "Leak Assignation",
@@ -227,7 +227,7 @@ class AmBreakage(dialog.GwAction):
         self.t0 = time()
         self.timer = QTimer()
         self.timer.timeout.connect(self._update_assignation_timer)
-        self.timer.start(200)
+        self.timer.start(250)
 
         # Log behavior
         t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
@@ -245,6 +245,23 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.rejected.connect(self._cancel_assignation)
 
         QgsApplication.taskManager().addTask(t)
+
+    def _validate_assignation_input(self):
+        dlg = self.dlg_assignation
+
+        try:
+            buffer = int(dlg.txt_buffer.text())
+        except ValueError:
+            tools_qt.show_info_box("The buffer should be a valid integer number!")
+            return
+
+        try:
+            years = int(dlg.txt_years.text())
+        except ValueError:
+            tools_qt.show_info_box("The number of years should be a valid integer number!")
+            return
+
+        return buffer, years
 
     def _update_assignation_timer(self):
         return
