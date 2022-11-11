@@ -19,15 +19,23 @@ class GwAssignation(GwTask):
         try:
             self._emit_report("Getting data from DB (1/3)...")
             self.setProgress(0)
-            # TODO: Filter years
+            # TODO: Check if self.years is bigger than total interval of asset.leaks
             sql = (
-                "SELECT "
+                "WITH "
+                + "leak_dates AS (SELECT "
+                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
+                + "FROM asset.leaks), "
+                + "max_date AS (SELECT max(date_leak) FROM leak_dates) "
+                + "SELECT "
                 + "l.id AS leak_id, "
                 + "a.arc_id AS arc_id, "
                 + "ST_DISTANCE(l.the_geom, a.the_geom) AS distance, "
                 + f"ST_LENGTH(ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)) AS length "
                 + "FROM asset.leaks AS l "
-                + f"JOIN asset.v_asset_arc_output AS a ON ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer}) "
+                + "JOIN leak_dates AS d USING (id) "
+                + "JOIN asset.v_asset_arc_output AS a "
+                + f"ON ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer}) "
+                + f"WHERE d.date_leak > ((select * from max_date) - interval '{self.years} year')::date "
             )
             rows = tools_db.get_rows(sql)
 
