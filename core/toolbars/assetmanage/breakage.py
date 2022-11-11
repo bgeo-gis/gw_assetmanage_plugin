@@ -333,8 +333,7 @@ class AmBreakage(dialog.GwAction):
 
     def _execute_config(self):
 
-
         function_name = 'gw_fct_assetmanage_main'
         body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+        json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
         print(f"json_result -> {json_result}")
