@@ -8,12 +8,12 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 from time import time
-from datetime import timedelta
+# from datetime import timedelta
 import psycopg2
 # import arcpy
-import geopandas as gpd
+# import geopandas as gpd
 import os
-from sqlalchemy import create_engine
+# from sqlalchemy import create_engine
 # import geoalchemy2
 
 from qgis.core import QgsApplication
@@ -246,9 +246,10 @@ class AmBreakage(dialog.GwAction):
         QgsApplication.taskManager().addTask(t)
 
     def _update_assignation_timer(self):
-        elapsed_time = time() - self.t0
-        text = str(timedelta(seconds=round(elapsed_time)))
-        self.dlg_assignation.lbl_timer.setText(text)
+        return
+        # elapsed_time = time() - self.t0
+        # text = str(timedelta(seconds=round(elapsed_time)))
+        # self.dlg_assignation.lbl_timer.setText(text)
 
     def _cancel_assignation(self):
         self.thread.cancel()
@@ -269,11 +270,11 @@ class AmBreakage(dialog.GwAction):
 
         return
         # Get connection
-        engine = create_engine(f"postgresql://{global_vars.db_credentials['user']}:{global_vars.db_credentials['password']}@{global_vars.db_credentials['host']}:{global_vars.db_credentials['port']}/{global_vars.db_credentials['db']}")
-        # read in the data
-        file = tools_qt.get_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path)
-        leaks_shp = gpd.read_file(file)
-        leaks_shp.to_postgis('leaks_test', engine, index=True, index_label='Index')
+        # engine = create_engine(f"postgresql://{global_vars.db_credentials['user']}:{global_vars.db_credentials['password']}@{global_vars.db_credentials['host']}:{global_vars.db_credentials['port']}/{global_vars.db_credentials['db']}")
+        # # read in the data
+        # file = tools_qt.get_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path)
+        # leaks_shp = gpd.read_file(file)
+        # leaks_shp.to_postgis('leaks_test', engine, index=True, index_label='Index')
 
 
     def _select_file_shp(self):
