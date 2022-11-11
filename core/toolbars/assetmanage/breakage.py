@@ -116,7 +116,8 @@ class AmBreakage(dialog.GwAction):
                         set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_engine, "config_engine", schema_name='asset')
 
-        self.dlg_priority_config.btn_save.clicked.connect(self._execute_config)
+        self.dlg_priority_config.btn_calc.clicked.connect(self._execute_config)
+        self.dlg_priority_config.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_config))
 
 
         # Open the dialog
