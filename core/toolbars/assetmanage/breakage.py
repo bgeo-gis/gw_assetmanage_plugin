@@ -106,18 +106,22 @@ class AmBreakage(dialog.GwAction):
 
 
         # Triggers
-        self._fill_table(self.dlg_priority_config, self.qtbl_diameter, "config_diameter",
+        self._fill_table(self.dlg_priority_config, self.qtbl_diameter, "asset.config_diameter",
                          set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_diameter, "config_diameter", schema_name='asset')
-        self._fill_table(self.dlg_priority_config, self.qtbl_material, "config_material",
+        self._fill_table(self.dlg_priority_config, self.qtbl_material, "asset.config_material",
                         set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_material, "config_material", schema_name='asset')
-        self._fill_table(self.dlg_priority_config, self.qtbl_engine, "config_engine",
+        self._fill_table(self.dlg_priority_config, self.qtbl_engine, "asset.config_engine",
                         set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_engine, "config_engine", schema_name='asset')
 
+        self.dlg_priority_config.btn_save.clicked.connect(self._execute_config)
+
+
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_config, dlg_name='incremental')
+
 
     def incremental_load(self):
 
@@ -296,8 +300,6 @@ class AmBreakage(dialog.GwAction):
             2: OnManualSubmit
         """
         try:
-            if gw_global_vars.db_credentials['schema'] not in table_name:
-                table_name = global_vars.db_credentials['schema'] + "." + table_name
 
             # Set model
             model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
@@ -325,3 +327,12 @@ class AmBreakage(dialog.GwAction):
                 self.refresh_table(dialog, widget)
         except Exception as e:
             print(f"EXCEPTION -> {e}")
+
+
+    def _execute_config(self):
+
+
+        function_name = 'gw_fct_assetmanage_main'
+        body = tools_gw.create_body()
+        json_result = tools_gw.execute_procedure(function_name, body, rubber_band=self.rubber_band)
+        print(f"json_result -> {json_result}")

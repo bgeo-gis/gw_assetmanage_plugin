@@ -12,7 +12,7 @@ import os
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup
 from qgis.PyQt.QtGui import QIcon
 
-from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_maptool
+from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db
 from .... import global_vars
 
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
@@ -32,9 +32,11 @@ class AmPriority(dialog.GwAction):
         self.text = text
         self.toolbar = toolbar
         self.action_group = action_group
+        self.layer_to_work = 'v_asset_arc_output'
 
         # Priority variables
         self.dlg_priority = None
+
 
 
     def clicked_event(self):
@@ -47,15 +49,14 @@ class AmPriority(dialog.GwAction):
 
         icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20")
 
-
-        # Manage selection group
-        # self._manage_selection()
-
-        # Manage expression group
-        self._manage_expr()
-
-        # Manage attributes group
-        self._manage_attr()
+        # Manage visibility for Atribute section
+        self.dlg_priority.lbl_dnom.setVisible(False)
+        self.dlg_priority.cmb_dnom.setVisible(False)
+        self.dlg_priority.lbl_material.setVisible(False)
+        self.dlg_priority.cmb_material.setVisible(False)
+        # Manage visibility for Expresion section
+        self.dlg_priority.rb_expr.setVisible(False)
+        self.dlg_priority.grb_expr.setVisible(False)
 
         # Manage radiobuttons
         self.dlg_priority.rb_select_all.toggled.connect(partial(self._manage_radio_buttons, 0))
@@ -71,7 +72,16 @@ class AmPriority(dialog.GwAction):
         # Triggers
         self.dlg_priority.btn_load.clicked.connect(self._open_manager)
         self.dlg_priority.btn_snapping.clicked.connect(self._manage_selection)
+        self.dlg_priority.cmb_mapzone.currentIndexChanged.connect(partial(self._populate_child))
 
+        # Manage selection group
+        # self._manage_selection()
+
+        # Manage expression group
+        self._manage_expr()
+
+        # Manage attributes group
+        self._manage_attr()
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
@@ -128,8 +138,7 @@ class AmPriority(dialog.GwAction):
     def _manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
 
-        maptool = gw_maptool()
-        print(f"MAPTOOL -> {maptool}")
+        print(f"11")
 
 
     def _trigger_action_select(self, num):
@@ -169,17 +178,29 @@ class AmPriority(dialog.GwAction):
 
     def _manage_attr(self):
         # Combo dnom
-        rows = [[25, 'Ø25'],
-                [32, 'Ø32'],
-                [40, 'Ø40'],
-                [50, 'Ø50']]
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
+        # rows = [[25, 'Ø25'],
+        #         [32, 'Ø32'],
+        #         [40, 'Ø40'],
+        #         [50, 'Ø50']]
+        # tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
 
         # Combo mapzone
-        rows = [['explotacion', 'Explotacion'],
-                ['sector', 'Sector'],
-                ['sistema', 'Sistema'],
-                ['zona_operacion', 'Zona operación']]
+        rows = [['exploitation', 'Explotacion', 'SELECT expl_id as id, name as idval FROM ws.exploitation'],
+                ['sectore', 'Sector', 'SELECT sector_id as id, name as idval FROM asset.sector'],
+                ['macrosector', 'Sistema', 'SELECT macrosector_id as id, name as idval FROM asset.macrosector'],
+                ['presszone', 'Zona operación', 'SELECT presszone_id as id, name as idval FROM asset.presszone']]
         tools_qt.fill_combo_values(self.dlg_priority.cmb_mapzone, rows, 1)
+        self._populate_child()
+
+    def _populate_child(self):
+
+        sql = tools_qt.get_combo_value(self.dlg_priority, 'cmb_mapzone', 2)
+        if sql not in (None, ''):
+            rows = tools_db.get_rows(sql)
+            tools_qt.fill_combo_values(self.dlg_priority.cmb_child, rows, 1)
+        else:
+            self.dlg_priority.cmb_child.clear()
+
+
 
     # endregion

@@ -25,7 +25,6 @@ this.tools_gw = None
 this.dialog = None
 this.toolbox = None
 this.task = None
-this.gw_maptool = None
 this.gw_global_vars = None
 
 
@@ -50,7 +49,6 @@ def init_plugin():
     this.dialog = importlib.import_module('.dialog', package=f'{this.giswater_folder}.core.toolbars')
     this.toolbox = importlib.import_module('.toolbox_btn', package=f'{this.giswater_folder}.core.toolbars.utilities')
     this.task = importlib.import_module('.task', package=f'{this.giswater_folder}.core.threads')
-    this.gw_maptool = importlib.import_module('.maptool', package=f'{this.giswater_folder}.core.toolbars')
     this.gw_global_vars = importlib.import_module('.global_vars', package=f'{this.giswater_folder}')
 
 
