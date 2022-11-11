@@ -178,11 +178,11 @@ class AmPriority(dialog.GwAction):
 
     def _manage_attr(self):
         # Combo dnom
-        # rows = [[25, 'Ø25'],
-        #         [32, 'Ø32'],
-        #         [40, 'Ø40'],
-        #         [50, 'Ø50']]
-        # tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
+        rows = [[25, 'Ø25'],
+                [32, 'Ø32'],
+                [40, 'Ø40'],
+                [50, 'Ø50']]
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
 
         # Combo mapzone
         rows = [['exploitation', 'Explotacion', 'SELECT expl_id as id, name as idval FROM ws.exploitation'],
