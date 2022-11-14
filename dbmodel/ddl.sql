@@ -212,9 +212,11 @@ the_geom geometry(Point,5367),
 
 CREATE TABLE arc_asset
 (arc_id integer,
+code text,
 sector_id integer,
 macrosector_id integer,
 pressurezone_id character varying(30),
+expl_id integer,
 builtdate  date,
 dnom integer,
 matcat_id character varying(30),
@@ -234,6 +236,38 @@ CREATE TABLE selector_result
       ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+
+
+CREATE TABLE macrosector (
+  macrosector_id serial4 NOT NULL,
+  name text,
+  the_geom public.geometry(multipolygon, 5367),
+  CONSTRAINT macrosector_pkey PRIMARY KEY (macrosector_id)
+);
+
+CREATE TABLE sector (
+  sector_id serial4 NOT NULL,
+  name text,
+  macrosector_id int4,
+  the_geom public.geometry(multipolygon, 5367),
+  CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
+);
+  
+
+
+CREATE TABLE presszone (
+  presszone_id serial4 NOT NULL,
+  name text,
+  the_geom public.geometry(multipolygon, 5367),
+  CONSTRAINT presszone_pkey PRIMARY KEY (presszone_id)
+);
+
+CREATE TABLE exploitation (
+  expl_id serial4 NOT NULL,
+  "name" text,
+  the_geom public.geometry(multipolygon, 5367),
+  CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id)
+);
 
 
 CREATE OR REPLACE VIEW v_asset_output
