@@ -137,8 +137,6 @@ class GwAssignation(GwTask):
 
             self.setProgress(100)
 
-            # TODO: Report of leaks without arcs inside buffer
-            # TODO: Report of how many arcs have and don't have leaks
             # TODO: Report of max and min rleak
 
             self._emit_report(

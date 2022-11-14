@@ -144,6 +144,7 @@ class AmBreakage(dialog.GwAction):
 
         self.dlg_assignation = AssignationUi()
         dlg = self.dlg_assignation
+        tools_gw.load_settings(dlg)
 
         # Disable tab log
         tools_gw.disable_tab_log(self.dlg_assignation)
@@ -203,6 +204,7 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
         dlg.rejected.connect(partial(self._assignation_user_values, "save"))
+        dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
 
     def _execute_assignation(self):
         dlg = self.dlg_assignation
