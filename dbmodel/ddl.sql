@@ -89,6 +89,7 @@ result_id integer,
 val integer,
 mandatory boolean,
 orderby integer,
+target_year integer,
 budget numeric (12,2),
 total numeric (12,2),
  CONSTRAINT arc_output_pkey PRIMARY KEY (arc_id, result_id));
@@ -136,20 +137,27 @@ method	character varying(30),
 round smallint,
 descript text,
 active boolean,
-layoutname	character varying(50),
+/*layoutname	character varying(50),
 layoutorder	integer,
 label character varying(200),
 datatype character varying(50),
 widgettype character varying(50),
 dv_querytext text,	
-dv_controls	json,
-ismandatory	boolean,
+dv_filterbyfield text,
+isenabled boolean,
+project_type character varying,
+dv_isparent boolean,
+isautoupdate boolean,
+ismandatory boolean,
 iseditable boolean,
-stylesheet json, 
+dv_orderby_id boolean,
+dv_isnullvalue boolean,
+stylesheet json,
 widgetcontrols json,
-placeholder	text,
-standardvalue text,
+placeholder text,
+standardvalue text,*/
  CONSTRAINT config_engine_pkey PRIMARY KEY (parameter));
+
 
 
 CREATE TABLE log_config 
@@ -214,3 +222,43 @@ pavcat_id character varying(30),
 function_type character varying(50),
 the_geom geometry(Linestring,5367),
  CONSTRAINT arc_asset_pkey PRIMARY KEY (arc_id));
+
+
+CREATE TABLE selector_result
+(
+  result_id integer NOT NULL,
+  cur_user text NOT NULL DEFAULT "current_user"(),
+  CONSTRAINT selector_result_pkey PRIMARY KEY (result_id, cur_user),
+  CONSTRAINT cat_result_result_id_fkey FOREIGN KEY (result_id)
+      REFERENCES cat_result (result_id) MATCH SIMPLE
+      ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+
+
+CREATE OR REPLACE VIEW v_asset_output
+ AS
+ SELECT a.arc_id,
+    s.result_id,
+    a.sector_id,
+    a.macrosector_id,
+    a.presszone_id,
+    a.expl_id,
+    a.builtdate,
+    a.dnom,
+    a.matcat_id,
+    a.pavcat_id,
+    a.function_type,
+    i.rleak,
+    o.val,
+    o.mandatory,
+    o.orderby,
+    o.target_year,
+    o.budget,
+    o.total,
+    a.the_geom
+   FROM selector_result s,
+    arc_asset a
+     JOIN arc_input i USING (arc_id)
+     JOIN arc_output o USING (arc_id)
+  WHERE s.result_id = i.result_id AND s.result_id = o.result_id AND s.cur_user = CURRENT_USER::text;
