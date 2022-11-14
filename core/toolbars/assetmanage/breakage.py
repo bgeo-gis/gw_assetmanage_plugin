@@ -17,7 +17,7 @@ import os
 # import geoalchemy2
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer
+from qgis.PyQt.QtCore import QTimer, QPoint
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QFileDialog, QTableView, QAbstractItemView
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
@@ -57,6 +57,11 @@ class AmBreakage(dialog.GwAction):
 
         # Assignation variables
         self.dlg_assignation = None
+
+    def clicked_event(self): 
+        button = self.action.associatedWidgets()[1]
+        menu_point = button.mapToGlobal(QPoint(0,button.height()))
+        self.menu.exec(menu_point)
 
 
     def _fill_action_menu(self):
