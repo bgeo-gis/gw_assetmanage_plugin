@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Calculo de prioridades</string>
+   <string>CÁLCULO PRIORIDADES</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="5" column="0">

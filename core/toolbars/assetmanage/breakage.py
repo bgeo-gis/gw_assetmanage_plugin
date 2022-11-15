@@ -75,7 +75,7 @@ class AmBreakage(dialog.GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['CARGA INCREMENTAL', 'ASIGNACIÓN', 'CALCULO PRIORIDADES']
+        actions = ['CARGA ROTURAS', 'ASIGNACIÓN ROTURAS', 'CÁLCULO PRIORIDADES']
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -84,11 +84,11 @@ class AmBreakage(dialog.GwAction):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        if name == 'CARGA INCREMENTAL':
+        if name == 'CARGA ROTURAS':
             self.incremental_load()
-        elif name == 'ASIGNACIÓN':
+        elif name == 'ASIGNACIÓN ROTURAS':
             self.assignation()
-        elif name == 'CALCULO PRIORIDADES':
+        elif name == 'CÁLCULO PRIORIDADES':
             self.priority_config()
         else:
             msg = f"No action found"
