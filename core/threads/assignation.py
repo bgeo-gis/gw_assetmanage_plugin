@@ -34,7 +34,7 @@ class GwAssignation(GwTask):
                 self._emit_report(
                     "Task canceled: The number of years is greater than the interval disponible.",
                     f"Oldest leak: {min_date}.",
-                    f"Newest leak: {max_date}."
+                    f"Newest leak: {max_date}.",
                 )
                 return False
 
@@ -169,9 +169,12 @@ class GwAssignation(GwTask):
                 + "WHERE result_id = 0 AND (rleak IS NULL or rleak = 0)"
             )[0][0]
 
-            self.setProgress(100)
+            max_rleak, min_rleak = tools_db.get_rows(
+                "SELECT max(rleak), min(rleak) FROM asset.v_asset_arc_output "
+                + "WHERE result_id = 0 AND rleak IS NOT NULL AND rleak <> 0"
+            )[0]
 
-            # TODO: Report of max and min rleak
+            self.setProgress(100)
 
             self._emit_report(
                 "Task finished!",
@@ -179,6 +182,8 @@ class GwAssignation(GwTask):
                 f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
                 f"Total of pipes: {total_pipes}.",
                 f"Pipes with zero leaks per km per year: {orphan_pipes}.",
+                f"Max rleak: {max_rleak} leaks/km.year.",
+                f"Min non-zero rleak: {min_rleak} leaks/km.year.",
             )
             return True
 
