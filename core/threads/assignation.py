@@ -45,7 +45,9 @@ class GwAssignation(GwTask):
                 + "max_date AS (SELECT max(date_leak) FROM leak_dates) "
                 + "SELECT "
                 + "l.id AS leak_id, "
+                + "l.diameter AS leak_diameter, "
                 + "a.arc_id AS arc_id, "
+                + "a.dnom AS arc_diameter, "
                 + "ST_DISTANCE(l.the_geom, a.the_geom) AS distance, "
                 + f"ST_LENGTH(ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)) AS length "
                 + "FROM asset.leaks AS l "
@@ -67,7 +69,7 @@ class GwAssignation(GwTask):
             orphan_leaks = set()
 
             for row in rows:
-                leak_id, arc_id, distance, length = row
+                leak_id, leak_diameter, arc_id, arc_diameter, distance, length = row
 
                 distance_index = (self.buffer - distance) / self.buffer
                 if self.method == "exponential":
@@ -76,7 +78,13 @@ class GwAssignation(GwTask):
 
                 if leak_id not in leaks:
                     leaks[leak_id] = []
-                leaks[leak_id].append({"arc_id": arc_id, "index": index})
+                leaks[leak_id].append(
+                    {
+                        "arc_id": arc_id,
+                        "index": index,
+                        "same_diameter": leak_diameter == arc_diameter,
+                    }
+                )
 
             for leak_id in all_leaks:
                 if leak_id not in leaks:
@@ -84,8 +92,11 @@ class GwAssignation(GwTask):
 
             for leak_id, arcs in leaks.items():
                 sum_indexes = 0
+                sum_indexes_by_diameter = 0
                 for arc in arcs:
                     sum_indexes += arc["index"]
+                    if arc["same_diameter"]:
+                        sum_indexes_by_diameter += arc["index"]
                 for arc in arcs:
                     if sum_indexes == 0:
                         orphan_leaks.add(leak_id)
@@ -94,7 +105,9 @@ class GwAssignation(GwTask):
                         continue
                     if arc["arc_id"] not in leaks_by_arc:
                         leaks_by_arc[arc["arc_id"]] = 0
-                    leaks_by_arc[arc["arc_id"]] += arc["index"] / sum_indexes
+                    leaks_by_arc[arc["arc_id"]] += arc["index"] / (
+                        sum_indexes_by_diameter or sum_indexes
+                    )
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -144,7 +157,7 @@ class GwAssignation(GwTask):
                 f"Leaks within the indicated period: {len(all_leaks)}.",
                 f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
                 f"Total of pipes: {total_pipes}.",
-                f"Pipes with zero leaks per km per year: {orphan_pipes}."
+                f"Pipes with zero leaks per km per year: {orphan_pipes}.",
             )
             return True
 
