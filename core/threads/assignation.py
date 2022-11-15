@@ -17,6 +17,27 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
+            sql = (
+                "WITH "
+                + "leak_dates AS (SELECT "
+                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
+                + "FROM asset.leaks) "
+                + "SELECT "
+                + "max(date_leak) AS max_date, "
+                + "min(date_leak) AS min_date, "
+                + "max(date_leak) - min(date_leak) AS interval "
+                + "FROM leak_dates "
+            )
+            rows = tools_db.get_rows(sql)
+            max_date, min_date, interval = rows[0]
+            if self.years > interval / 365:
+                self._emit_report(
+                    "Task canceled: The number of years is greater than the interval disponible.",
+                    f"Oldest leak: {min_date}.",
+                    f"Newest leak: {max_date}."
+                )
+                return False
+
             self._emit_report("Getting leak data from DB (1/4)...")
             self.setProgress(0)
 
@@ -36,7 +57,7 @@ class GwAssignation(GwTask):
                 return False
             self._emit_report("Getting pipe data from DB (2/4)...")
             self.setProgress(25)
-            # TODO: Check if self.years is bigger than total interval of asset.leaks
+
             sql = (
                 "WITH "
                 + "leak_dates AS (SELECT "
