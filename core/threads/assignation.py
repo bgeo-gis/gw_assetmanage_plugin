@@ -195,7 +195,7 @@ class GwAssignation(GwTask):
             return True
 
         except Exception as e:
-            self._emit_report(e)
+            self._emit_report(f"Error: {e}")
             return False
 
     def _emit_report(self, *args):
