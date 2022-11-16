@@ -103,7 +103,12 @@ class GwAssignation(GwTask):
                     {
                         "arc_id": arc_id,
                         "index": index,
-                        "same_diameter": leak_diameter == arc_diameter,
+                        "same_diameter": (
+                            # Diameters within 4mm are the same
+                            False
+                            if not leak_diameter
+                            else leak_diameter - 4 <= arc_diameter <= leak_diameter + 4
+                        ),
                     }
                 )
 
@@ -123,6 +128,8 @@ class GwAssignation(GwTask):
                         orphan_leaks.add(leak_id)
                         continue
                     if arc["index"] == 0:
+                        continue
+                    if sum_indexes_by_diameter and not arc["same_diameter"]:
                         continue
                     if arc["arc_id"] not in leaks_by_arc:
                         leaks_by_arc[arc["arc_id"]] = 0
