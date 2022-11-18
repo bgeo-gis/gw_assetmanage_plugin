@@ -34,6 +34,9 @@ class AmPriority(dialog.GwAction):
         self.toolbar = toolbar
         self.action_group = action_group
         self.layer_to_work = 'v_asset_arc_output'
+        self.layers = {}
+        self.layers['arc'] = []
+        self.list_ids = {}
 
         # Priority variables
         self.dlg_priority = None
@@ -51,27 +54,29 @@ class AmPriority(dialog.GwAction):
         icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20")
 
         # Manage visibility for Atribute section
-        self.dlg_priority.lbl_dnom.setVisible(False)
-        self.dlg_priority.cmb_dnom.setVisible(False)
-        self.dlg_priority.lbl_material.setVisible(False)
-        self.dlg_priority.cmb_material.setVisible(False)
+        # self.dlg_priority.lbl_dnom.setVisible(False)
+        # self.dlg_priority.cmb_dnom.setVisible(False)
+        # self.dlg_priority.lbl_material.setVisible(False)
+        # self.dlg_priority.cmb_material.setVisible(False)
         # Manage visibility for Expresion section
         self.dlg_priority.rb_expr.setVisible(False)
         self.dlg_priority.grb_expr.setVisible(False)
 
         # Manage radiobuttons
-        self.dlg_priority.rb_select_all.toggled.connect(partial(self._manage_radio_buttons, 0))
+        # self.dlg_priority.rb_select_all.toggled.connect(partial(self._manage_radio_buttons, 0))
         self.dlg_priority.rb_select.toggled.connect(partial(self._manage_radio_buttons, 1))
         self.dlg_priority.rb_expr.toggled.connect(partial(self._manage_radio_buttons, 2))
         self.dlg_priority.rb_attr.toggled.connect(partial(self._manage_radio_buttons, 3))
-        self.dlg_priority.rb_select_all.setChecked(True)
+        # self.dlg_priority.rb_select_all.setChecked(True)
 
         self._manage_radio_buttons(1, False)
         self._manage_radio_buttons(2, False)
         self._manage_radio_buttons(3, False)
 
         # Triggers
+        self.dlg_priority.btn_accept.clicked.connect(self._manage_accept)
         self.dlg_priority.btn_load.clicked.connect(self._open_manager)
+        self.dlg_priority.btn_save.clicked.connect(self._manage_save)
         self.dlg_priority.cmb_mapzone.currentIndexChanged.connect(partial(self._populate_child))
 
         # Manage selection group
@@ -85,6 +90,14 @@ class AmPriority(dialog.GwAction):
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
+
+
+    def _manage_save(self):
+
+        return
+
+    def _manage_accept(self):
+        print(f"LIST IDS -> {self.list_ids}")
 
 
     def _manage_radio_buttons(self, rbtn, checked):
@@ -115,11 +128,24 @@ class AmPriority(dialog.GwAction):
     def _manage_selection(self):
         """ Slot function for signal 'canvas.selectionChanged' """
 
-        self._manage_btn_select()
+        self._manage_btn_snapping()
+
+    def _manage_btn_snapping(self):
+
+        self.feature_type = 'arc'
+        layer = tools_qgis.get_layer_by_tablename('v_asset_arc_output')
+        self.layers['arc'].append(layer)
+
+        # Remove all previous selections
+        self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
 
-    def _manage_btn_select(self):
-        """ Fill btn_select QMenu """
+        self.dlg_priority.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dlg_priority, self.layer_to_work))
+
+
+    def old_manage_btn_snapping(self):
+        """ Fill btn_snapping QMenu """
 
         # Functions
         icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg")
@@ -140,7 +166,7 @@ class AmPriority(dialog.GwAction):
             action = select_menu.addAction(icon, f"{label}")
             action.triggered.connect(partial(self._trigger_action_select, num))
 
-        self.dlg_priority.btn_select.setMenu(select_menu)
+        self.dlg_priority.btn_snapping.setMenu(select_menu)
 
 
     def _trigger_action_select(self, num):
@@ -179,11 +205,14 @@ class AmPriority(dialog.GwAction):
 
     def _manage_attr(self):
         # Combo dnom
-        rows = [[25, 'Ø25'],
-                [32, 'Ø32'],
-                [40, 'Ø40'],
-                [50, 'Ø50']]
+        sql = "SELECT distinct(dnom) as id, dnom as idval FROM cat_arc WHERE dnom is not null;"
+        rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
+
+        # Combo material
+        sql = "SELECT id, id as idval FROM cat_mat_arc;"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1)
 
         # Combo mapzone
         rows = [['exploitation', 'Explotacion', 'SELECT expl_id as id, name as idval FROM ws.exploitation'],
