@@ -6,42 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>784</width>
-    <height>495</height>
+    <width>740</width>
+    <height>476</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>CÁLCULO PRIORIDADES</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="5" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="5" column="1">
-    <widget class="QPushButton" name="btn_calc">
+    <widget class="QLabel" name="lbl_timer">
      <property name="text">
-      <string>Calcular</string>
+      <string/>
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="QPushButton" name="btn_close">
-     <property name="text">
-      <string>Cerrar</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="3">
+   <item row="1" column="1" colspan="4">
     <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
       <number>0</number>
@@ -147,9 +127,43 @@
        <item row="0" column="0">
         <widget class="QTextEdit" name="txt_infolog"/>
        </item>
+       <item row="1" column="0">
+        <widget class="QProgressBar" name="progressBar">
+         <property name="value">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="5" column="4">
+    <widget class="QPushButton" name="btn_cancel">
+     <property name="text">
+      <string>Cancel</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="QPushButton" name="btn_calc">
+     <property name="text">
+      <string>Calcular</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

@@ -25,6 +25,7 @@ from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools
 from .... import global_vars
 
 from ...threads.assignation import GwAssignation
+from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import IncrementalUi, AssignationUi, PriorityConfigUi
 
 
@@ -122,7 +123,7 @@ class AmBreakage(dialog.GwAction):
         tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_engine, "config_engine", schema_name='asset')
 
         self.dlg_priority_config.btn_calc.clicked.connect(self._execute_config)
-        self.dlg_priority_config.btn_close.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_config))
+        self.dlg_priority_config.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_config))
 
 
         # Open the dialog
@@ -233,7 +234,7 @@ class AmBreakage(dialog.GwAction):
         # Set timer
         self.t0 = time()
         self.timer = QTimer()
-        self.timer.timeout.connect(self._update_assignation_timer)
+        self.timer.timeout.connect(partial(self._update_timer, dlg.lbl_timer))
         self.timer.start(250)
 
         # Log behavior
@@ -249,7 +250,7 @@ class AmBreakage(dialog.GwAction):
 
         # Button Cancel behavior
         dlg.buttonBox.rejected.disconnect()
-        dlg.buttonBox.rejected.connect(self._cancel_assignation)
+        dlg.buttonBox.rejected.connect(partial(self._cancel_thread, dlg))
 
         QgsApplication.taskManager().addTask(t)
 
@@ -270,15 +271,15 @@ class AmBreakage(dialog.GwAction):
 
         return buffer, years
 
-    def _update_assignation_timer(self):
+    def _update_timer(self, widget):
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
-        self.dlg_assignation.lbl_timer.setText(text)
+        widget.setText(text)
 
-    def _cancel_assignation(self):
+    def _cancel_thread(self, dlg):
         self.thread.cancel()
         tools_gw.fill_tab_log (
-            self.dlg_assignation,
+            dlg,
             {"info": {"values": [{"message": "Canceling task..."}]}}, 
             reset_text=False, 
             close=False
@@ -355,8 +356,38 @@ class AmBreakage(dialog.GwAction):
 
 
     def _execute_config(self):
+        dlg = self.dlg_priority_config
 
-        function_name = 'gw_fct_assetmanage_main'
-        body = tools_gw.create_body()
-        json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
-        print(f"json_result -> {json_result}")
+        self.thread = GwCalculatePriority(
+            "Priority Calculation",
+        )
+        t = self.thread
+        t.taskCompleted.connect(self._config_ended)
+        t.taskTerminated.connect(self._config_ended)
+
+        # Set timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._update_timer, dlg.lbl_timer))
+        self.timer.start(250)
+
+        # Log behavior
+        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+
+        # Progress bar behavior
+        t.progressChanged.connect(dlg.progressBar.setValue)
+
+        # # Button OK behavior
+        dlg.btn_calc.setEnabled(False)
+
+        # # Button Cancel behavior
+        dlg.btn_cancel.clicked.disconnect()
+        dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
+
+        QgsApplication.taskManager().addTask(t)
+
+    def _config_ended(self):
+        dlg = self.dlg_priority_config
+        dlg.btn_cancel.clicked.disconnect()
+        dlg.btn_cancel.clicked.connect(dlg.reject)
+        self.timer.stop()
