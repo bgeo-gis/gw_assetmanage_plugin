@@ -358,6 +358,23 @@ class AmBreakage(dialog.GwAction):
     def _execute_config(self):
         dlg = self.dlg_priority_config
 
+        invalid_diameters = tools_db.get_rows("""
+            select count(*)
+            from asset.arc_asset
+            where dnom is null 
+                or dnom <= 0
+                or dnom > (select max(dnom) from asset.config_diameter)
+        """)[0][0]
+        if invalid_diameters:
+            text = (
+                f"Pipes with invalid diameters: {invalid_diameters}.\n\n"
+                + "A diameter is invalid when its value is NULL, 0, negative, or greater than max diameter on config table. "
+                + "These pipes WILL NOT receive a priority value.\n\n"
+                + "Do you want to proceed?"
+            )
+            if not tools_qt.show_question(text):
+                return
+
         self.thread = GwCalculatePriority(
             "Priority Calculation",
         )
@@ -377,10 +394,10 @@ class AmBreakage(dialog.GwAction):
         # Progress bar behavior
         t.progressChanged.connect(dlg.progressBar.setValue)
 
-        # # Button OK behavior
+        # Button OK behavior
         dlg.btn_calc.setEnabled(False)
 
-        # # Button Cancel behavior
+        # Button Cancel behavior
         dlg.btn_cancel.clicked.disconnect()
         dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
 
