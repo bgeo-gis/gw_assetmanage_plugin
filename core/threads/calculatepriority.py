@@ -88,11 +88,13 @@ class GwCalculatePriority(GwTask):
                     "repairing_cost": float(cost_repmain),
                 }
 
-            last_leak_year = tools_db.get_rows("""
+            last_leak_year = tools_db.get_rows(
+                """
                 select max(year) from (select 
                     date_part('year', to_date(startdate, 'DD/MM/YYYY')) as year
                     FROM asset.leaks) years
-            """)[0][0]
+                """
+            )[0][0]
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -115,6 +117,13 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Calculating values (3/n)...")
             self.setProgress(20)
 
+            save_arcs_sql = """
+                delete from asset.arc_engine_sh where result_id = 0;
+                insert into asset.arc_engine_sh 
+                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year)
+                values 
+            """
+
             for arc in arcs:
                 arc_id, _, arc_diameter, arc_length, rleak = arc
                 if (
@@ -127,8 +136,10 @@ class GwCalculatePriority(GwTask):
                     continue
                 reference_dnom = get_min_greater_than(diameters.keys(), arc_diameter)
                 cost_repmain = diameters[reference_dnom]["repairing_cost"]
+
                 replacement_cost = diameters[reference_dnom]["replacement_cost"]
                 cost_constr = replacement_cost * float(arc_length)
+
                 if rleak == 0 or rleak is None:
                     year = "NULL"
                 else:
@@ -142,6 +153,36 @@ class GwCalculatePriority(GwTask):
                             discount_rate,
                         )
                     )
+                save_arcs_sql += f"({arc_id},0,{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year}),"
+
+            save_arcs_sql = save_arcs_sql[:-1]
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+            self._emit_report("Updating tables (4/n)...")
+            self.setProgress(20)
+
+            tools_db.execute_sql(save_arcs_sql)
+            tools_db.execute_sql(
+                """
+                update asset.arc_engine_sh 
+                    set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
+                    from (
+                        select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
+                        ) as years
+                    where result_id = 0;
+                update asset.arc_engine_sh
+                    set val = year_order
+                    where result_id = 0;
+                delete from asset.arc_output
+                    where result_id = 0;
+                insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
+                    select arc_id, result_id, val, year, cost_constr
+                        from asset.arc_engine_sh
+                        where result_id = 0;
+                """
+            )
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
