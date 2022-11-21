@@ -358,6 +358,11 @@ class AmBreakage(dialog.GwAction):
     def _execute_config(self):
         dlg = self.dlg_priority_config
 
+        inputs = self._validate_config_input()
+        if not inputs:
+            return
+        result_name, result_description = inputs
+
         invalid_diameters = tools_db.get_rows("""
             select count(*)
             from asset.arc_asset
@@ -402,6 +407,23 @@ class AmBreakage(dialog.GwAction):
         dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
 
         QgsApplication.taskManager().addTask(t)
+
+    def _validate_config_input(self):
+        dlg = self.dlg_priority_config
+
+        result_name = dlg.txt_result_id.text()
+        if not len(result_name):
+            tools_qt.show_info_box("You must enter an identifier for the result!")
+            return
+
+        # TODO: verify if result_name already exists
+
+        description = dlg.txt_descript.text()
+        if not len(description):
+            tools_qt.show_info_box("You must enter a description for the result!")
+            return
+
+        return result_name, description
 
     def _config_ended(self):
         dlg = self.dlg_priority_config
