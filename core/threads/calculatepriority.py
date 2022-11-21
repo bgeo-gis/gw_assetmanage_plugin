@@ -61,8 +61,7 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            # FIXME: Number of steps and progress
-            self._emit_report("Getting config data from DB (1/n)...")
+            self._emit_report("Getting config data from DB (1/5)...")
             self.setProgress(0)
 
             sql = (
@@ -115,8 +114,8 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
-            self._emit_report("Getting pipe data from DB (2/n)...")
-            self.setProgress(10)
+            self._emit_report("Getting pipe data from DB (2/5)...")
+            self.setProgress(20)
 
             sql = (
                 "select a.arc_id, a.matcat_id, a.dnom, "
@@ -130,8 +129,8 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
-            self._emit_report("Calculating values (3/n)...")
-            self.setProgress(20)
+            self._emit_report("Calculating values (3/5)...")
+            self.setProgress(40)
 
             # TODO: Update asset.result_calculate and get result_id
             result_id = 0
@@ -189,8 +188,8 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
-            self._emit_report("Updating tables (4/n)...")
-            self.setProgress(20)
+            self._emit_report("Updating tables (4/5)...")
+            self.setProgress(60)
 
             tools_db.execute_sql(save_arcs_sql)
             tools_db.execute_sql(
@@ -222,7 +221,7 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
-            self._emit_report("Generating result stats (5/n)...")
+            self._emit_report("Generating result stats (5/5)...")
             self.setProgress(80)
 
             invalid_diameters_count = tools_db.get_rows(
