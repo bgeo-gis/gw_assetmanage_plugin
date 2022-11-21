@@ -365,16 +365,29 @@ class AmBreakage(dialog.GwAction):
             return
         result_name, result_description = inputs
 
-        invalid_diameters = tools_db.get_rows("""
+        invalid_diameters_count = tools_db.get_rows("""
             select count(*)
             from asset.arc_asset
             where dnom is null 
                 or dnom <= 0
                 or dnom > (select max(dnom) from asset.config_diameter)
         """)[0][0]
-        if invalid_diameters:
+        if invalid_diameters_count:
+            invalid_diameters = [
+                x[0]
+                for x in tools_db.get_rows(
+                    """
+                    select distinct dnom
+                    from asset.arc_asset
+                    where dnom is null 
+                        or dnom <= 0
+                        or dnom > (select max(dnom) from asset.config_diameter)
+                    """
+                )
+            ]
             text = (
-                f"Pipes with invalid diameters: {invalid_diameters}.\n\n"
+                f"Pipes with invalid diameters: {invalid_diameters_count}.\n"
+                f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
                 "A diameter value is invalid if it is zero, negative, NULL, "
                 "or is greater than the maximum diameter in the configuration table. "
                 "These pipes WILL NOT be assigned a priority value.\n\n"
@@ -383,7 +396,7 @@ class AmBreakage(dialog.GwAction):
             if not tools_qt.show_question(text):
                 return
 
-        invalid_materials = tools_db.get_rows("""
+        invalid_materials_count = tools_db.get_rows("""
             select count(*)
             from asset.arc_asset a
             where not exists (
@@ -392,9 +405,24 @@ class AmBreakage(dialog.GwAction):
                 where material = a.matcat_id
             )
         """)[0][0]
-        if invalid_materials:
+        if invalid_materials_count:
+            invalid_materials = [
+                x[0]
+                for x in tools_db.get_rows(
+                    """
+                    select distinct matcat_id
+                    from asset.arc_asset a
+                    where not exists (
+                        select 1
+                        from asset.config_material
+                        where material = a.matcat_id
+                    )
+                    """
+                )
+            ]
             text = (
-                f"Pipes with invalid material: {invalid_materials}.\n\n"
+                f"Pipes with invalid material: {invalid_materials_count}.\n"
+                f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
                 "A material value is invalid if "
                 "it is not in the material configuration table. "
                 "These pipes will be assigned as compliant by default, "
