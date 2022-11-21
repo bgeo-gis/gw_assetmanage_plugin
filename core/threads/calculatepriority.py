@@ -222,6 +222,84 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
+            self._emit_report("Generating result stats (5/n)...")
+            self.setProgress(80)
+
+            invalid_diameters_count = tools_db.get_rows(
+                """
+                select count(*)
+                from asset.arc_asset
+                where dnom is null 
+                    or dnom <= 0
+                    or dnom > (select max(dnom) from asset.config_diameter)
+                """
+            )[0][0]
+
+            invalid_diameters = [
+                x[0]
+                for x in tools_db.get_rows(
+                    """
+                    select distinct dnom
+                    from asset.arc_asset
+                    where dnom is null 
+                        or dnom <= 0
+                        or dnom > (select max(dnom) from asset.config_diameter)
+                    """
+                )
+            ]
+
+            invalid_materials_count = tools_db.get_rows(
+                """
+                select count(*)
+                from asset.arc_asset a
+                where not exists (
+                    select 1
+                    from asset.config_material
+                    where material = a.matcat_id
+                )
+                """
+            )[0][0]
+
+            invalid_materials = [
+                x[0]
+                for x in tools_db.get_rows(
+                    """
+                    select distinct matcat_id
+                    from asset.arc_asset a
+                    where not exists (
+                        select 1
+                        from asset.config_material
+                        where material = a.matcat_id
+                    )
+                    """
+                )
+            ]
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+
+            self._emit_report(
+                "Task finished!",
+                "Warnings:"
+                if invalid_diameters_count or invalid_materials_count
+                else "",
+            )
+
+            if invalid_diameters_count:
+                self._emit_report(
+                    f"Pipes with invalid diameters: {invalid_diameters_count}.",
+                    f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.",
+                    "These pipes WERE NOT assigned a priority value.",
+                )
+
+            if invalid_materials_count:
+                self._emit_report(
+                    f"Pipes with invalid materials: {invalid_materials_count}.",
+                    f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.",
+                    "These pipes were assigned as compliant by default, "
+                    + "which may result in a lower priority value.",
+                )
 
             return True
 
