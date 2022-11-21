@@ -73,7 +73,7 @@ class GwAssignation(GwTask):
                 + f"ST_LENGTH(ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)) AS length "
                 + "FROM asset.leaks AS l "
                 + "JOIN leak_dates AS d USING (id) "
-                + "JOIN asset.v_asset_arc_output AS a "
+                + "JOIN asset.arc_asset AS a "
                 + f"ON ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer}) "
                 + f"WHERE d.date_leak > ((select * from max_date) - interval '{self.years} year')::date "
             )
@@ -141,7 +141,7 @@ class GwAssignation(GwTask):
                 self._emit_report("Task canceled.")
                 return False
 
-            sql = "SELECT arc_id, ST_LENGTH(the_geom) FROM asset.v_asset_arc_output WHERE result_id = 0"
+            sql = "SELECT arc_id, ST_LENGTH(the_geom) FROM asset.arc_asset"
             rows = tools_db.get_rows(sql)
             total_pipes = len(rows)
             rleaks = []
@@ -172,13 +172,17 @@ class GwAssignation(GwTask):
             tools_db.execute_sql(sql)
 
             orphan_pipes = tools_db.get_rows(
-                "SELECT count(1) FROM asset.v_asset_arc_output "
-                + "WHERE result_id = 0 AND (rleak IS NULL or rleak = 0)"
+                """
+                SELECT count(*) FROM asset.arc_input
+                    WHERE result_id = 0 AND (rleak IS NULL or rleak = 0)
+                """
             )[0][0]
 
             max_rleak, min_rleak = tools_db.get_rows(
-                "SELECT max(rleak), min(rleak) FROM asset.v_asset_arc_output "
-                + "WHERE result_id = 0 AND rleak IS NOT NULL AND rleak <> 0"
+                """
+                SELECT max(rleak), min(rleak) FROM asset.arc_input
+                    WHERE result_id = 0 AND rleak IS NOT NULL AND rleak <> 0
+                """
             )[0]
 
             self.setProgress(100)
