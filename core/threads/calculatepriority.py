@@ -1,8 +1,53 @@
+from math import log, log1p, exp
+
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ...settings import tools_db
+
+
+def get_min_greater_than(iterable, value):
+    result = None
+    for item in iterable:
+        if item <= value:
+            continue
+        if result is None or item < result:
+            result = item
+    return result
+
+
+def optimal_replacement_time(
+    present_year,
+    number_of_breaks,
+    break_growth_rate,
+    repairing_cost,
+    replacement_cost,
+    discount_rate,
+):
+    BREAKS_YEAR_0 = 0.2
+    optimal_replacement_cycle = (1 / break_growth_rate) * log(
+        log1p(discount_rate) * replacement_cost / BREAKS_YEAR_0 / repairing_cost
+    )
+    cycle_costs = 0
+    for t in range(1, round(optimal_replacement_cycle) + 1):
+        # print(cycle_costs)
+        cycle_costs += (
+            repairing_cost
+            * BREAKS_YEAR_0
+            * exp(break_growth_rate * t)
+            / (1 + discount_rate) ** t
+        )
+
+    b_orc = 1 / ((1 + discount_rate) ** optimal_replacement_cycle - 1)
+
+    return present_year + (1 / break_growth_rate) * log(
+        log1p(discount_rate)
+        # * replacement_cost
+        * ((replacement_cost + cycle_costs) * b_orc + replacement_cost)
+        / number_of_breaks
+        / repairing_cost
+    )
 
 
 class GwCalculatePriority(GwTask):
@@ -14,8 +59,8 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            self._emit_report("Getting data from DB (1/4)...")
-            self.setProgress(10)
+            self._emit_report("Getting config data from DB (1/n)...")
+            self.setProgress(0)
 
             sql = (
                 "select parameter, value::float, active "
@@ -27,8 +72,8 @@ class GwCalculatePriority(GwTask):
             for row in rows:
                 parameter, value, _ = row
                 config_engine[parameter] = value
-            discount_rate = config_engine["drate"]
-            break_growth_rate = config_engine["bratemain0"]
+            discount_rate = float(config_engine["drate"])
+            break_growth_rate = float(config_engine["bratemain0"])
 
             sql = (
                 "select dnom, cost_constr, cost_repmain, compliance "
@@ -38,10 +83,22 @@ class GwCalculatePriority(GwTask):
             diameters = {}
             for row in rows:
                 dnom, cost_constr, cost_repmain, _ = row
-                diameters[dnom] = {
-                    "replacement_cost": cost_constr,
-                    "repairing_cost": cost_repmain,
+                diameters[int(dnom)] = {
+                    "replacement_cost": float(cost_constr),
+                    "repairing_cost": float(cost_repmain),
                 }
+
+            last_leak_year = tools_db.get_rows("""
+                select max(year) from (select 
+                    date_part('year', to_date(startdate, 'DD/MM/YYYY')) as year
+                    FROM asset.leaks) years
+            """)[0][0]
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
+            self._emit_report("Getting pipe data from DB (2/n)...")
+            self.setProgress(10)
 
             sql = (
                 "select a.arc_id, a.matcat_id, a.dnom, "
@@ -55,8 +112,40 @@ class GwCalculatePriority(GwTask):
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
-            self._emit_report("Getting pipe data from DB (2/4)...")
-            self.setProgress(25)
+            self._emit_report("Calculating values (3/n)...")
+            self.setProgress(20)
+
+            for arc in arcs:
+                arc_id, _, arc_diameter, arc_length, rleak = arc
+                if (
+                    arc_diameter is None
+                    or arc_diameter <= 0
+                    or arc_diameter > max(diameters.keys())
+                ):
+                    continue
+                if arc_length is None:
+                    continue
+                reference_dnom = get_min_greater_than(diameters.keys(), arc_diameter)
+                cost_repmain = diameters[reference_dnom]["repairing_cost"]
+                replacement_cost = diameters[reference_dnom]["replacement_cost"]
+                cost_constr = replacement_cost * float(arc_length)
+                if rleak == 0 or rleak is None:
+                    year = "NULL"
+                else:
+                    year = int(
+                        optimal_replacement_time(
+                            last_leak_year,
+                            float(rleak),
+                            break_growth_rate,
+                            cost_repmain,
+                            replacement_cost * 1000,
+                            discount_rate,
+                        )
+                    )
+
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
 
             return True
 
