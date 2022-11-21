@@ -100,6 +100,8 @@ class AmBreakage(dialog.GwAction):
 
         self.dlg_priority_config = PriorityConfigUi()
 
+        tools_gw.disable_tab_log(self.dlg_priority_config)
+
         # Define tableviews
         self.qtbl_diameter = self.dlg_priority_config.findChild(QTableView, "tbl_diameter")
         self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
