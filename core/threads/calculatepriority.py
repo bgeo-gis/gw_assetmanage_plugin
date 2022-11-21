@@ -25,7 +25,7 @@ def optimal_replacement_time(
     replacement_cost,
     discount_rate,
 ):
-    BREAKS_YEAR_0 = 0.2
+    BREAKS_YEAR_0 = 0.05
     optimal_replacement_cycle = (1 / break_growth_rate) * log(
         log1p(discount_rate) * replacement_cost / BREAKS_YEAR_0 / repairing_cost
     )
