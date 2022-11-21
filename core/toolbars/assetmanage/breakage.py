@@ -383,6 +383,27 @@ class AmBreakage(dialog.GwAction):
             if not tools_qt.show_question(text):
                 return
 
+        invalid_materials = tools_db.get_rows("""
+            select count(*)
+            from asset.arc_asset a
+            where not exists (
+                select 1
+                from asset.config_material
+                where material = a.matcat_id
+            )
+        """)[0][0]
+        if invalid_materials:
+            text = (
+                f"Pipes with invalid material: {invalid_materials}.\n\n"
+                "A material value is invalid if "
+                "it is not in the material configuration table. "
+                "These pipes will be assigned as compliant by default, "
+                "which may result in a lower priority value.\n\n"
+                "Do you want to proceed?"
+            )
+            if not tools_qt.show_question(text):
+                return
+
         self.thread = GwCalculatePriority(
             "Priority Calculation",
             result_name,

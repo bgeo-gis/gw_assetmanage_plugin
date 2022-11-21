@@ -93,6 +93,17 @@ class GwCalculatePriority(GwTask):
                     "compliance": compliance,
                 }
 
+            rows = tools_db.get_rows(
+                """
+                select material, compliance
+                    from asset.config_material
+                """
+            )
+            materials = {}
+            for row in rows:
+                material, compliance = row
+                materials[material] = compliance
+
             last_leak_year = tools_db.get_rows(
                 """
                 select max(year) from (select 
@@ -133,7 +144,7 @@ class GwCalculatePriority(GwTask):
             """
 
             for arc in arcs:
-                arc_id, _, arc_diameter, arc_length, rleak = arc
+                arc_id, arc_material, arc_diameter, arc_length, rleak = arc
                 if (
                     arc_diameter is None
                     or arc_diameter <= 0
@@ -148,7 +159,15 @@ class GwCalculatePriority(GwTask):
                 replacement_cost = diameters[reference_dnom]["replacement_cost"]
                 cost_constr = replacement_cost * float(arc_length)
 
-                compliance = 0 if diameters[reference_dnom]["compliance"] else 10
+                material_compliance = True
+                if arc_material in materials and materials[arc_material]:
+                    material_compliance = materials[arc_material]
+
+                compliance = (
+                    0
+                    if diameters[reference_dnom]["compliance"] and material_compliance
+                    else 10
+                )
 
                 if rleak == 0 or rleak is None:
                     year = "NULL"
