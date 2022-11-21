@@ -78,17 +78,19 @@ class GwCalculatePriority(GwTask):
             discount_rate = float(config_engine["drate"])
             break_growth_rate = float(config_engine["bratemain0"])
 
-            sql = (
-                "select dnom, cost_constr, cost_repmain, compliance "
-                + "from asset.config_diameter "
+            rows = tools_db.get_rows(
+                """
+                select dnom, cost_constr, cost_repmain, compliance
+                    from asset.config_diameter
+                """
             )
-            rows = tools_db.get_rows(sql)
             diameters = {}
             for row in rows:
-                dnom, cost_constr, cost_repmain, _ = row
+                dnom, cost_constr, cost_repmain, compliance = row
                 diameters[int(dnom)] = {
                     "replacement_cost": float(cost_constr),
                     "repairing_cost": float(cost_repmain),
+                    "compliance": compliance,
                 }
 
             last_leak_year = tools_db.get_rows(
@@ -126,7 +128,7 @@ class GwCalculatePriority(GwTask):
             save_arcs_sql = f"""
                 delete from asset.arc_engine_sh where result_id = {result_id};
                 insert into asset.arc_engine_sh 
-                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year)
+                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance)
                 values 
             """
 
@@ -146,6 +148,8 @@ class GwCalculatePriority(GwTask):
                 replacement_cost = diameters[reference_dnom]["replacement_cost"]
                 cost_constr = replacement_cost * float(arc_length)
 
+                compliance = 0 if diameters[reference_dnom]["compliance"] else 10
+
                 if rleak == 0 or rleak is None:
                     year = "NULL"
                 else:
@@ -159,7 +163,7 @@ class GwCalculatePriority(GwTask):
                             discount_rate,
                         )
                     )
-                save_arcs_sql += f"({arc_id},{result_id},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year}),"
+                save_arcs_sql += f"({arc_id},{result_id},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year},{compliance}),"
 
             save_arcs_sql = save_arcs_sql[:-1]
 
@@ -178,8 +182,14 @@ class GwCalculatePriority(GwTask):
                         select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
                         ) as years
                     where result_id = {result_id};
-                update asset.arc_engine_sh
-                    set val = year_order
+                update asset.arc_engine_sh sh
+                    set val = sh.year_order * weight.year_order + sh.compliance * weight.compliance
+                    from (
+                        select y.value::real year_order, c.value::real compliance
+                            from asset.config_engine y
+                            join asset.config_engine c on c.parameter = 'compliance'
+                            where y.parameter = 'expected_year'
+                    ) as weight
                     where result_id = {result_id};
                 delete from asset.arc_output
                     where result_id = {result_id};
