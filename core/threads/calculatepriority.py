@@ -120,8 +120,11 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Calculating values (3/n)...")
             self.setProgress(20)
 
-            save_arcs_sql = """
-                delete from asset.arc_engine_sh where result_id = 0;
+            # TODO: Update asset.result_calculate and get result_id
+            result_id = 0
+
+            save_arcs_sql = f"""
+                delete from asset.arc_engine_sh where result_id = {result_id};
                 insert into asset.arc_engine_sh 
                 (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year)
                 values 
@@ -156,7 +159,7 @@ class GwCalculatePriority(GwTask):
                             discount_rate,
                         )
                     )
-                save_arcs_sql += f"({arc_id},0,{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year}),"
+                save_arcs_sql += f"({arc_id},{result_id},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year}),"
 
             save_arcs_sql = save_arcs_sql[:-1]
 
@@ -168,22 +171,22 @@ class GwCalculatePriority(GwTask):
 
             tools_db.execute_sql(save_arcs_sql)
             tools_db.execute_sql(
-                """
+                f"""
                 update asset.arc_engine_sh 
                     set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
                     from (
                         select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
                         ) as years
-                    where result_id = 0;
+                    where result_id = {result_id};
                 update asset.arc_engine_sh
                     set val = year_order
-                    where result_id = 0;
+                    where result_id = {result_id};
                 delete from asset.arc_output
-                    where result_id = 0;
+                    where result_id = {result_id};
                 insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
                     select arc_id, result_id, val, year, cost_constr
                         from asset.arc_engine_sh
-                        where result_id = 0;
+                        where result_id = {result_id};
                 """
             )
 
