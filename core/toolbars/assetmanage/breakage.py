@@ -375,9 +375,10 @@ class AmBreakage(dialog.GwAction):
         if invalid_diameters:
             text = (
                 f"Pipes with invalid diameters: {invalid_diameters}.\n\n"
-                + "A diameter is invalid when its value is NULL, 0, negative, or greater than max diameter on config table. "
-                + "These pipes WILL NOT receive a priority value.\n\n"
-                + "Do you want to proceed?"
+                "A diameter value is invalid if it is zero, negative, NULL, "
+                "or is greater than the maximum diameter in the configuration table. "
+                "These pipes WILL NOT be assigned a priority value.\n\n"
+                "Do you want to proceed?"
             )
             if not tools_qt.show_question(text):
                 return
