@@ -54,11 +54,14 @@ class GwCalculatePriority(GwTask):
     report = pyqtSignal(dict)
     step = pyqtSignal(str)
 
-    def __init__(self, description):
+    def __init__(self, description, result_name, result_description):
         super().__init__(description, QgsTask.CanCancel)
+        self.result_name = result_name
+        self.result_description = result_description
 
     def run(self):
         try:
+            # FIXME: Number of steps and progress
             self._emit_report("Getting config data from DB (1/n)...")
             self.setProgress(0)
 

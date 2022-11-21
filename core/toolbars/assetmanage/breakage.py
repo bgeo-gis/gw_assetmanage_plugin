@@ -382,6 +382,8 @@ class AmBreakage(dialog.GwAction):
 
         self.thread = GwCalculatePriority(
             "Priority Calculation",
+            result_name,
+            result_description,
         )
         t = self.thread
         t.taskCompleted.connect(self._config_ended)
