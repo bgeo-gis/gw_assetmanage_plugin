@@ -393,7 +393,7 @@ class AmBreakage(dialog.GwAction):
                 "These pipes WILL NOT be assigned a priority value.\n\n"
                 "Do you want to proceed?"
             )
-            if not tools_qt.show_question(text):
+            if not tools_qt.show_question(text, force_action=True):
                 return
 
         invalid_materials_count = tools_db.get_rows("""
@@ -429,7 +429,7 @@ class AmBreakage(dialog.GwAction):
                 "which may result in a lower priority value.\n\n"
                 "Do you want to proceed?"
             )
-            if not tools_qt.show_question(text):
+            if not tools_qt.show_question(text, force_action=True):
                 return
 
         self.thread = GwCalculatePriority(
