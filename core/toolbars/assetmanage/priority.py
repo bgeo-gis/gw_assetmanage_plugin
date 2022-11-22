@@ -8,6 +8,7 @@ or (at your option) any later version.
 from datetime import datetime
 from functools import partial
 import os
+import json
 
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
 from qgis.PyQt.QtGui import QIcon
@@ -35,7 +36,7 @@ class AmPriority(dialog.GwAction):
         self.action_group = action_group
         self.layer_to_work = 'v_asset_arc_output'
         self.layers = {}
-        self.layers['arc'] = []
+        self.layers["arc"] = []
         self.list_ids = {}
 
         # Priority variables
@@ -52,38 +53,18 @@ class AmPriority(dialog.GwAction):
         self.dlg_priority = PriorityUi()
 
         icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20")
-
-        # Manage visibility for Atribute section
-        # self.dlg_priority.lbl_dnom.setVisible(False)
-        # self.dlg_priority.cmb_dnom.setVisible(False)
-        # self.dlg_priority.lbl_material.setVisible(False)
-        # self.dlg_priority.cmb_material.setVisible(False)
-        # Manage visibility for Expresion section
-        self.dlg_priority.rb_expr.setVisible(False)
-        self.dlg_priority.grb_expr.setVisible(False)
-
-        # Manage radiobuttons
-        # self.dlg_priority.rb_select_all.toggled.connect(partial(self._manage_radio_buttons, 0))
-        self.dlg_priority.rb_select.toggled.connect(partial(self._manage_radio_buttons, 1))
-        self.dlg_priority.rb_expr.toggled.connect(partial(self._manage_radio_buttons, 2))
-        self.dlg_priority.rb_attr.toggled.connect(partial(self._manage_radio_buttons, 3))
-        # self.dlg_priority.rb_select_all.setChecked(True)
-
-        self._manage_radio_buttons(1, False)
-        self._manage_radio_buttons(2, False)
-        self._manage_radio_buttons(3, False)
+        icon_path = os.path.join(icons_folder, str(137) + ".png")
+        if os.path.exists(icon_path):
+            self.dlg_priority.btn_snapping.setIcon(QIcon(icon_path))
 
         # Triggers
-        self.dlg_priority.btn_accept.clicked.connect(self._manage_accept)
+        self.dlg_priority.btn_calc.clicked.connect(self._manage_calculate)
         self.dlg_priority.btn_load.clicked.connect(self._open_manager)
         self.dlg_priority.btn_save.clicked.connect(self._manage_save)
         self.dlg_priority.cmb_mapzone.currentIndexChanged.connect(partial(self._populate_child))
 
         # Manage selection group
         self._manage_selection()
-
-        # Manage expression group
-        self._manage_expr()
 
         # Manage attributes group
         self._manage_attr()
@@ -94,20 +75,42 @@ class AmPriority(dialog.GwAction):
 
     def _manage_save(self):
 
-        return
+        self.result_name = tools_qt.get_text(self.dlg_priority, 'txt_result_name')
+        if self.result_name is None:
+            message = "Result name is mandatory"
+            tools_qgis.show_message(message, 0)
+            return
 
-    def _manage_accept(self):
-        print(f"LIST IDS -> {self.list_ids}")
+        sql = f"INSERT INTO asset.result_selection (result_name, arc_id, dnom, material, mapzone, mapzone_child, cur_user, tstamp)" \
+              f"VALUES ('{self.result_name}', '{self.list_ids}', '{self.dnom_value}', '{self.material_value}', " \
+              f"'{self.mapzone_value}', '{self.child_value}', current_user, now())"
+        tools_db.execute_sql(sql)
 
+    def _manage_calculate(self):
 
-    def _manage_radio_buttons(self, rbtn, checked):
+        # Manage selection
+        if self.list_ids == {}:
+            message = "No features selected"
+            tools_qgis.show_message(message, 0)
+            return
 
-        if rbtn == 1:
-            self.dlg_priority.grb_select.setEnabled(checked)
-        elif rbtn == 2:
-            self.dlg_priority.grb_expr.setEnabled(checked)
-        elif rbtn == 3:
-            self.dlg_priority.grb_attr.setEnabled(checked)
+        function_name = 'gw_fct_assetmanage_selection'
+        self.child_value = None
+
+        # Manage extras
+        self.list_ids = json.dumps(self.list_ids)
+        self.config_result = tools_qt.get_combo_value(self.dlg_priority, 'cmb_config_result', 0)
+        self.dnom_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_dnom', 0)
+        self.material_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_material', 0)
+        self.mapzone_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_mapzone', 0)
+        if self.mapzone_value:
+            self.child_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_child', 0)
+
+        extras = f'"selection":{self.list_ids}, "result_name":"{self.config_result}" "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
+        body = tools_gw.create_body(extras=extras)
+        json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
+        print(f"JSON_RESULT -> {json_result}")
+
 
 
     def _open_manager(self):
@@ -132,9 +135,9 @@ class AmPriority(dialog.GwAction):
 
     def _manage_btn_snapping(self):
 
-        self.feature_type = 'arc'
+        self.feature_type = "arc"
         layer = tools_qgis.get_layer_by_tablename('v_asset_arc_output')
-        self.layers['arc'].append(layer)
+        self.layers["arc"].append(layer)
 
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
@@ -194,31 +197,31 @@ class AmPriority(dialog.GwAction):
 
     # endregion
 
-    # region Expression
-
-    def _manage_expr(self):
-        pass
-
-    # endregion
-
     # region Attribute
 
     def _manage_attr(self):
-        # Combo dnom
-        sql = "SELECT distinct(dnom) as id, dnom as idval FROM cat_arc WHERE dnom is not null;"
+
+        # Combo result_name
+        sql = "SELECT id, result_name as idval FROM asset.result_calculate;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0)
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_result_name, rows, 1, sort_by=0)
+
+        # Combo dnom
+        sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True)
 
         # Combo material
-        sql = "SELECT id, id as idval FROM cat_mat_arc;"
+        sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1)
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1, add_empty=True)
 
         # Combo mapzone
-        rows = [['exploitation', 'Explotacion', 'SELECT expl_id as id, name as idval FROM ws.exploitation'],
-                ['sectore', 'Sector', 'SELECT sector_id as id, name as idval FROM asset.sector'],
-                ['macrosector', 'Sistema', 'SELECT macrosector_id as id, name as idval FROM asset.macrosector'],
-                ['presszone', 'Zona operación', 'SELECT presszone_id as id, name as idval FROM asset.presszone']]
+        rows = [['', '', ''],
+                ['expl_id', 'Explotacion', 'SELECT expl_id as id, name as idval FROM ws.exploitation'],
+                ['sector_id', 'Sector', 'SELECT sector_id as id, name as idval FROM asset.sector'],
+                ['macrosector_id', 'Sistema', 'SELECT macrosector_id as id, name as idval FROM asset.macrosector'],
+                ['presszone_id', 'Zona operación', 'SELECT presszone_id as id, name as idval FROM asset.presszone']]
         tools_qt.fill_combo_values(self.dlg_priority.cmb_mapzone, rows, 1)
         self._populate_child()
 
