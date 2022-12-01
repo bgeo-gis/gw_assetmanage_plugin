@@ -179,9 +179,11 @@ class AmBreakage(dialog.GwAction):
             # Get configuration parameters
             if tools_os.set_boolean(config.get("dialog_leaks", "show_check_material")) is not True:
                 self.dlg_assignation.lbl_material.setVisible(False)
+                self.dlg_assignation.chk_material.setChecked(False)
                 self.dlg_assignation.chk_material.setVisible(False)
             if tools_os.set_boolean(config.get("dialog_leaks", "show_check_diameter")) is not True:
                 self.dlg_assignation.lbl_diameter.setVisible(False)
+                self.dlg_assignation.chk_diameter.setChecked(False)
                 self.dlg_assignation.chk_diameter.setVisible(False)
 
 
@@ -238,6 +240,8 @@ class AmBreakage(dialog.GwAction):
         inputs = self._validate_assignation_input()
         if not inputs:
             return
+        use_diameter = dlg.chk_diameter.isChecked()
+        use_material = dlg.chk_material.isChecked()
         method, _ = dlg.cmb_method.currentData()
         buffer, years = inputs
 
@@ -246,6 +250,8 @@ class AmBreakage(dialog.GwAction):
             method,
             buffer,
             years,
+            use_material,
+            use_diameter,
         )
         t = self.thread
         t.taskCompleted.connect(self._assignation_ended)

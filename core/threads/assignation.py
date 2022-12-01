@@ -9,11 +9,15 @@ class GwAssignation(GwTask):
     report = pyqtSignal(dict)
     step = pyqtSignal(str)
 
-    def __init__(self, description, method, buffer, years):
+    def __init__(
+        self, description, method, buffer, years, use_material=False, use_diameter=False
+    ):
         super().__init__(description, QgsTask.CanCancel)
         self.method = method
         self.buffer = buffer
         self.years = years
+        self.use_material = use_material
+        self.use_diameter = use_diameter
 
     def run(self):
         try:
@@ -67,8 +71,10 @@ class GwAssignation(GwTask):
                 + "SELECT "
                 + "l.id AS leak_id, "
                 + "l.diameter AS leak_diameter, "
+                + "l.material AS leak_material, "
                 + "a.arc_id AS arc_id, "
                 + "a.dnom AS arc_diameter, "
+                + "a.matcat_id AS arc_material, "
                 + "ST_DISTANCE(l.the_geom, a.the_geom) AS distance, "
                 + f"ST_LENGTH(ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)) AS length "
                 + "FROM asset.leaks AS l "
@@ -90,7 +96,16 @@ class GwAssignation(GwTask):
             orphan_leaks = set()
 
             for row in rows:
-                leak_id, leak_diameter, arc_id, arc_diameter, distance, length = row
+                (
+                    leak_id,
+                    leak_diameter,
+                    leak_material,
+                    arc_id,
+                    arc_diameter,
+                    arc_material,
+                    distance,
+                    length,
+                ) = row
 
                 distance_index = (self.buffer - distance) / self.buffer
                 if self.method == "exponential":
@@ -99,15 +114,19 @@ class GwAssignation(GwTask):
 
                 if leak_id not in leaks:
                     leaks[leak_id] = []
+
                 leaks[leak_id].append(
                     {
                         "arc_id": arc_id,
                         "index": index,
                         "same_diameter": (
                             # Diameters within 4mm are the same
-                            False
-                            if not leak_diameter
-                            else leak_diameter - 4 <= arc_diameter <= leak_diameter + 4
+                            leak_diameter is not None
+                            and arc_diameter is not None
+                            and leak_diameter - 4 <= arc_diameter <= leak_diameter + 4
+                        ),
+                        "same_material": (
+                            leak_material is not None and leak_material == arc_material
                         ),
                     }
                 )
@@ -117,25 +136,34 @@ class GwAssignation(GwTask):
                     orphan_leaks.add(leak_id)
 
             for leak_id, arcs in leaks.items():
-                sum_indexes = 0
-                sum_indexes_by_diameter = 0
-                for arc in arcs:
-                    sum_indexes += arc["index"]
-                    if arc["same_diameter"]:
-                        sum_indexes_by_diameter += arc["index"]
-                for arc in arcs:
-                    if sum_indexes == 0:
-                        orphan_leaks.add(leak_id)
-                        continue
-                    if arc["index"] == 0:
-                        continue
-                    if sum_indexes_by_diameter and not arc["same_diameter"]:
-                        continue
+                same_material_exists = any([a["same_material"] for a in arcs])
+                same_diameter_exists = any([a["same_diameter"] for a in arcs])
+
+                if (
+                    self.use_material
+                    and self.use_diameter
+                    and same_material_exists
+                    and same_diameter_exists
+                ):
+                    is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
+                elif self.use_material and same_material_exists:
+                    is_arc_valid = lambda x: x["same_material"]
+                elif self.use_diameter and same_diameter_exists:
+                    is_arc_valid = lambda x: x["same_diameter"]
+                else:
+                    is_arc_valid = lambda x: True
+
+                valid_arcs = list(
+                    filter(
+                        is_arc_valid,
+                        arcs,
+                    )
+                )
+                sum_indexes = sum([a["index"] for a in valid_arcs])
+                for arc in valid_arcs:
                     if arc["arc_id"] not in leaks_by_arc:
                         leaks_by_arc[arc["arc_id"]] = 0
-                    leaks_by_arc[arc["arc_id"]] += arc["index"] / (
-                        sum_indexes_by_diameter or sum_indexes
-                    )
+                    leaks_by_arc[arc["arc_id"]] += arc["index"] / sum_indexes
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -167,7 +195,7 @@ class GwAssignation(GwTask):
                 sql += f"({arc_id}, 0, {rleak}),"
             sql = (
                 sql[:-1]
-                + "ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
+                + " ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
             )
             tools_db.execute_sql(sql)
 
