@@ -41,7 +41,7 @@ class AmPriority(dialog.GwAction):
         self.list_ids = {}
 
         # Priority variables
-        self.dlg_priority = None
+        self.dlg_priority_selection = None
 
 
 
@@ -51,12 +51,12 @@ class AmPriority(dialog.GwAction):
 
     def priority(self):
 
-        self.dlg_priority = PriorityUi()
+        self.dlg_priority_selection = PriorityUi()
 
         icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20")
         icon_path = os.path.join(icons_folder, str(137) + ".png")
         if os.path.exists(icon_path):
-            self.dlg_priority.btn_snapping.setIcon(QIcon(icon_path))
+            self.dlg_priority_selection.btn_snapping.setIcon(QIcon(icon_path))
 
         # Manage form
 
@@ -70,15 +70,14 @@ class AmPriority(dialog.GwAction):
         self._manage_attr()
 
         # Triggers
-        self.dlg_priority.btn_calc.clicked.connect(self._manage_calculate)
-        # self.dlg_priority.btn_load.clicked.connect(self._open_manager)
-        self.dlg_priority.btn_save.clicked.connect(self._manage_save)
-        self.dlg_priority.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority))
-        self.dlg_priority.rejected.connect(partial(tools_gw.close_dialog, self.dlg_priority))
+        self.dlg_priority_selection.btn_calc.clicked.connect(self._manage_calculate)
+        self.dlg_priority_selection.btn_save.clicked.connect(self._manage_save)
+        self.dlg_priority_selection.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_selection))
+        self.dlg_priority_selection.rejected.connect(partial(tools_gw.close_dialog, self.dlg_priority_selection))
 
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
+        tools_gw.open_dialog(self.dlg_priority_selection, dlg_name='priority')
 
 
     def _manage_hidden_form_selection(self):
@@ -96,32 +95,35 @@ class AmPriority(dialog.GwAction):
             config.read(config_path)
 
             # Get configuration parameters
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_maptool")) is not True:
-                self.dlg_priority.btn_snapping.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_diameter")) is not True:
-                self.dlg_priority.lbl_dnom.setVisible(False)
-                self.dlg_priority.cmb_dnom.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_material")) is not True:
-                self.dlg_priority.lbl_material.setVisible(False)
-                self.dlg_priority.cmb_material.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_exploitation")) is not True:
-                self.dlg_priority.lbl_expl.setVisible(False)
-                self.dlg_priority.cmb_expl.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_presszone")) is not True:
-                pass
+            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_selection")) is not True:
+                self.dlg_priority_selection.grb_selection.setVisible(False)
+            else:
+                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_maptool")) is not True:
+                    self.dlg_priority_selection.btn_snapping.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_diameter")) is not True:
+                    self.dlg_priority_selection.lbl_dnom.setVisible(False)
+                    self.dlg_priority_selection.cmb_dnom.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_material")) is not True:
+                    self.dlg_priority_selection.lbl_material.setVisible(False)
+                    self.dlg_priority_selection.cmb_material.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_exploitation")) is not True:
+                    self.dlg_priority_selection.lbl_expl.setVisible(False)
+                    self.dlg_priority_selection.cmb_expl.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_presszone")) is not True:
+                    pass
             if tools_os.set_boolean(config.get("dialog_priority_selection", "show_ivi_button")) is not True:
                 pass
             if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config")) is not True:
-                self.dlg_priority.tab_widget.setVisible(False)
+                self.dlg_priority_selection.grb_global.setVisible(False)
             else:
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_diameter")) is not True:
-                    self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
+                    self.dlg_priority_selection.tab_widget.tab_diameter.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_arc")) is not True:
-                    self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
+                    self.dlg_priority_selection.tab_widget.tab_diameter.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_material")) is not True:
-                    self.dlg_priority.tab_widget.tab_material.setVisible(False)
+                    self.dlg_priority_selection.tab_widget.tab_material.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_engine")) is not True:
-                    self.dlg_priority.tab_widget.tab_engine.setVisible(False)
+                    self.dlg_priority_selection.tab_widget.tab_engine.setVisible(False)
 
         except Exception as e:
             print('read_config_file error %s' % e)
@@ -132,7 +134,7 @@ class AmPriority(dialog.GwAction):
 
     def _manage_save(self):
 
-        self.result_name = tools_qt.get_text(self.dlg_priority, 'txt_result_name')
+        self.result_name = tools_qt.get_text(self.dlg_priority_selection, 'txt_result_name')
         if self.result_name is None:
             message = "Result name is mandatory"
             tools_qgis.show_message(message, 0)
@@ -156,29 +158,13 @@ class AmPriority(dialog.GwAction):
 
         # Manage extras
         self.list_ids = json.dumps(self.list_ids)
-        self.config_result = tools_qt.get_combo_value(self.dlg_priority, 'cmb_config_result', 0)
-        self.dnom_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_dnom', 0)
-        self.material_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_material', 0)
+        self.dnom_value = tools_qt.get_combo_value(self.dlg_priority_selection, 'cmb_dnom', 0)
+        self.material_value = tools_qt.get_combo_value(self.dlg_priority_selection, 'cmb_material', 0)
 
-        extras = f'"selection":{self.list_ids}, "result_name":"{self.config_result}" "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
+        extras = f'"selection":{self.list_ids}, "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
         body = tools_gw.create_body(extras=extras)
         json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
         print(f"JSON_RESULT -> {json_result}")
-
-
-
-    def _open_manager(self):
-
-        self.dlg_priority_manager = PriorityManagerUi()
-
-
-        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection, "asset.result_selection",
-                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection, "result_selection", schema_name='asset')
-
-        # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name='priority')
-
 
     # region Selection
 
@@ -197,8 +183,8 @@ class AmPriority(dialog.GwAction):
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
 
-        self.dlg_priority.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_priority, self.layer_to_work))
+        self.dlg_priority_selection.btn_snapping.clicked.connect(
+            partial(tools_gw.selection_init, self, self.dlg_priority_selection, self.layer_to_work))
 
 
     def old_manage_btn_snapping(self):
@@ -223,7 +209,7 @@ class AmPriority(dialog.GwAction):
             action = select_menu.addAction(icon, f"{label}")
             action.triggered.connect(partial(self._trigger_action_select, num))
 
-        self.dlg_priority.btn_snapping.setMenu(select_menu)
+        self.dlg_priority_selection.btn_snapping.setMenu(select_menu)
 
 
     def _trigger_action_select(self, num):
@@ -255,20 +241,15 @@ class AmPriority(dialog.GwAction):
 
     def _manage_attr(self):
 
-        # Combo result_name
-        sql = "SELECT id, result_name as idval FROM asset.result_calculate;"
-        rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_config_result, rows, 1, sort_by=0)
-
         # Combo dnom
         sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_priority_selection.cmb_dnom, rows, 1, sort_by=0, add_empty=True)
 
         # Combo material
         sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(self.dlg_priority_selection.cmb_material, rows, 1, add_empty=True)
 
 
 

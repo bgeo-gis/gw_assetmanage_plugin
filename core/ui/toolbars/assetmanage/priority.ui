@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>389</width>
-    <height>610</height>
+    <width>396</width>
+    <height>581</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,91 +31,6 @@
        <string>Cálculo</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
-       <item row="2" column="0">
-        <widget class="QWidget" name="widget" native="true"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>Parametros de selección</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_9">
-          <item row="0" column="0">
-           <widget class="QLabel" name="lbl_expl">
-            <property name="text">
-             <string>Explotación:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cmb_expl"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lbl_dot">
-            <property name="text">
-             <string>Dotación:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="txt_dot"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lbl_year">
-            <property name="text">
-             <string>Año horizonte:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="cmb_year"/>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QTabWidget" name="tab_widget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="tab_diameter">
-          <attribute name="title">
-           <string>Diameter</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_2">
-           <item row="0" column="0">
-            <widget class="QTableView" name="tbl_diameter"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tab_material">
-          <attribute name="title">
-           <string>Material</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QTableView" name="tbl_material"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tab_engine">
-          <attribute name="title">
-           <string>Engine</string>
-          </attribute>
-          <layout class="QGridLayout" name="gridLayout_4">
-           <item row="0" column="0">
-            <widget class="QTableView" name="tbl_engine"/>
-           </item>
-          </layout>
-         </widget>
-        </widget>
-       </item>
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_5">
          <item row="1" column="1">
@@ -159,8 +74,102 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="0">
-        <widget class="QGroupBox" name="groupBox_2">
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="grb_global">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Calculo de prioridades</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_9">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lbl_expl">
+            <property name="text">
+             <string>Explotación:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cmb_expl"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txt_dot"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lbl_year">
+            <property name="text">
+             <string>Año horizonte:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="cmb_year"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_dot">
+            <property name="text">
+             <string>Dotación:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QTabWidget" name="tab_widget">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="currentIndex">
+             <number>0</number>
+            </property>
+            <widget class="QWidget" name="tab_diameter">
+             <attribute name="title">
+              <string>Diameter</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_2">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_diameter"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_material">
+             <attribute name="title">
+              <string>Material</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_material"/>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_engine">
+             <attribute name="title">
+              <string>Engine</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_4">
+              <item row="0" column="0">
+               <widget class="QTableView" name="tbl_engine"/>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QGroupBox" name="grb_selection">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="title">
           <string>Selección de prioridades</string>
          </property>
@@ -185,74 +194,57 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="btn_load">
-            <property name="text">
-             <string>Cargar...</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="0" colspan="3">
            <widget class="QGroupBox" name="groupBox_3">
             <property name="title">
              <string/>
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
-             <item row="0" column="0">
-              <widget class="QLabel" name="lbl_config_result">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Configuración:</string>
-               </property>
-              </widget>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="cmb_child"/>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lbl_dnom">
-               <property name="text">
-                <string>Diametro:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
+             <item row="1" column="0">
               <widget class="QLabel" name="lbl_material">
                <property name="text">
                 <string>Material:</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
+             <item row="2" column="0">
               <widget class="QLabel" name="lbl_mapzone">
                <property name="text">
                 <string>Mapzone:</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="cmb_config_result"/>
-             </item>
-             <item row="4" column="1">
-              <widget class="QComboBox" name="cmb_mapzone"/>
-             </item>
-             <item row="2" column="1">
-              <widget class="QComboBox" name="cmb_dnom"/>
-             </item>
-             <item row="3" column="1">
-              <widget class="QComboBox" name="cmb_material"/>
-             </item>
-             <item row="5" column="1">
-              <widget class="QComboBox" name="cmb_child"/>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="Line" name="line">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lbl_dnom">
+               <property name="text">
+                <string>Diametro:</string>
                </property>
               </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="cmb_dnom"/>
+             </item>
+             <item row="1" column="1">
+              <widget class="QComboBox" name="cmb_material"/>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="cmb_mapzone"/>
+             </item>
+             <item row="4" column="0" colspan="2">
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
              </item>
             </layout>
            </widget>

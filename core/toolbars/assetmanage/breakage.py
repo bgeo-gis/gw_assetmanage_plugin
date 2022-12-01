@@ -494,28 +494,33 @@ class AmBreakage(dialog.GwAction):
             config.read(config_path)
 
             # Get configuration parameters
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
-                self.dlg_priority_global.btn_snapping.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
-                self.dlg_priority_global.lbl_dnom.setVisible(False)
-                self.dlg_priority_global.cmb_dnom.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
-                self.dlg_priority_global.lbl_material.setVisible(False)
-                self.dlg_priority_global.cmb_material.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
-                self.dlg_priority_global.lbl_expl.setVisible(False)
-                self.dlg_priority_global.cmb_expl.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
-                pass
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_selection")) is not True:
+                print(F"AAA")
+                self.dlg_priority_global.grb_selection.setVisible(False)
+            else:
+                print(F"BBB")
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
+                    self.dlg_priority_global.btn_snapping.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
+                    self.dlg_priority_global.lbl_dnom.setVisible(False)
+                    self.dlg_priority_global.cmb_dnom.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
+                    self.dlg_priority_global.lbl_material.setVisible(False)
+                    self.dlg_priority_global.cmb_material.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
+                    self.dlg_priority_global.lbl_expl.setVisible(False)
+                    self.dlg_priority_global.cmb_expl.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
+                    pass
             if tools_os.set_boolean(config.get("dialog_priority_global", "show_ivi_button")) is not True:
                 pass
             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config")) is not True:
-                self.dlg_priority_global.tab_widget.setVisible(False)
+                self.dlg_priority_global.grb_global.setVisible(False)
             else:
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_diameter")) is not True:
                     self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_arc")) is not True:
-                    pass
+                    self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_material")) is not True:
                     self.dlg_priority_global.tab_widget.tab_material.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_engine")) is not True:
