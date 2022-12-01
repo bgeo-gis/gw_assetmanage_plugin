@@ -29,14 +29,12 @@ class ResultSelector(dialog.GwAction):
 
 
     def clicked_event(self):
-        self.open_selector()
+        self.open_manager()
 
 
     def open_manager(self):
 
         self.dlg_result_selector = ResultSelectorUi()
 
-
-
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name='priority_manager')
+        tools_gw.open_dialog(self.dlg_result_selector, dlg_name='result_selection')
