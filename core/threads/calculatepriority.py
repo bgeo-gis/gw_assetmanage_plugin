@@ -132,11 +132,27 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Calculating values (3/5)...")
             self.setProgress(40)
 
-            # TODO: Update asset.result_calculate and get result_id
-            result_id = 0
+            sql = (
+                f"select id from asset.result_calculate where result_name = '{self.result_name}'"
+            )
+            result_id = tools_db.get_rows(sql)
+
+            if result_id is not None:
+                self._emit_report("This result name already exist.")
+                return False
+
+            tools_db.execute_sql(
+                f"""
+                insert into asset.result_calculate (result_name, descript, cur_user, tstamp)
+                values ('{self.result_name}', '{self.result_description}', current_user, now()) 
+                """)
+            sql = (
+                    f"select id from asset.result_calculate where result_name = '{self.result_name}'"
+            )
+            result_id = tools_db.get_row(sql)
 
             save_arcs_sql = f"""
-                delete from asset.arc_engine_sh where result_id = {result_id};
+                delete from asset.arc_engine_sh where result_id = {result_id[0]};
                 insert into asset.arc_engine_sh 
                 (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance)
                 values 
@@ -181,7 +197,7 @@ class GwCalculatePriority(GwTask):
                             discount_rate,
                         )
                     )
-                save_arcs_sql += f"({arc_id},{result_id},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year},{compliance}),"
+                save_arcs_sql += f"({arc_id},{result_id[0]},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year},{compliance}),"
 
             save_arcs_sql = save_arcs_sql[:-1]
 
@@ -190,16 +206,16 @@ class GwCalculatePriority(GwTask):
                 return False
             self._emit_report("Updating tables (4/5)...")
             self.setProgress(60)
-
+            print(f"QUERY INSERT -> {save_arcs_sql}")
             tools_db.execute_sql(save_arcs_sql)
-            tools_db.execute_sql(
-                f"""
+            print(f"UPDATE -> ")
+            print(f"""
                 update asset.arc_engine_sh 
                     set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
                     from (
                         select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
                         ) as years
-                    where result_id = {result_id};
+                    where result_id = {result_id[0]};
                 update asset.arc_engine_sh sh
                     set val = sh.year_order * weight.year_order + sh.compliance * weight.compliance
                     from (
@@ -208,13 +224,37 @@ class GwCalculatePriority(GwTask):
                             join asset.config_engine c on c.parameter = 'compliance'
                             where y.parameter = 'expected_year'
                     ) as weight
-                    where result_id = {result_id};
+                    where result_id = {result_id[0]};
                 delete from asset.arc_output
-                    where result_id = {result_id};
+                    where result_id = {result_id[0]};
                 insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
                     select arc_id, result_id, val, year, cost_constr
                         from asset.arc_engine_sh
-                        where result_id = {result_id};
+                        where result_id = {result_id[0]};
+                """)
+            tools_db.execute_sql(
+                f"""
+                update asset.arc_engine_sh 
+                    set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
+                    from (
+                        select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
+                        ) as years
+                    where result_id = {result_id[0]};
+                update asset.arc_engine_sh sh
+                    set val = sh.year_order * weight.year_order + sh.compliance * weight.compliance
+                    from (
+                        select y.value::real year_order, c.value::real compliance
+                            from asset.config_engine y
+                            join asset.config_engine c on c.parameter = 'compliance'
+                            where y.parameter = 'expected_year'
+                    ) as weight
+                    where result_id = {result_id[0]};
+                delete from asset.arc_output
+                    where result_id = {result_id[0]};
+                insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
+                    select arc_id, result_id, val, year, cost_constr
+                        from asset.arc_engine_sh
+                        where result_id = {result_id[0]};
                 """
             )
 

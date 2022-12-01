@@ -67,9 +67,6 @@ def get_ui_class(ui_file_name, subfolder='shared'):
 
 # giswater_advancedtools
 
-FORM_CLASS = get_ui_class('incremental.ui', 'assetmanage')
-class IncrementalUi(GwDialog, FORM_CLASS):
-    pass
 
 FORM_CLASS = get_ui_class('assignation.ui', 'assetmanage')
 class AssignationUi(GwDialog, FORM_CLASS):
@@ -83,10 +80,6 @@ FORM_CLASS = get_ui_class('priority_manager.ui', 'assetmanage')
 class PriorityManagerUi(GwDialog, FORM_CLASS):
     pass
 
-FORM_CLASS = get_ui_class('priority_config.ui', 'assetmanage')
-class PriorityConfigUi_(GwDialog, FORM_CLASS):
-    pass
-
-FORM_CLASS = get_ui_class('priority_config_guk.ui', 'assetmanage')
-class PriorityConfigUi(GwDialog, FORM_CLASS):
+FORM_CLASS = get_ui_class('result_selector.ui', 'assetmanage')
+class ResultSelectorUi(GwDialog, FORM_CLASS):
     pass

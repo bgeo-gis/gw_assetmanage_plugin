@@ -9,4 +9,6 @@ or (at your option) any later version.
 # assetmanage
 from .assetmanage.breakage import AmBreakage
 from .assetmanage.priority import AmPriority
+from .assetmanage.result_manager import ResultManager
+from .assetmanage.result_selector import ResultSelector
 

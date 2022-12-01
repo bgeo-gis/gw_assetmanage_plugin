@@ -37,37 +37,37 @@
        <string>Config</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="txt_years"/>
+       </item>
+       <item row="3" column="0">
         <widget class="QLabel" name="lbl_method">
          <property name="text">
           <string>Método de asignación:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="txt_years"/>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="cmb_method"/>
        </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="txt_buffer"/>
-       </item>
-       <item row="2" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="lbl_years">
          <property name="text">
           <string>Años para atras:</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="lbl_buffer">
          <property name="text">
           <string>Distancia de buffer:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="cmb_method"/>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="txt_buffer"/>
        </item>
-       <item row="3" column="0">
+       <item row="6" column="0">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -79,6 +79,37 @@
           </size>
          </property>
         </spacer>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCheckBox" name="chk_diameter">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCheckBox" name="chk_material">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="lbl_diameter">
+         <property name="text">
+          <string>Utilizar diámetro:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="lbl_material">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Utilizar material:</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

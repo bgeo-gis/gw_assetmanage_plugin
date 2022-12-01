@@ -5,16 +5,12 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from datetime import datetime
+import configparser
+import os
+
 from functools import partial
 from time import time
 from datetime import timedelta
-import psycopg2
-# import arcpy
-# import geopandas as gpd
-import os
-# from sqlalchemy import create_engine
-# import geoalchemy2
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer, QPoint
@@ -26,7 +22,7 @@ from .... import global_vars
 
 from ...threads.assignation import GwAssignation
 from ...threads.calculatepriority import GwCalculatePriority
-from ...ui.ui_manager import IncrementalUi, AssignationUi, PriorityConfigUi
+from ...ui.ui_manager import AssignationUi, PriorityUi
 
 
 class AmBreakage(dialog.GwAction):
@@ -59,7 +55,7 @@ class AmBreakage(dialog.GwAction):
         # Assignation variables
         self.dlg_assignation = None
 
-    def clicked_event(self): 
+    def clicked_event(self):
         button = self.action.associatedWidgets()[1]
         menu_point = button.mapToGlobal(QPoint(0,button.height()))
         self.menu.exec(menu_point)
@@ -76,7 +72,7 @@ class AmBreakage(dialog.GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['CARGA ROTURAS', 'ASIGNACIÓN ROTURAS', 'CÁLCULO PRIORIDADES']
+        actions = ['ASIGNACIÓN ROTURAS', 'CÁLCULO PRIORIDADES']
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -85,9 +81,7 @@ class AmBreakage(dialog.GwAction):
     def _get_selected_action(self, name):
         """ Gets selected action """
 
-        if name == 'CARGA ROTURAS':
-            self.incremental_load()
-        elif name == 'ASIGNACIÓN ROTURAS':
+        if name == 'ASIGNACIÓN ROTURAS':
             self.assignation()
         elif name == 'CÁLCULO PRIORIDADES':
             self.priority_config()
@@ -98,54 +92,44 @@ class AmBreakage(dialog.GwAction):
 
     def priority_config(self):
 
-        self.dlg_priority_config = PriorityConfigUi()
+        self.dlg_priority_global = PriorityUi()
 
-        tools_gw.disable_tab_log(self.dlg_priority_config)
+        tools_gw.disable_tab_log(self.dlg_priority_global)
+
+
+        # Manage form
+
+        # Hidden widgets
+        self._manage_hidden_form_global()
 
         # Define tableviews
-        self.qtbl_diameter = self.dlg_priority_config.findChild(QTableView, "tbl_diameter")
+        self.qtbl_diameter = self.dlg_priority_global.findChild(QTableView, "tbl_diameter")
         self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.qtbl_material = self.dlg_priority_config.findChild(QTableView, "tbl_material")
+        self.qtbl_material = self.dlg_priority_global.findChild(QTableView, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.qtbl_engine = self.dlg_priority_config.findChild(QTableView, "tbl_engine")
+        self.qtbl_engine = self.dlg_priority_global.findChild(QTableView, "tbl_engine")
         self.qtbl_engine.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
         # Triggers
-        self._fill_table(self.dlg_priority_config, self.qtbl_diameter, "asset.config_diameter",
+        self._fill_table(self.dlg_priority_global, self.qtbl_diameter, "asset.config_diameter",
                          set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_diameter, "config_diameter", schema_name='asset')
-        self._fill_table(self.dlg_priority_config, self.qtbl_material, "asset.config_material",
+        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_diameter, "config_diameter", schema_name='asset')
+        self._fill_table(self.dlg_priority_global, self.qtbl_material, "asset.config_material",
                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_material, "config_material", schema_name='asset')
-        self._fill_table(self.dlg_priority_config, self.qtbl_engine, "asset.config_engine",
+        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_material, "config_material", schema_name='asset')
+        self._fill_table(self.dlg_priority_global, self.qtbl_engine, "asset.config_engine",
                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_config, self.qtbl_engine, "config_engine", schema_name='asset')
+        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_engine, "config_engine", schema_name='asset')
 
-        self.dlg_priority_config.btn_calc.clicked.connect(self._execute_config)
-        self.dlg_priority_config.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_config))
+        self.dlg_priority_global.btn_calc.clicked.connect(self._execute_config)
+        self.dlg_priority_global.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_global))
 
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_config, dlg_name='incremental')
-
-
-    def incremental_load(self):
-
-        self.dlg_incremental = IncrementalUi()
-
-        # Disable tab log
-        tools_gw.disable_tab_log(self.dlg_incremental)
-
-
-        # Triggers
-        self.dlg_incremental.btn_load.clicked.connect(self._upload_leaks)
-        self.dlg_incremental.btn_shp_path.clicked.connect(partial(self._select_file_shp))
-
-        # Open the dialog
-        tools_gw.open_dialog(self.dlg_incremental, dlg_name='incremental')
+        tools_gw.open_dialog(self.dlg_priority_global, dlg_name='incremental')
 
 
     def assignation(self):
@@ -154,8 +138,11 @@ class AmBreakage(dialog.GwAction):
         dlg = self.dlg_assignation
         tools_gw.load_settings(dlg)
 
-        # Disable tab log
-        tools_gw.disable_tab_log(self.dlg_assignation)
+
+        # Manage form
+
+        # Hidden widgets
+        self._manage_hidden_form_leaks()
 
         # Fill combos
         self._fill_assign_combos()
@@ -163,15 +150,46 @@ class AmBreakage(dialog.GwAction):
         tools_qt.double_validator(dlg.txt_buffer, min_=0, decimals=0)
         tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
 
+        # Disable tab log
         tools_gw.disable_tab_log(dlg)
         dlg.progressBar.hide()
-        
+
         self._assignation_user_values("load")
 
         self._set_assignation_signals()
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_assignation, dlg_name='assignation')
+
+
+    def _manage_hidden_form_leaks(self):
+
+        status = True
+        try:
+
+            # Read the config file
+            config = configparser.ConfigParser()
+            config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
+            if not os.path.exists(config_path):
+                print(f"Config file not found: {config_path}")
+                return
+
+            config.read(config_path)
+
+            # Get configuration parameters
+            if tools_os.set_boolean(config.get("dialog_leaks", "show_check_material")) is not True:
+                self.dlg_assignation.lbl_material.setVisible(False)
+                self.dlg_assignation.chk_material.setVisible(False)
+            if tools_os.set_boolean(config.get("dialog_leaks", "show_check_diameter")) is not True:
+                self.dlg_assignation.lbl_diameter.setVisible(False)
+                self.dlg_assignation.chk_diameter.setVisible(False)
+
+
+        except Exception as e:
+            print('read_config_file error %s' % e)
+            status = False
+
+        return status
 
 
     def _fill_assign_combos(self):
@@ -293,31 +311,6 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.rejected.connect(dlg.reject)
         self.timer.stop()
 
-    def _upload_leaks(self):
-
-        return
-        # Get connection
-        # engine = create_engine(f"postgresql://{global_vars.db_credentials['user']}:{global_vars.db_credentials['password']}@{global_vars.db_credentials['host']}:{global_vars.db_credentials['port']}/{global_vars.db_credentials['db']}")
-        # # read in the data
-        # file = tools_qt.get_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path)
-        # leaks_shp = gpd.read_file(file)
-        # leaks_shp.to_postgis('leaks_test', engine, index=True, index_label='Index')
-
-
-    def _select_file_shp(self):
-        """ Select SHP file """
-
-        self.file_inp = tools_qt.get_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path)
-
-        # Get directory of that file
-        folder_path = os.path.dirname(self.file_inp)
-        if not os.path.exists(folder_path):
-            folder_path = os.path.dirname(__file__)
-        os.chdir(folder_path)
-        message = tools_qt.tr("Select SHP file")
-        self.file_inp, filter_ = QFileDialog.getOpenFileName(None, message, "", '*.shp')
-        tools_qt.set_widget_text(self.dlg_incremental, self.dlg_incremental.txt_shp_path, self.file_inp)
-
 
     def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
         """ Set a model with selected filter.
@@ -358,7 +351,7 @@ class AmBreakage(dialog.GwAction):
 
 
     def _execute_config(self):
-        dlg = self.dlg_priority_config
+        dlg = self.dlg_priority_global
 
         inputs = self._validate_config_input()
         if not inputs:
@@ -463,7 +456,7 @@ class AmBreakage(dialog.GwAction):
         QgsApplication.taskManager().addTask(t)
 
     def _validate_config_input(self):
-        dlg = self.dlg_priority_config
+        dlg = self.dlg_priority_global
 
         result_name = dlg.txt_result_id.text()
         if not len(result_name):
@@ -480,7 +473,56 @@ class AmBreakage(dialog.GwAction):
         return result_name, description
 
     def _config_ended(self):
-        dlg = self.dlg_priority_config
+        dlg = self.dlg_priority_global
         dlg.btn_cancel.clicked.disconnect()
         dlg.btn_cancel.clicked.connect(dlg.reject)
         self.timer.stop()
+
+
+    def _manage_hidden_form_global(self):
+
+        status = True
+        try:
+
+            # Read the config file
+            config = configparser.ConfigParser()
+            config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
+            if not os.path.exists(config_path):
+                print(f"Config file not found: {config_path}")
+                return
+
+            config.read(config_path)
+
+            # Get configuration parameters
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
+                self.dlg_priority_global.btn_snapping.setVisible(False)
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
+                self.dlg_priority_global.lbl_dnom.setVisible(False)
+                self.dlg_priority_global.cmb_dnom.setVisible(False)
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
+                self.dlg_priority_global.lbl_material.setVisible(False)
+                self.dlg_priority_global.cmb_material.setVisible(False)
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
+                self.dlg_priority_global.lbl_expl.setVisible(False)
+                self.dlg_priority_global.cmb_expl.setVisible(False)
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
+                pass
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_ivi_button")) is not True:
+                pass
+            if tools_os.set_boolean(config.get("dialog_priority_global", "show_config")) is not True:
+                self.dlg_priority_global.tab_widget.setVisible(False)
+            else:
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_diameter")) is not True:
+                    self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_arc")) is not True:
+                    pass
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_material")) is not True:
+                    self.dlg_priority_global.tab_widget.tab_material.setVisible(False)
+                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_engine")) is not True:
+                    self.dlg_priority_global.tab_widget.tab_engine.setVisible(False)
+
+        except Exception as e:
+            print('read_config_file error %s' % e)
+            status = False
+
+        return status
