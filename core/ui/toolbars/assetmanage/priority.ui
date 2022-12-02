@@ -24,7 +24,7 @@
    <item row="1" column="1" colspan="4">
     <widget class="QTabWidget" name="mainTab">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_calc">
       <attribute name="title">
@@ -97,7 +97,7 @@
            <widget class="QComboBox" name="cmb_expl_global"/>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="txt_dot"/>
+           <widget class="QLineEdit" name="txt_budget"/>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lbl_year">
@@ -110,7 +110,7 @@
            <widget class="QComboBox" name="cmb_year"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="lbl_dot">
+           <widget class="QLabel" name="lbl_budget">
             <property name="text">
              <string>Dotación:</string>
             </property>
@@ -282,32 +282,8 @@
        </item>
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_11">
-         <item row="3" column="0">
-          <widget class="QPushButton" name="btn_save">
-           <property name="text">
-            <string>Guardar...</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QPushButton" name="btn_export_csv">
-           <property name="text">
-            <string>Exportar CSV</string>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0" colspan="2">
           <widget class="QTextEdit" name="txt_infolog"/>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QLabel" name="lbl_result">
-           <property name="text">
-            <string>Nombre del resultado:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0" colspan="2">
-          <widget class="QLineEdit" name="txt_result_name"/>
          </item>
         </layout>
        </item>

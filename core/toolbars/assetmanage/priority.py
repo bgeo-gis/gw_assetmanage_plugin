@@ -71,7 +71,6 @@ class AmPriority(dialog.GwAction):
 
         # Triggers
         self.dlg_priority_selection.btn_calc.clicked.connect(self._manage_calculate)
-        self.dlg_priority_selection.btn_save.clicked.connect(self._manage_save)
         self.dlg_priority_selection.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_selection))
         self.dlg_priority_selection.rejected.connect(partial(tools_gw.close_dialog, self.dlg_priority_selection))
 
@@ -132,20 +131,6 @@ class AmPriority(dialog.GwAction):
             status = False
 
         return status
-
-
-    def _manage_save(self):
-
-        self.result_name = tools_qt.get_text(self.dlg_priority_selection, 'txt_result_name')
-        if self.result_name is None:
-            message = "Result name is mandatory"
-            tools_qgis.show_message(message, 0)
-            return
-
-        sql = f"INSERT INTO asset.result_selection (result_name, arc_id, dnom, material, mapzone, mapzone_child, cur_user, tstamp)" \
-              f"VALUES ('{self.result_name}', '{self.list_ids}', '{self.dnom_value}', '{self.material_value}', " \
-              f"'{self.mapzone_value}', '{self.child_value}', current_user, now())"
-        tools_db.execute_sql(sql)
 
     def _manage_calculate(self):
 
