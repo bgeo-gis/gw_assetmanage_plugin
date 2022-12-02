@@ -114,51 +114,51 @@ class GWAssetPlugin(QObject):
         global_vars.user_folder_name = user_folder_name
 
         # Set db connection
-        self._read_config_file()
+        # self._read_config_file()
         # status = tools_db.connect_to_database(self.host, self.port, self.db, self.user, self.password, self.ssl)
 
         # Read project
         self._project_read()
 
 
-    def _read_config_file(self):
-
-        status = True
-        try:
-
-            # Read the config file
-            config = configparser.ConfigParser()
-            folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-            config_path = os.path.join(f"{folder}{os.sep}config", "config.config")
-            if not os.path.exists(config_path):
-                print(f"Config file not found: {config_path}")
-                return
-
-            config.read(config_path)
-
-            # Get database configuration parameters
-            self.host = config.get("db_config", "host")
-            self.port = config.get("db_config", "port")
-            self.db = config.get("db_config", "db")
-            self.schema = config.get("db_config", "schema")
-            self.user = config.get("db_config", "user")
-            self.password = config.get("db_config", "password")
-            self.ssl = config.get("db_config", "ssl")
-
-            # Setting global_vars
-            global_vars.db_credentials['host'] = self.host
-            global_vars.db_credentials['port'] = self.port
-            global_vars.db_credentials['db'] = self.db
-            global_vars.db_credentials['schema'] = self.schema
-            global_vars.db_credentials['user'] = self.user
-            global_vars.db_credentials['password'] = self.password
-            global_vars.db_credentials['ssl'] = self.ssl
-
-        except Exception as e:
-            print('read_config_file error %s' % e)
-            status = False
-
-        return status
+    # def _read_config_file(self):
+    #
+    #     status = True
+    #     try:
+    #
+    #         # Read the config file
+    #         config = configparser.ConfigParser()
+    #         folder = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    #         config_path = os.path.join(f"{folder}{os.sep}config", "config.config")
+    #         if not os.path.exists(config_path):
+    #             print(f"Config file not found: {config_path}")
+    #             return
+    #
+    #         config.read(config_path)
+    #
+    #         # Get database configuration parameters
+    #         self.host = config.get("db_config", "host")
+    #         self.port = config.get("db_config", "port")
+    #         self.db = config.get("db_config", "db")
+    #         self.schema = config.get("db_config", "schema")
+    #         self.user = config.get("db_config", "user")
+    #         self.password = config.get("db_config", "password")
+    #         self.ssl = config.get("db_config", "ssl")
+    #
+    #         # Setting global_vars
+    #         global_vars.db_credentials['host'] = self.host
+    #         global_vars.db_credentials['port'] = self.port
+    #         global_vars.db_credentials['db'] = self.db
+    #         global_vars.db_credentials['schema'] = self.schema
+    #         global_vars.db_credentials['user'] = self.user
+    #         global_vars.db_credentials['password'] = self.password
+    #         global_vars.db_credentials['ssl'] = self.ssl
+    #
+    #     except Exception as e:
+    #         print('read_config_file error %s' % e)
+    #         status = False
+    #
+    #     return status
 
     def _project_read(self):
 
