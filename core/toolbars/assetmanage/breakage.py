@@ -501,10 +501,8 @@ class AmBreakage(dialog.GwAction):
 
             # Get configuration parameters
             if tools_os.set_boolean(config.get("dialog_priority_global", "show_selection")) is not True:
-                print(F"AAA")
                 self.dlg_priority_global.grb_selection.setVisible(False)
             else:
-                print(F"BBB")
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
                     self.dlg_priority_global.btn_snapping.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:

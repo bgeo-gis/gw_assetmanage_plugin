@@ -253,6 +253,16 @@ class AmPriority(dialog.GwAction):
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_priority_selection.cmb_material, rows, 1, add_empty=True)
 
+        # Combo exploitation
+        sql = "SELECT expl_id as id, name as idval FROM ws.exploitation;"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_priority_selection.cmb_expl_selection, rows, 1, add_empty=True)
+
+        # Combo presszone
+        sql = "SELECT presszone_id as id, name as idval FROM asset.presszone"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_priority_selection.cmb_presszone, rows, 1, add_empty=True)
+
 
 
     # endregion
