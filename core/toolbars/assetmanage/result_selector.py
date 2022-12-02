@@ -36,5 +36,14 @@ class ResultSelector(dialog.GwAction):
 
         self.dlg_result_selector = ResultSelectorUi()
 
+        # Combo result_selector
+        sql = "SELECT cr.result_id as id, cr.result_name as idval FROM asset.selector_result_main sm join asset.cat_result cr using (result_id);"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_result_selector.cmb_result_selector, rows, 1, sort_by=0)
+        # Combo result_global
+        sql = "SELECT cr.result_id as id, cr.result_name as idval FROM asset.selector_result_compare sc join asset.cat_result cr using (result_id);"
+        rows = tools_db.get_rows(sql)
+        tools_qt.fill_combo_values(self.dlg_result_selector.cmb_result_global, rows, 1, sort_by=0)
+
         # Open the dialog
         tools_gw.open_dialog(self.dlg_result_selector, dlg_name='result_selection')

@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
+from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
 from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
 from .... import global_vars
@@ -36,10 +37,55 @@ class ResultManager(dialog.GwAction):
 
         self.dlg_priority_manager = PriorityManagerUi()
 
-        # self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection, "asset.result_selection",
-        #                  set_edit_triggers=QTableView.DoubleClicked)
-        # tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection,
-        #                                "result_selection", schema_name='asset')
-
+        # Fill table global
+        filter = f"result_type = 'GLOBAL'"
+        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_global, "asset.cat_result",
+                         set_edit_triggers=QTableView.DoubleClicked, expr=filter)
+        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_global,
+                                       "cat_result", schema_name='asset')
+        # Fill table selection
+        filter = f"result_type = 'SELECTION'"
+        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection, "asset.cat_result",
+                         set_edit_triggers=QTableView.DoubleClicked, expr=filter)
+        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection,
+                                       "cat_result", schema_name='asset')
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_manager, dlg_name='priority_manager')
+
+
+    def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+        """ Set a model with selected filter.
+            Attach that model to selected table
+            @setEditStrategy:
+            0: OnFieldChange
+            1: OnRowChange
+            2: OnManualSubmit
+        """
+        try:
+
+            # Set model
+            model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
+            model.setTable(table_name)
+            model.setEditStrategy(QSqlTableModel.OnFieldChange)
+            model.setSort(0, 0)
+            model.select()
+
+            # When change some field we need to refresh Qtableview and filter by psector_id
+            # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
+            widget.setEditTriggers(set_edit_triggers)
+
+            # Check for errors
+            if model.lastError().isValid():
+                print(f"ERROR -> {model.lastError().text()}")
+
+            # Attach model to table view
+            if expr:
+                widget.setModel(model)
+                widget.model().setFilter(expr)
+            else:
+                widget.setModel(model)
+
+            if hidde:
+                self.refresh_table(dialog, widget)
+        except Exception as e:
+            print(f"EXCEPTION -> {e}")

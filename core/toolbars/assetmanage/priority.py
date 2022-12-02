@@ -107,11 +107,13 @@ class AmPriority(dialog.GwAction):
                     self.dlg_priority_selection.lbl_material.setVisible(False)
                     self.dlg_priority_selection.cmb_material.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_exploitation")) is not True:
-                    self.dlg_priority_selection.lbl_expl.setVisible(False)
-                    self.dlg_priority_selection.cmb_expl.setVisible(False)
+                    self.dlg_priority_selection.lbl_expl_selection.setVisible(False)
+                    self.dlg_priority_selection.cmb_expl_selection.setVisible(False)
                 if tools_os.set_boolean(config.get("dialog_priority_selection", "show_presszone")) is not True:
-                    pass
+                    self.dlg_priority_selection.lbl_presszone.setVisible(False)
+                    self.dlg_priority_selection.cmb_presszone.setVisible(False)
             if tools_os.set_boolean(config.get("dialog_priority_selection", "show_ivi_button")) is not True:
+                #TODO: next approach
                 pass
             if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config")) is not True:
                 self.dlg_priority_selection.grb_global.setVisible(False)

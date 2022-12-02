@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>396</width>
+    <width>401</width>
     <height>581</height>
    </rect>
   </property>
@@ -200,20 +200,10 @@
              <string/>
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
-             <item row="3" column="1">
-              <widget class="QComboBox" name="cmb_child"/>
-             </item>
              <item row="1" column="0">
               <widget class="QLabel" name="lbl_material">
                <property name="text">
                 <string>Material:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lbl_mapzone">
-               <property name="text">
-                <string>Mapzone:</string>
                </property>
               </widget>
              </item>
@@ -225,13 +215,24 @@
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="cmb_dnom"/>
+              <widget class="QComboBox" name="cmb_dnom">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
              </item>
              <item row="1" column="1">
               <widget class="QComboBox" name="cmb_material"/>
              </item>
-             <item row="2" column="1">
-              <widget class="QComboBox" name="cmb_mapzone"/>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lbl_exploitation">
+               <property name="text">
+                <string>Exploitation:</string>
+               </property>
+              </widget>
              </item>
              <item row="4" column="0" colspan="2">
               <spacer name="verticalSpacer">
@@ -245,6 +246,19 @@
                 </size>
                </property>
               </spacer>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lbl_presszone">
+               <property name="text">
+                <string>Presszone:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QComboBox" name="cmb_exploitation"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QComboBox" name="cmb_presszone"/>
              </item>
             </layout>
            </widget>
