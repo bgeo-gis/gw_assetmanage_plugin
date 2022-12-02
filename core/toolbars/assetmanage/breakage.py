@@ -362,7 +362,7 @@ class AmBreakage(dialog.GwAction):
         inputs = self._validate_config_input()
         if not inputs:
             return
-        result_name, result_description = inputs
+        result_name, description, expl_id, budget, target_year = inputs
 
         invalid_diameters_count = tools_db.get_rows("""
             select count(*)
@@ -434,7 +434,10 @@ class AmBreakage(dialog.GwAction):
         self.thread = GwCalculatePriority(
             "Priority Calculation",
             result_name,
-            result_description,
+            description,
+            expl_id,
+            budget,
+            target_year
         )
         t = self.thread
         t.taskCompleted.connect(self._config_ended)
@@ -476,7 +479,13 @@ class AmBreakage(dialog.GwAction):
             tools_qt.show_info_box("You must enter a description for the result!")
             return
 
-        return result_name, description
+        expl_id = tools_qt.get_combo_value(dlg, 'cmb_expl_global', 0)
+        budget = tools_qt.get_text(dlg, 'txt_budget', False, False)
+        if budget in (None, ""):
+            budget = -1
+        target_year = tools_qt.get_combo_value(dlg, 'cmb_year', 0)
+
+        return result_name, description, expl_id, budget, target_year
 
     def _config_ended(self):
         dlg = self.dlg_priority_global

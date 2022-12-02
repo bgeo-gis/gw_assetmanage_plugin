@@ -54,10 +54,14 @@ class GwCalculatePriority(GwTask):
     report = pyqtSignal(dict)
     step = pyqtSignal(str)
 
-    def __init__(self, description, result_name, result_description):
+    def __init__(self, description, result_name, result_description, exploitation, budget, target_year):
         super().__init__(description, QgsTask.CanCancel)
         self.result_name = result_name
         self.result_description = result_description
+        self.result_exploitation = exploitation
+        self.result_budget = budget
+        self.result_target_year = target_year
+
 
     def run(self):
         try:
@@ -133,21 +137,21 @@ class GwCalculatePriority(GwTask):
             self.setProgress(40)
 
             sql = (
-                f"select id from asset.result_calculate where result_name = '{self.result_name}'"
+                f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
             )
-            result_id = tools_db.get_rows(sql)
-
+            result_id = tools_db.get_row(sql)
+            print(f"RESULT_ID 11 -> {result_id}")
             if result_id is not None:
                 self._emit_report("This result name already exist.")
                 return False
 
             tools_db.execute_sql(
                 f"""
-                insert into asset.result_calculate (result_name, descript, cur_user, tstamp)
-                values ('{self.result_name}', '{self.result_description}', current_user, now()) 
+                insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
+                values ('{self.result_name}', 'GLOBAL', '{self.result_description}', '{self.result_exploitation}', '{self.result_budget}', '{self.result_target_year}', current_user, now())
                 """)
             sql = (
-                    f"select id from asset.result_calculate where result_name = '{self.result_name}'"
+                    f"select id from asset.cat_result where result_name = '{self.result_name}'"
             )
             result_id = tools_db.get_row(sql)
 
