@@ -135,6 +135,11 @@ class GwAssignation(GwTask):
                 if leak_id not in leaks:
                     orphan_leaks.add(leak_id)
 
+            by_material_diameter = 0
+            by_material = 0
+            by_diameter = 0
+            any_pipe = 0
+
             for leak_id, arcs in leaks.items():
                 same_material_exists = any([a["same_material"] for a in arcs])
                 same_diameter_exists = any([a["same_diameter"] for a in arcs])
@@ -146,12 +151,16 @@ class GwAssignation(GwTask):
                     and same_diameter_exists
                 ):
                     is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
+                    by_material_diameter += 1
                 elif self.use_material and same_material_exists:
                     is_arc_valid = lambda x: x["same_material"]
+                    by_material += 1
                 elif self.use_diameter and same_diameter_exists:
                     is_arc_valid = lambda x: x["same_diameter"]
+                    by_diameter += 1
                 else:
                     is_arc_valid = lambda x: True
+                    any_pipe += 1
 
                 valid_arcs = list(
                     filter(
@@ -215,15 +224,31 @@ class GwAssignation(GwTask):
 
             self.setProgress(100)
 
-            self._emit_report(
+            final_report = [
                 "Task finished!",
                 f"Leaks within the indicated period: {len(all_leaks)}.",
                 f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
+            ]
+
+            if by_material_diameter:
+                final_report.append(
+                    f"Leaks assigned by material and diameter: {by_material_diameter}."
+                )
+            if by_material:
+                final_report.append(f"Leaks assigned by material only:  {by_material}.")
+            if by_diameter:
+                final_report.append(f"Leaks assigned by diameter only: {by_diameter}.")
+            if any_pipe:
+                final_report.append(f"Leaks assigned to any nearby pipes: {any_pipe}.")
+
+            final_report += [
                 f"Total of pipes: {total_pipes}.",
                 f"Pipes with zero leaks per km per year: {orphan_pipes}.",
                 f"Max rleak: {max_rleak} leaks/km.year.",
                 f"Min non-zero rleak: {min_rleak} leaks/km.year.",
-            )
+            ]
+
+            self._emit_report(*final_report)
             return True
 
         except Exception as e:
