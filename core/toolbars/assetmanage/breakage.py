@@ -95,46 +95,6 @@ class AmBreakage(dialog.GwAction):
         calculate_priority = CalculatePriority(type="global")
         calculate_priority.clicked_event()
 
-        # self.dlg_priority_global = PriorityUi()
-
-        # tools_gw.disable_tab_log(self.dlg_priority_global)
-
-
-        # # Manage form
-
-        # # Hidden widgets
-        # self._manage_hidden_form_global()
-
-        # # Define tableviews
-        # self.qtbl_diameter = self.dlg_priority_global.findChild(QTableView, "tbl_diameter")
-        # self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        # self.qtbl_material = self.dlg_priority_global.findChild(QTableView, "tbl_material")
-        # self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        # self.qtbl_engine = self.dlg_priority_global.findChild(QTableView, "tbl_engine")
-        # self.qtbl_engine.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-
-        # # Triggers
-        # self._fill_table(self.dlg_priority_global, self.qtbl_diameter, "asset.config_diameter",
-        #                  set_edit_triggers=QTableView.DoubleClicked)
-        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_diameter, "config_diameter", schema_name='asset')
-        # self._fill_table(self.dlg_priority_global, self.qtbl_material, "asset.config_material",
-        #                 set_edit_triggers=QTableView.DoubleClicked)
-        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_material, "config_material", schema_name='asset')
-        # self._fill_table(self.dlg_priority_global, self.qtbl_engine, "asset.config_engine",
-        #                 set_edit_triggers=QTableView.DoubleClicked)
-        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_engine, "config_engine", schema_name='asset')
-
-        # self.dlg_priority_global.btn_calc.clicked.connect(self._execute_config)
-        # self.dlg_priority_global.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_global))
-
-
-        # # Open the dialog
-        # tools_gw.open_dialog(self.dlg_priority_global, dlg_name='incremental')
-
-
     def assignation(self):
 
         self.dlg_assignation = AssignationUi()
@@ -321,44 +281,6 @@ class AmBreakage(dialog.GwAction):
         self.timer.stop()
 
 
-    # def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
-    #     """ Set a model with selected filter.
-    #         Attach that model to selected table
-    #         @setEditStrategy:
-    #         0: OnFieldChange
-    #         1: OnRowChange
-    #         2: OnManualSubmit
-    #     """
-    #     try:
-
-    #         # Set model
-    #         model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
-    #         model.setTable(table_name)
-    #         model.setEditStrategy(QSqlTableModel.OnFieldChange)
-    #         model.setSort(0, 0)
-    #         model.select()
-
-    #         # When change some field we need to refresh Qtableview and filter by psector_id
-    #         # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
-    #         widget.setEditTriggers(set_edit_triggers)
-
-    #         # Check for errors
-    #         if model.lastError().isValid():
-    #             print(f"ERROR -> {model.lastError().text()}")
-
-    #         # Attach model to table view
-    #         if expr:
-    #             widget.setModel(model)
-    #             widget.model().setFilter(expr)
-    #         else:
-    #             widget.setModel(model)
-
-    #         if hidde:
-    #             self.refresh_table(dialog, widget)
-    #     except Exception as e:
-    #         print(f"EXCEPTION -> {e}")
-
-
     # def _execute_config(self):
     #     dlg = self.dlg_priority_global
 
@@ -495,55 +417,3 @@ class AmBreakage(dialog.GwAction):
     #     dlg.btn_cancel.clicked.disconnect()
     #     dlg.btn_cancel.clicked.connect(dlg.reject)
     #     self.timer.stop()
-
-
-    # def _manage_hidden_form_global(self):
-
-    #     status = True
-    #     try:
-
-    #         # Read the config file
-    #         config = configparser.ConfigParser()
-    #         config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
-    #         if not os.path.exists(config_path):
-    #             print(f"Config file not found: {config_path}")
-    #             return
-
-    #         config.read(config_path)
-
-    #         # Get configuration parameters
-    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_selection")) is not True:
-    #             self.dlg_priority_global.grb_selection.setVisible(False)
-    #         else:
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
-    #                 self.dlg_priority_global.btn_snapping.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
-    #                 self.dlg_priority_global.lbl_dnom.setVisible(False)
-    #                 self.dlg_priority_global.cmb_dnom.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
-    #                 self.dlg_priority_global.lbl_material.setVisible(False)
-    #                 self.dlg_priority_global.cmb_material.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
-    #                 self.dlg_priority_global.lbl_expl.setVisible(False)
-    #                 self.dlg_priority_global.cmb_expl.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
-    #                 pass
-    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_ivi_button")) is not True:
-    #             pass
-    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_config")) is not True:
-    #             self.dlg_priority_global.grb_global.setVisible(False)
-    #         else:
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_diameter")) is not True:
-    #                 self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_arc")) is not True:
-    #                 self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_material")) is not True:
-    #                 self.dlg_priority_global.tab_widget.tab_material.setVisible(False)
-    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_engine")) is not True:
-    #                 self.dlg_priority_global.tab_widget.tab_engine.setVisible(False)
-
-    #     except Exception as e:
-    #         print('read_config_file error %s' % e)
-    #         status = False
-
-    #     return status
