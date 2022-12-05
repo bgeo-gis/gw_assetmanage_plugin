@@ -54,14 +54,37 @@ class GwCalculatePriority(GwTask):
     report = pyqtSignal(dict)
     step = pyqtSignal(str)
 
-    def __init__(self, description, result_name, result_description, exploitation, budget, target_year):
+    def __init__(
+        self,
+        description,
+        result_name,
+        result_type,
+        result_description,
+        exploitation,
+        budget,
+        target_year,
+        config_diameter,
+        config_material,
+        config_engine,
+        features,
+        diameter,
+        material,
+        presszone,
+    ):
         super().__init__(description, QgsTask.CanCancel)
         self.result_name = result_name
+        self.result_type = result_type
         self.result_description = result_description
         self.result_exploitation = exploitation
         self.result_budget = budget
         self.result_target_year = target_year
-
+        self.config_diameter = config_diameter
+        self.config_material = config_material
+        self.config_engine = config_engine
+        self.features = features
+        self.diameter = diameter
+        self.material = material
+        self.presszone = presszone
 
     def run(self):
         try:
@@ -136,9 +159,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Calculating values (3/5)...")
             self.setProgress(40)
 
-            sql = (
-                f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-            )
+            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
             result_id = tools_db.get_row(sql)
             print(f"RESULT_ID 11 -> {result_id}")
             if result_id is not None:
@@ -149,10 +170,9 @@ class GwCalculatePriority(GwTask):
                 f"""
                 insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
                 values ('{self.result_name}', 'GLOBAL', '{self.result_description}', '{self.result_exploitation}', '{self.result_budget}', '{self.result_target_year}', current_user, now())
-                """)
-            sql = (
-                    f"select id from asset.cat_result where result_name = '{self.result_name}'"
+                """
             )
+            sql = f"select id from asset.cat_result where result_name = '{self.result_name}'"
             result_id = tools_db.get_row(sql)
 
             save_arcs_sql = f"""
@@ -213,7 +233,8 @@ class GwCalculatePriority(GwTask):
             print(f"QUERY INSERT -> {save_arcs_sql}")
             tools_db.execute_sql(save_arcs_sql)
             print(f"UPDATE -> ")
-            print(f"""
+            print(
+                f"""
                 update asset.arc_engine_sh 
                     set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
                     from (
@@ -235,7 +256,8 @@ class GwCalculatePriority(GwTask):
                     select arc_id, result_id, val, year, cost_constr
                         from asset.arc_engine_sh
                         where result_id = {result_id[0]};
-                """)
+                """
+            )
             tools_db.execute_sql(
                 f"""
                 update asset.arc_engine_sh 
