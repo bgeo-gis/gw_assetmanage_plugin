@@ -92,7 +92,7 @@ class AmBreakage(dialog.GwAction):
 
 
     def priority_config(self):
-        calculate_priority = CalculatePriority(type="global")
+        calculate_priority = CalculatePriority(type="GLOBAL")
         calculate_priority.clicked_event()
 
     def assignation(self):

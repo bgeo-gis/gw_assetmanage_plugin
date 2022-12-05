@@ -37,11 +37,11 @@ class AmPriority(dialog.GwAction):
         self.action_group = action_group
 
     def clicked_event(self):
-        calculate_priority = CalculatePriority(type="selection")
+        calculate_priority = CalculatePriority(type="SELECTION")
         calculate_priority.clicked_event()
 
 class CalculatePriority:
-    def __init__(self, type="global"):
+    def __init__(self, type="GLOBAL"):
         self.type = type
         self.layer_to_work = 'v_asset_arc_output'
         self.layers = {}
@@ -107,12 +107,12 @@ class CalculatePriority:
     def _manage_hidden_form(self):
         status = True
         try:
-            if self.type == "global":
+            if self.type == "GLOBAL":
                 dialog_type = "dialog_priority_global"
-            elif self.type == "selection":
+            elif self.type == "SELECTION":
                 dialog_type = "dialog_priority_selection"
             else:
-                raise ValueError(f"Type of priority dialog shoud be 'global' or 'selection'. Value passed: '{self.type}'.")
+                raise ValueError(f"Type of priority dialog shoud be 'GLOBAL' or 'SELECTION'. Value passed: '{self.type}'.")
 
             # Read the config file
             config = configparser.ConfigParser()
