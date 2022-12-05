@@ -163,25 +163,28 @@ class CalculatePriority:
         return status
 
     def _manage_calculate(self):
-
-        # Manage selection
-        if self.list_ids == {}:
-            message = "No features selected"
-            tools_qgis.show_message(message, 0)
+        inputs = self._validate_inputs()
+        if not inputs:
             return
 
-        function_name = 'gw_fct_assetmanage_selection'
-        self.child_value = None
+        # # Manage selection
+        # if self.list_ids == {}:
+        #     message = "No features selected"
+        #     tools_qgis.show_message(message, 0)
+        #     return
 
-        # Manage extras
-        self.list_ids = json.dumps(self.list_ids)
-        self.dnom_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_dnom', 0)
-        self.material_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_material', 0)
+        # function_name = 'gw_fct_assetmanage_selection'
+        # self.child_value = None
 
-        extras = f'"selection":{self.list_ids}, "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
-        body = tools_gw.create_body(extras=extras)
-        json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
-        print(f"JSON_RESULT -> {json_result}")
+        # # Manage extras
+        # self.list_ids = json.dumps(self.list_ids)
+        # self.dnom_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_dnom', 0)
+        # self.material_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_material', 0)
+
+        # extras = f'"selection":{self.list_ids}, "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
+        # body = tools_gw.create_body(extras=extras)
+        # json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
+        # print(f"JSON_RESULT -> {json_result}")
 
     # region Selection
 
@@ -253,6 +256,20 @@ class CalculatePriority:
         # self.connect_signal_selection_changed()
 
     # endregion
+
+    def _validate_inputs(self):
+        dlg = self.dlg_priority
+
+        result_name = dlg.txt_result_id.text()
+        if not result_name:
+            tools_qt.show_info_box("You should inform an Result Identifier!")
+            return
+        if tools_db.get_row(f"""
+            select * from asset.cat_result
+            where result_name = '{result_name}'
+        """):
+            tools_qt.show_info_box(f"'{result_name}' already exists. Please choose another Result Identifier.")
+            return
 
     # region Attribute
 
