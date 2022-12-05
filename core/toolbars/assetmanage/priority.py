@@ -35,6 +35,14 @@ class AmPriority(dialog.GwAction):
         self.text = text
         self.toolbar = toolbar
         self.action_group = action_group
+
+    def clicked_event(self):
+        calculate_priority = CalculatePriority(type="selection")
+        calculate_priority.clicked_event()
+
+class CalculatePriority:
+    def __init__(self, type="global"):
+        self.type = type
         self.layer_to_work = 'v_asset_arc_output'
         self.layers = {}
         self.layers["arc"] = []
@@ -43,13 +51,7 @@ class AmPriority(dialog.GwAction):
         # Priority variables
         self.dlg_priority_selection = None
 
-
-
     def clicked_event(self):
-        self.priority()
-
-
-    def priority(self):
 
         self.dlg_priority_selection = PriorityUi()
 
@@ -80,9 +82,14 @@ class AmPriority(dialog.GwAction):
 
 
     def _manage_hidden_form_selection(self):
-
         status = True
         try:
+            if self.type == "global":
+                dialog_type = "dialog_priority_global"
+            elif self.type == "selection":
+                dialog_type = "dialog_priority_selection"
+            else:
+                raise ValueError(f"Type of priority dialog shoud be 'global' or 'selection'. Value passed: '{self.type}'.")
 
             # Read the config file
             config = configparser.ConfigParser()
@@ -94,36 +101,36 @@ class AmPriority(dialog.GwAction):
             config.read(config_path)
 
             # Get configuration parameters
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_selection")) is not True:
+            if tools_os.set_boolean(config.get(dialog_type, "show_selection")) is not True:
                 self.dlg_priority_selection.grb_selection.setVisible(False)
             else:
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_maptool")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_maptool")) is not True:
                     self.dlg_priority_selection.btn_snapping.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_diameter")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_diameter")) is not True:
                     self.dlg_priority_selection.lbl_dnom.setVisible(False)
                     self.dlg_priority_selection.cmb_dnom.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_material")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_material")) is not True:
                     self.dlg_priority_selection.lbl_material.setVisible(False)
                     self.dlg_priority_selection.cmb_material.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_exploitation")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_exploitation")) is not True:
                     self.dlg_priority_selection.lbl_expl_selection.setVisible(False)
                     self.dlg_priority_selection.cmb_expl_selection.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_presszone")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_presszone")) is not True:
                     self.dlg_priority_selection.lbl_presszone.setVisible(False)
                     self.dlg_priority_selection.cmb_presszone.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_ivi_button")) is not True:
+            if tools_os.set_boolean(config.get(dialog_type, "show_ivi_button")) is not True:
                 #TODO: next approach
                 pass
-            if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config")) is not True:
+            if tools_os.set_boolean(config.get(dialog_type, "show_config")) is not True:
                 self.dlg_priority_selection.grb_global.setVisible(False)
             else:
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_diameter")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_config_diameter")) is not True:
                     self.dlg_priority_selection.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_arc")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_config_arc")) is not True:
                     self.dlg_priority_selection.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_material")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_config_material")) is not True:
                     self.dlg_priority_selection.tab_widget.tab_material.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_selection", "show_config_engine")) is not True:
+                if tools_os.set_boolean(config.get(dialog_type, "show_config_engine")) is not True:
                     self.dlg_priority_selection.tab_widget.tab_engine.setVisible(False)
 
         except Exception as e:

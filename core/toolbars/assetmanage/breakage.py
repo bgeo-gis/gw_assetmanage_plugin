@@ -20,6 +20,7 @@ from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
 from .... import global_vars
 
+from .priority import CalculatePriority
 from ...threads.assignation import GwAssignation
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import AssignationUi, PriorityUi
@@ -91,45 +92,47 @@ class AmBreakage(dialog.GwAction):
 
 
     def priority_config(self):
+        calculate_priority = CalculatePriority(type="global")
+        calculate_priority.clicked_event()
 
-        self.dlg_priority_global = PriorityUi()
+        # self.dlg_priority_global = PriorityUi()
 
-        tools_gw.disable_tab_log(self.dlg_priority_global)
-
-
-        # Manage form
-
-        # Hidden widgets
-        self._manage_hidden_form_global()
-
-        # Define tableviews
-        self.qtbl_diameter = self.dlg_priority_global.findChild(QTableView, "tbl_diameter")
-        self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        self.qtbl_material = self.dlg_priority_global.findChild(QTableView, "tbl_material")
-        self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        self.qtbl_engine = self.dlg_priority_global.findChild(QTableView, "tbl_engine")
-        self.qtbl_engine.setSelectionBehavior(QAbstractItemView.SelectRows)
+        # tools_gw.disable_tab_log(self.dlg_priority_global)
 
 
-        # Triggers
-        self._fill_table(self.dlg_priority_global, self.qtbl_diameter, "asset.config_diameter",
-                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_diameter, "config_diameter", schema_name='asset')
-        self._fill_table(self.dlg_priority_global, self.qtbl_material, "asset.config_material",
-                        set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_material, "config_material", schema_name='asset')
-        self._fill_table(self.dlg_priority_global, self.qtbl_engine, "asset.config_engine",
-                        set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_engine, "config_engine", schema_name='asset')
+        # # Manage form
 
-        self.dlg_priority_global.btn_calc.clicked.connect(self._execute_config)
-        self.dlg_priority_global.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_global))
+        # # Hidden widgets
+        # self._manage_hidden_form_global()
+
+        # # Define tableviews
+        # self.qtbl_diameter = self.dlg_priority_global.findChild(QTableView, "tbl_diameter")
+        # self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        # self.qtbl_material = self.dlg_priority_global.findChild(QTableView, "tbl_material")
+        # self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
+
+        # self.qtbl_engine = self.dlg_priority_global.findChild(QTableView, "tbl_engine")
+        # self.qtbl_engine.setSelectionBehavior(QAbstractItemView.SelectRows)
 
 
-        # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_global, dlg_name='incremental')
+        # # Triggers
+        # self._fill_table(self.dlg_priority_global, self.qtbl_diameter, "asset.config_diameter",
+        #                  set_edit_triggers=QTableView.DoubleClicked)
+        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_diameter, "config_diameter", schema_name='asset')
+        # self._fill_table(self.dlg_priority_global, self.qtbl_material, "asset.config_material",
+        #                 set_edit_triggers=QTableView.DoubleClicked)
+        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_material, "config_material", schema_name='asset')
+        # self._fill_table(self.dlg_priority_global, self.qtbl_engine, "asset.config_engine",
+        #                 set_edit_triggers=QTableView.DoubleClicked)
+        # tools_gw.set_tablemodel_config(self.dlg_priority_global, self.qtbl_engine, "config_engine", schema_name='asset')
+
+        # self.dlg_priority_global.btn_calc.clicked.connect(self._execute_config)
+        # self.dlg_priority_global.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority_global))
+
+
+        # # Open the dialog
+        # tools_gw.open_dialog(self.dlg_priority_global, dlg_name='incremental')
 
 
     def assignation(self):
@@ -318,229 +321,229 @@ class AmBreakage(dialog.GwAction):
         self.timer.stop()
 
 
-    def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
-        """ Set a model with selected filter.
-            Attach that model to selected table
-            @setEditStrategy:
-            0: OnFieldChange
-            1: OnRowChange
-            2: OnManualSubmit
-        """
-        try:
+    # def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
+    #     """ Set a model with selected filter.
+    #         Attach that model to selected table
+    #         @setEditStrategy:
+    #         0: OnFieldChange
+    #         1: OnRowChange
+    #         2: OnManualSubmit
+    #     """
+    #     try:
 
-            # Set model
-            model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
-            model.setTable(table_name)
-            model.setEditStrategy(QSqlTableModel.OnFieldChange)
-            model.setSort(0, 0)
-            model.select()
+    #         # Set model
+    #         model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
+    #         model.setTable(table_name)
+    #         model.setEditStrategy(QSqlTableModel.OnFieldChange)
+    #         model.setSort(0, 0)
+    #         model.select()
 
-            # When change some field we need to refresh Qtableview and filter by psector_id
-            # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
-            widget.setEditTriggers(set_edit_triggers)
+    #         # When change some field we need to refresh Qtableview and filter by psector_id
+    #         # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
+    #         widget.setEditTriggers(set_edit_triggers)
 
-            # Check for errors
-            if model.lastError().isValid():
-                print(f"ERROR -> {model.lastError().text()}")
+    #         # Check for errors
+    #         if model.lastError().isValid():
+    #             print(f"ERROR -> {model.lastError().text()}")
 
-            # Attach model to table view
-            if expr:
-                widget.setModel(model)
-                widget.model().setFilter(expr)
-            else:
-                widget.setModel(model)
+    #         # Attach model to table view
+    #         if expr:
+    #             widget.setModel(model)
+    #             widget.model().setFilter(expr)
+    #         else:
+    #             widget.setModel(model)
 
-            if hidde:
-                self.refresh_table(dialog, widget)
-        except Exception as e:
-            print(f"EXCEPTION -> {e}")
-
-
-    def _execute_config(self):
-        dlg = self.dlg_priority_global
-
-        inputs = self._validate_config_input()
-        if not inputs:
-            return
-        result_name, description, expl_id, budget, target_year = inputs
-
-        invalid_diameters_count = tools_db.get_rows("""
-            select count(*)
-            from asset.arc_asset
-            where dnom is null 
-                or dnom <= 0
-                or dnom > (select max(dnom) from asset.config_diameter)
-        """)[0][0]
-        if invalid_diameters_count:
-            invalid_diameters = [
-                x[0]
-                for x in tools_db.get_rows(
-                    """
-                    select distinct dnom
-                    from asset.arc_asset
-                    where dnom is null 
-                        or dnom <= 0
-                        or dnom > (select max(dnom) from asset.config_diameter)
-                    """
-                )
-            ]
-            text = (
-                f"Pipes with invalid diameters: {invalid_diameters_count}.\n"
-                f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
-                "A diameter value is invalid if it is zero, negative, NULL, "
-                "or is greater than the maximum diameter in the configuration table. "
-                "These pipes WILL NOT be assigned a priority value.\n\n"
-                "Do you want to proceed?"
-            )
-            if not tools_qt.show_question(text, force_action=True):
-                return
-
-        invalid_materials_count = tools_db.get_rows("""
-            select count(*)
-            from asset.arc_asset a
-            where not exists (
-                select 1
-                from asset.config_material
-                where material = a.matcat_id
-            )
-        """)[0][0]
-        if invalid_materials_count:
-            invalid_materials = [
-                x[0]
-                for x in tools_db.get_rows(
-                    """
-                    select distinct matcat_id
-                    from asset.arc_asset a
-                    where not exists (
-                        select 1
-                        from asset.config_material
-                        where material = a.matcat_id
-                    )
-                    """
-                )
-            ]
-            text = (
-                f"Pipes with invalid material: {invalid_materials_count}.\n"
-                f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
-                "A material value is invalid if "
-                "it is not in the material configuration table. "
-                "These pipes will be assigned as compliant by default, "
-                "which may result in a lower priority value.\n\n"
-                "Do you want to proceed?"
-            )
-            if not tools_qt.show_question(text, force_action=True):
-                return
-
-        self.thread = GwCalculatePriority(
-            "Priority Calculation",
-            result_name,
-            description,
-            expl_id,
-            budget,
-            target_year
-        )
-        t = self.thread
-        t.taskCompleted.connect(self._config_ended)
-        t.taskTerminated.connect(self._config_ended)
-
-        # Set timer
-        self.t0 = time()
-        self.timer = QTimer()
-        self.timer.timeout.connect(partial(self._update_timer, dlg.lbl_timer))
-        self.timer.start(250)
-
-        # Log behavior
-        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
-
-        # Progress bar behavior
-        t.progressChanged.connect(dlg.progressBar.setValue)
-
-        # Button OK behavior
-        dlg.btn_calc.setEnabled(False)
-
-        # Button Cancel behavior
-        dlg.btn_cancel.clicked.disconnect()
-        dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
-
-        QgsApplication.taskManager().addTask(t)
-
-    def _validate_config_input(self):
-        dlg = self.dlg_priority_global
-
-        result_name = dlg.txt_result_id.text()
-        if not len(result_name):
-            tools_qt.show_info_box("You must enter an identifier for the result!")
-            return
-
-        # TODO: verify if result_name already exists
-
-        description = dlg.txt_descript.text()
-        if not len(description):
-            tools_qt.show_info_box("You must enter a description for the result!")
-            return
-
-        expl_id = tools_qt.get_combo_value(dlg, 'cmb_expl_global', 0)
-        budget = tools_qt.get_text(dlg, 'txt_budget', False, False)
-        if budget in (None, ""):
-            budget = -1
-        target_year = tools_qt.get_combo_value(dlg, 'cmb_year', 0)
-
-        return result_name, description, expl_id, budget, target_year
-
-    def _config_ended(self):
-        dlg = self.dlg_priority_global
-        dlg.btn_cancel.clicked.disconnect()
-        dlg.btn_cancel.clicked.connect(dlg.reject)
-        self.timer.stop()
+    #         if hidde:
+    #             self.refresh_table(dialog, widget)
+    #     except Exception as e:
+    #         print(f"EXCEPTION -> {e}")
 
 
-    def _manage_hidden_form_global(self):
+    # def _execute_config(self):
+    #     dlg = self.dlg_priority_global
 
-        status = True
-        try:
+    #     inputs = self._validate_config_input()
+    #     if not inputs:
+    #         return
+    #     result_name, description, expl_id, budget, target_year = inputs
 
-            # Read the config file
-            config = configparser.ConfigParser()
-            config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
-            if not os.path.exists(config_path):
-                print(f"Config file not found: {config_path}")
-                return
+    #     invalid_diameters_count = tools_db.get_rows("""
+    #         select count(*)
+    #         from asset.arc_asset
+    #         where dnom is null 
+    #             or dnom <= 0
+    #             or dnom > (select max(dnom) from asset.config_diameter)
+    #     """)[0][0]
+    #     if invalid_diameters_count:
+    #         invalid_diameters = [
+    #             x[0]
+    #             for x in tools_db.get_rows(
+    #                 """
+    #                 select distinct dnom
+    #                 from asset.arc_asset
+    #                 where dnom is null 
+    #                     or dnom <= 0
+    #                     or dnom > (select max(dnom) from asset.config_diameter)
+    #                 """
+    #             )
+    #         ]
+    #         text = (
+    #             f"Pipes with invalid diameters: {invalid_diameters_count}.\n"
+    #             f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
+    #             "A diameter value is invalid if it is zero, negative, NULL, "
+    #             "or is greater than the maximum diameter in the configuration table. "
+    #             "These pipes WILL NOT be assigned a priority value.\n\n"
+    #             "Do you want to proceed?"
+    #         )
+    #         if not tools_qt.show_question(text, force_action=True):
+    #             return
 
-            config.read(config_path)
+    #     invalid_materials_count = tools_db.get_rows("""
+    #         select count(*)
+    #         from asset.arc_asset a
+    #         where not exists (
+    #             select 1
+    #             from asset.config_material
+    #             where material = a.matcat_id
+    #         )
+    #     """)[0][0]
+    #     if invalid_materials_count:
+    #         invalid_materials = [
+    #             x[0]
+    #             for x in tools_db.get_rows(
+    #                 """
+    #                 select distinct matcat_id
+    #                 from asset.arc_asset a
+    #                 where not exists (
+    #                     select 1
+    #                     from asset.config_material
+    #                     where material = a.matcat_id
+    #                 )
+    #                 """
+    #             )
+    #         ]
+    #         text = (
+    #             f"Pipes with invalid material: {invalid_materials_count}.\n"
+    #             f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
+    #             "A material value is invalid if "
+    #             "it is not in the material configuration table. "
+    #             "These pipes will be assigned as compliant by default, "
+    #             "which may result in a lower priority value.\n\n"
+    #             "Do you want to proceed?"
+    #         )
+    #         if not tools_qt.show_question(text, force_action=True):
+    #             return
 
-            # Get configuration parameters
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_selection")) is not True:
-                self.dlg_priority_global.grb_selection.setVisible(False)
-            else:
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
-                    self.dlg_priority_global.btn_snapping.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
-                    self.dlg_priority_global.lbl_dnom.setVisible(False)
-                    self.dlg_priority_global.cmb_dnom.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
-                    self.dlg_priority_global.lbl_material.setVisible(False)
-                    self.dlg_priority_global.cmb_material.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
-                    self.dlg_priority_global.lbl_expl.setVisible(False)
-                    self.dlg_priority_global.cmb_expl.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
-                    pass
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_ivi_button")) is not True:
-                pass
-            if tools_os.set_boolean(config.get("dialog_priority_global", "show_config")) is not True:
-                self.dlg_priority_global.grb_global.setVisible(False)
-            else:
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_diameter")) is not True:
-                    self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_arc")) is not True:
-                    self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_material")) is not True:
-                    self.dlg_priority_global.tab_widget.tab_material.setVisible(False)
-                if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_engine")) is not True:
-                    self.dlg_priority_global.tab_widget.tab_engine.setVisible(False)
+    #     self.thread = GwCalculatePriority(
+    #         "Priority Calculation",
+    #         result_name,
+    #         description,
+    #         expl_id,
+    #         budget,
+    #         target_year
+    #     )
+    #     t = self.thread
+    #     t.taskCompleted.connect(self._config_ended)
+    #     t.taskTerminated.connect(self._config_ended)
 
-        except Exception as e:
-            print('read_config_file error %s' % e)
-            status = False
+    #     # Set timer
+    #     self.t0 = time()
+    #     self.timer = QTimer()
+    #     self.timer.timeout.connect(partial(self._update_timer, dlg.lbl_timer))
+    #     self.timer.start(250)
 
-        return status
+    #     # Log behavior
+    #     t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+
+    #     # Progress bar behavior
+    #     t.progressChanged.connect(dlg.progressBar.setValue)
+
+    #     # Button OK behavior
+    #     dlg.btn_calc.setEnabled(False)
+
+    #     # Button Cancel behavior
+    #     dlg.btn_cancel.clicked.disconnect()
+    #     dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
+
+    #     QgsApplication.taskManager().addTask(t)
+
+    # def _validate_config_input(self):
+    #     dlg = self.dlg_priority_global
+
+    #     result_name = dlg.txt_result_id.text()
+    #     if not len(result_name):
+    #         tools_qt.show_info_box("You must enter an identifier for the result!")
+    #         return
+
+    #     # TODO: verify if result_name already exists
+
+    #     description = dlg.txt_descript.text()
+    #     if not len(description):
+    #         tools_qt.show_info_box("You must enter a description for the result!")
+    #         return
+
+    #     expl_id = tools_qt.get_combo_value(dlg, 'cmb_expl_global', 0)
+    #     budget = tools_qt.get_text(dlg, 'txt_budget', False, False)
+    #     if budget in (None, ""):
+    #         budget = -1
+    #     target_year = tools_qt.get_combo_value(dlg, 'cmb_year', 0)
+
+    #     return result_name, description, expl_id, budget, target_year
+
+    # def _config_ended(self):
+    #     dlg = self.dlg_priority_global
+    #     dlg.btn_cancel.clicked.disconnect()
+    #     dlg.btn_cancel.clicked.connect(dlg.reject)
+    #     self.timer.stop()
+
+
+    # def _manage_hidden_form_global(self):
+
+    #     status = True
+    #     try:
+
+    #         # Read the config file
+    #         config = configparser.ConfigParser()
+    #         config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
+    #         if not os.path.exists(config_path):
+    #             print(f"Config file not found: {config_path}")
+    #             return
+
+    #         config.read(config_path)
+
+    #         # Get configuration parameters
+    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_selection")) is not True:
+    #             self.dlg_priority_global.grb_selection.setVisible(False)
+    #         else:
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_maptool")) is not True:
+    #                 self.dlg_priority_global.btn_snapping.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_diameter")) is not True:
+    #                 self.dlg_priority_global.lbl_dnom.setVisible(False)
+    #                 self.dlg_priority_global.cmb_dnom.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_material")) is not True:
+    #                 self.dlg_priority_global.lbl_material.setVisible(False)
+    #                 self.dlg_priority_global.cmb_material.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_exploitation")) is not True:
+    #                 self.dlg_priority_global.lbl_expl.setVisible(False)
+    #                 self.dlg_priority_global.cmb_expl.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_presszone")) is not True:
+    #                 pass
+    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_ivi_button")) is not True:
+    #             pass
+    #         if tools_os.set_boolean(config.get("dialog_priority_global", "show_config")) is not True:
+    #             self.dlg_priority_global.grb_global.setVisible(False)
+    #         else:
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_diameter")) is not True:
+    #                 self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_arc")) is not True:
+    #                 self.dlg_priority_global.tab_widget.tab_diameter.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_material")) is not True:
+    #                 self.dlg_priority_global.tab_widget.tab_material.setVisible(False)
+    #             if tools_os.set_boolean(config.get("dialog_priority_global", "show_config_engine")) is not True:
+    #                 self.dlg_priority_global.tab_widget.tab_engine.setVisible(False)
+
+    #     except Exception as e:
+    #         print('read_config_file error %s' % e)
+    #         status = False
+
+    #     return status
