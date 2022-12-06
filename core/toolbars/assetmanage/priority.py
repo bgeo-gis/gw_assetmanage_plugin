@@ -54,6 +54,8 @@ class CalculatePriority:
     def clicked_event(self):
 
         self.dlg_priority = PriorityUi()
+        dlg = self.dlg_priority
+        dlg.setWindowTitle(dlg.windowTitle() + f" ({self.type})")
 
         tools_gw.disable_tab_log(self.dlg_priority)
 
