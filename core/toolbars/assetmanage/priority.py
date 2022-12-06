@@ -128,6 +128,10 @@ class CalculatePriority:
             # Get configuration parameters
             if tools_os.set_boolean(config.get(dialog_type, "show_selection")) is not True:
                 self.dlg_priority.grb_selection.setVisible(False)
+                self.dlg_priority.lbl_budget.setVisible(False)
+                self.dlg_priority.txt_budget.setVisible(False)
+                self.dlg_priority.lbl_year.setVisible(False)
+                self.dlg_priority.cmb_year.setVisible(False)
             else:
                 if tools_os.set_boolean(config.get(dialog_type, "show_maptool")) is not True:
                     self.dlg_priority.btn_snapping.setVisible(False)
