@@ -57,34 +57,34 @@ class GwCalculatePriority(GwTask):
     def __init__(
         self,
         description,
-        result_name,
         result_type,
+        result_name,
         result_description,
+        features,
         exploitation,
+        presszone,
+        diameter,
+        material,
         budget,
         target_year,
         config_diameter,
         config_material,
         config_engine,
-        features,
-        diameter,
-        material,
-        presszone,
     ):
         super().__init__(description, QgsTask.CanCancel)
-        self.result_name = result_name
         self.result_type = result_type
+        self.result_name = result_name
         self.result_description = result_description
+        self.features = features
         self.result_exploitation = exploitation
+        self.presszone = presszone
+        self.diameter = diameter
+        self.material = material
         self.result_budget = budget
         self.result_target_year = target_year
         self.config_diameter = config_diameter
         self.config_material = config_material
         self.config_engine = config_engine
-        self.features = features
-        self.diameter = diameter
-        self.material = material
-        self.presszone = presszone
 
     def run(self):
         try:
