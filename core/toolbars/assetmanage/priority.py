@@ -68,7 +68,7 @@ class CalculatePriority:
 
     def clicked_event(self):
         if gw_global_vars.dao.conn.closed:
-            gw_global_vars.dao.init_db()
+            gw_global_vars.dao.reset_db()
 
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
