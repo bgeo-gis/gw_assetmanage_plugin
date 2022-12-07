@@ -133,10 +133,10 @@ class GwCalculatePriority(GwTask):
             tools_db.execute_sql(
                 f"""
                 insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
-                values ('{self.result_name}', 'GLOBAL', '{self.result_description}', '{self.result_exploitation}', '{self.result_budget}', '{self.result_target_year}', current_user, now())
+                values ('{self.result_name}', 'GLOBAL', '{self.result_description}', NULL, NULL, NULL, current_user, now())
                 """
             )
-            sql = f"select id from asset.cat_result where result_name = '{self.result_name}'"
+            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
             result_id = tools_db.get_row(sql)
 
             save_arcs_sql = f"""
@@ -156,15 +156,24 @@ class GwCalculatePriority(GwTask):
                     continue
                 if arc_length is None:
                     continue
-                reference_dnom = get_min_greater_than(self.config_diameter.keys(), arc_diameter)
+                reference_dnom = get_min_greater_than(
+                    self.config_diameter.keys(), arc_diameter
+                )
                 cost_repmain = self.config_diameter[reference_dnom]["repairing_cost"]
 
-                replacement_cost = self.config_diameter[reference_dnom]["replacement_cost"]
+                replacement_cost = self.config_diameter[reference_dnom][
+                    "replacement_cost"
+                ]
                 cost_constr = replacement_cost * float(arc_length)
 
                 material_compliance = 10
-                if arc_material in self.config_material and self.config_material[arc_material]:
-                    material_compliance = self.config_material[arc_material]["compliance"]
+                if (
+                    arc_material in self.config_material
+                    and self.config_material[arc_material]
+                ):
+                    material_compliance = self.config_material[arc_material][
+                        "compliance"
+                    ]
 
                 compliance = 10 - min(
                     self.config_diameter[reference_dnom]["compliance"],
@@ -202,16 +211,11 @@ class GwCalculatePriority(GwTask):
                     set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
                     from (
                         select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
+                            where result_id = {result_id[0]}
                         ) as years
                     where result_id = {result_id[0]};
                 update asset.arc_engine_sh sh
-                    set val = sh.year_order * weight.year_order + sh.compliance * weight.compliance
-                    from (
-                        select y.value::real year_order, c.value::real compliance
-                            from asset.config_engine y
-                            join asset.config_engine c on c.parameter = 'compliance'
-                            where y.parameter = 'expected_year'
-                    ) as weight
+                    set val = sh.year_order * {self.config_engine['expected_year']} + sh.compliance * {self.config_engine['compliance']}
                     where result_id = {result_id[0]};
                 delete from asset.arc_output
                     where result_id = {result_id[0]};
@@ -227,16 +231,11 @@ class GwCalculatePriority(GwTask):
                     set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
                     from (
                         select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
+                            where result_id = {result_id[0]}
                         ) as years
                     where result_id = {result_id[0]};
                 update asset.arc_engine_sh sh
-                    set val = sh.year_order * weight.year_order + sh.compliance * weight.compliance
-                    from (
-                        select y.value::real year_order, c.value::real compliance
-                            from asset.config_engine y
-                            join asset.config_engine c on c.parameter = 'compliance'
-                            where y.parameter = 'expected_year'
-                    ) as weight
+                    set val = sh.year_order * {self.config_engine['expected_year']} + sh.compliance * {self.config_engine['compliance']}
                     where result_id = {result_id[0]};
                 delete from asset.arc_output
                     where result_id = {result_id[0]};
