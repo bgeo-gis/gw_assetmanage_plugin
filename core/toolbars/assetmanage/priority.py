@@ -11,6 +11,7 @@ import configparser
 import os
 import json
 
+from qgis.core import QgsApplication
 from qgis.PyQt.QtWidgets import QMenu, QAbstractItemView, QAction, QActionGroup, QTableView
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -18,7 +19,19 @@ from qgis.PyQt.QtSql import QSqlTableModel
 from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
 from .... import global_vars
 
+from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
+
+
+def table2data(table_view):
+    model = table_view.model()
+    data = []
+    for row in range(model.rowCount()):
+        data.append([])
+        for column in range(model.columnCount()):
+            index = model.index(row, column)
+            data[row].append(model.data(index))
+    return data
 
 
 class AmPriority(dialog.GwAction):
@@ -173,6 +186,32 @@ class CalculatePriority:
         if not inputs:
             return
 
+        (
+            result_name,
+            result_description,
+            config_diameter,
+            config_material,
+            config_engine,
+        ) = inputs
+
+        self.thread = GwCalculatePriority(
+            "Calculate Priority",
+            self.type,
+            result_name,
+            result_description,
+            features=None,
+            exploitation=None,
+            presszone=None,
+            diameter=None,
+            material=None,
+            budget=None,
+            target_year=None,
+            config_diameter=config_diameter,
+            config_material=config_material,
+            config_engine=config_engine,
+        )
+        return
+        QgsApplication.taskManager().addTask(self.thread)
         # # Manage selection
         # if self.list_ids == {}:
         #     message = "No features selected"
@@ -270,12 +309,61 @@ class CalculatePriority:
         if not result_name:
             tools_qt.show_info_box("You should inform an Result Identifier!")
             return
-        if tools_db.get_row(f"""
+        if tools_db.get_row(
+            f"""
             select * from asset.cat_result
             where result_name = '{result_name}'
-        """):
-            tools_qt.show_info_box(f"'{result_name}' already exists. Please choose another Result Identifier.")
+            """
+        ):
+            tools_qt.show_info_box(
+                f"'{result_name}' already exists. Please choose another Result Identifier."
+            )
             return
+
+        result_description = self.dlg_priority.txt_descript.text() or None
+
+        config_diameter = {}
+        for dnom, cost_constr, cost_repmain, _, compliance, _ in table2data(
+            self.qtbl_diameter
+        ):
+            if not cost_constr:
+                tools_qt.show_info_box(
+                    f"You should inform the replacing cost for diameter {dnom}!"
+                )
+                return
+            if not cost_repmain:
+                tools_qt.show_info_box(
+                    f"You should inform the repairing cost for diameter {dnom}!"
+                )
+                return
+            if not (0 <= compliance <= 10):
+                tools_qt.show_info_box(
+                    f"For diameter {dnom}, compliance must be a value between 0 and 10, inclusive!"
+                )
+            config_diameter[dnom] = {
+                "cost_constr": cost_constr,
+                "cost_repmain": cost_repmain,
+                "compliance": compliance,
+            }
+
+        config_material = {}
+        for material, _, _, _, _, _, compliance, _ in table2data(self.qtbl_material):
+            if not (0 <= compliance <= 10):
+                tools_qt.show_info_box(
+                    f"For material {material}, compliance must be a value between 0 and 10, inclusive!"
+                )
+                return
+            config_material[material] = {"compliance": compliance}
+
+        config_engine = {x[0]: x[1] for x in table2data(self.qtbl_engine)}
+
+        return (
+            result_name,
+            result_description,
+            config_diameter,
+            config_material,
+            config_engine,
+        )
 
     # region Attribute
 
