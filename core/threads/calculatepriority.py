@@ -91,44 +91,8 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Getting config data from DB (1/5)...")
             self.setProgress(0)
 
-            sql = (
-                "select parameter, value::float, active "
-                + "from asset.config_engine "
-                + "where method = 'S-H' "
-            )
-            rows = tools_db.get_rows(sql)
-            config_engine = {}
-            for row in rows:
-                parameter, value, _ = row
-                config_engine[parameter] = value
-            discount_rate = float(config_engine["drate"])
-            break_growth_rate = float(config_engine["bratemain0"])
-
-            rows = tools_db.get_rows(
-                """
-                select dnom, cost_constr, cost_repmain, compliance
-                    from asset.config_diameter
-                """
-            )
-            diameters = {}
-            for row in rows:
-                dnom, cost_constr, cost_repmain, compliance = row
-                diameters[int(dnom)] = {
-                    "replacement_cost": float(cost_constr),
-                    "repairing_cost": float(cost_repmain),
-                    "compliance": compliance,
-                }
-
-            rows = tools_db.get_rows(
-                """
-                select material, compliance
-                    from asset.config_material
-                """
-            )
-            materials = {}
-            for row in rows:
-                material, compliance = row
-                materials[material] = compliance
+            discount_rate = float(self.config_engine["drate"])
+            break_growth_rate = float(self.config_engine["bratemain0"])
 
             last_leak_year = tools_db.get_rows(
                 """
@@ -187,24 +151,24 @@ class GwCalculatePriority(GwTask):
                 if (
                     arc_diameter is None
                     or arc_diameter <= 0
-                    or arc_diameter > max(diameters.keys())
+                    or arc_diameter > max(self.config_diameter.keys())
                 ):
                     continue
                 if arc_length is None:
                     continue
-                reference_dnom = get_min_greater_than(diameters.keys(), arc_diameter)
-                cost_repmain = diameters[reference_dnom]["repairing_cost"]
+                reference_dnom = get_min_greater_than(self.config_diameter.keys(), arc_diameter)
+                cost_repmain = self.config_diameter[reference_dnom]["repairing_cost"]
 
-                replacement_cost = diameters[reference_dnom]["replacement_cost"]
+                replacement_cost = self.config_diameter[reference_dnom]["replacement_cost"]
                 cost_constr = replacement_cost * float(arc_length)
 
                 material_compliance = True
-                if arc_material in materials and materials[arc_material]:
-                    material_compliance = materials[arc_material]
+                if arc_material in self.config_material and self.config_material[arc_material]:
+                    material_compliance = self.config_material[arc_material]["compliance"]
 
                 compliance = (
                     0
-                    if diameters[reference_dnom]["compliance"] and material_compliance
+                    if self.config_diameter[reference_dnom]["compliance"] and material_compliance
                     else 10
                 )
 

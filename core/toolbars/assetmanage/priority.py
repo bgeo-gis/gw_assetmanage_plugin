@@ -340,9 +340,9 @@ class CalculatePriority:
                 tools_qt.show_info_box(
                     f"For diameter {dnom}, compliance must be a value between 0 and 10, inclusive!"
                 )
-            config_diameter[dnom] = {
-                "cost_constr": cost_constr,
-                "cost_repmain": cost_repmain,
+            config_diameter[int(dnom)] = {
+                "replacement_cost": cost_constr,
+                "repairing_cost": cost_repmain,
                 "compliance": compliance,
             }
 
