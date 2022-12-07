@@ -412,7 +412,7 @@ class CalculatePriority:
                 return
             config_material[material_name] = {"compliance": compliance}
 
-        config_engine = {x[0]: x[1] for x in table2data(self.qtbl_engine)}
+        config_engine = {x[0]: float(x[1]) for x in table2data(self.qtbl_engine)}
 
         return (
             result_name,

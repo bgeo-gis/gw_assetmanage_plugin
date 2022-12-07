@@ -76,7 +76,7 @@ class GwCalculatePriority(GwTask):
         self.result_name = result_name
         self.result_description = result_description
         self.features = features
-        self.result_exploitation = exploitation
+        self.exploitation = exploitation
         self.presszone = presszone
         self.diameter = diameter
         self.material = material
@@ -88,7 +88,7 @@ class GwCalculatePriority(GwTask):
 
     def run(self):
         try:
-            self._emit_report("Getting config data from DB (1/5)...")
+            self._emit_report("Getting auxiliary data from DB (1/5)...")
             self.setProgress(0)
 
             discount_rate = float(self.config_engine["drate"])
@@ -110,7 +110,8 @@ class GwCalculatePriority(GwTask):
 
             sql = (
                 "select a.arc_id, a.matcat_id, a.dnom, "
-                + "st_length(a.the_geom) length, coalesce(ai.rleak, 0) rleak "
+                + "st_length(a.the_geom) length, coalesce(ai.rleak, 0) rleak, "
+                + "a.expl_id, a.presszone_id "
                 + "from asset.arc_asset a "
                 + "left join asset.arc_input ai "
                 + "on (a.arc_id = ai.arc_id and ai.result_id = 0) "
@@ -123,31 +124,17 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Calculating values (3/5)...")
             self.setProgress(40)
 
-            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-            result_id = tools_db.get_row(sql)
-            print(f"RESULT_ID 11 -> {result_id}")
-            if result_id is not None:
-                self._emit_report("This result name already exist.")
-                return False
-
-            tools_db.execute_sql(
-                f"""
-                insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
-                values ('{self.result_name}', 'GLOBAL', '{self.result_description}', NULL, NULL, NULL, current_user, now())
-                """
-            )
-            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-            result_id = tools_db.get_row(sql)
-
-            save_arcs_sql = f"""
-                delete from asset.arc_engine_sh where result_id = {result_id[0]};
-                insert into asset.arc_engine_sh 
-                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance)
-                values 
-            """
-
+            output_arcs = []
             for arc in arcs:
-                arc_id, arc_material, arc_diameter, arc_length, rleak = arc
+                (
+                    arc_id,
+                    arc_material,
+                    arc_diameter,
+                    arc_length,
+                    rleak,
+                    expl_id,
+                    presszone_id,
+                ) = arc
                 if (
                     arc_diameter is None
                     or arc_diameter <= 0
@@ -156,6 +143,15 @@ class GwCalculatePriority(GwTask):
                     continue
                 if arc_length is None:
                     continue
+                if self.exploitation and self.exploitation != expl_id:
+                    continue
+                if self.presszone and self.presszone != presszone_id:
+                    continue
+                if self.diameter and self.diameter != arc_diameter:
+                    continue
+                if self.material and self.material != arc_material:
+                    continue
+
                 reference_dnom = get_min_greater_than(
                     self.config_diameter.keys(), arc_diameter
                 )
@@ -181,7 +177,7 @@ class GwCalculatePriority(GwTask):
                 )
 
                 if rleak == 0 or rleak is None:
-                    year = "NULL"
+                    year = None
                 else:
                     year = int(
                         optimal_replacement_time(
@@ -193,50 +189,89 @@ class GwCalculatePriority(GwTask):
                             discount_rate,
                         )
                     )
-                save_arcs_sql += f"({arc_id},{result_id[0]},{cost_repmain},{cost_repmain},{cost_constr},{break_growth_rate},{year},{compliance}),"
+                output_arcs.append(
+                    [
+                        arc_id,
+                        cost_repmain,
+                        cost_constr,
+                        break_growth_rate,
+                        year,
+                        compliance,
+                    ]
+                )
+            if not len(output_arcs):
+                self._emit_report(
+                    "Task canceled:", "No pipes to process with selected filters."
+                )
+                return False
 
-            save_arcs_sql = save_arcs_sql[:-1]
+            years = [x[4] for x in output_arcs if x[4]]
+            min_year = min(years)
+            max_year = max(years)
+
+            for arc in output_arcs:
+                year_order = 10 * (
+                    1 - ((arc[4] or max_year) - min_year) / (max_year - min_year)
+                )
+                val = (
+                    year_order * self.config_engine["expected_year"]
+                    + arc[5] * self.config_engine["compliance"]
+                )
+                arc.extend([year_order, val])
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
             self._emit_report("Updating tables (4/5)...")
             self.setProgress(60)
+
+            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
+            result_id = tools_db.get_row(sql)
+            print(f"RESULT_ID 11 -> {result_id}")
+            if result_id is not None:
+                self._emit_report("This result name already exist.")
+                return False
+
+            tools_db.execute_sql(
+                f"""
+                insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
+                values ('{self.result_name}', '{self.result_type}', '{self.result_description}', NULL, NULL, NULL, current_user, now())
+                """
+            )
+
+            sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
+            result_id = tools_db.get_row(sql)
+
+            save_arcs_sql = f"""
+                delete from asset.arc_engine_sh where result_id = {result_id[0]};
+                insert into asset.arc_engine_sh 
+                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance, year_order, val)
+                values 
+            """
+
+            for arc in output_arcs:
+                (
+                    arc_id,
+                    cost_repmain,
+                    cost_constr,
+                    break_growth_rate,
+                    year,
+                    compliance,
+                    year_order,
+                    val,
+                ) = arc
+                save_arcs_sql += (
+                    f"({arc_id}, {result_id[0]}, {cost_repmain}, {cost_repmain}, "
+                    f"{cost_constr}, {break_growth_rate}, {year or 'NULL'}, "
+                    f"{compliance}, {year_order}, {val}),"
+                )
+            save_arcs_sql = save_arcs_sql[:-1]
+
             print(f"QUERY INSERT -> {save_arcs_sql}")
             tools_db.execute_sql(save_arcs_sql)
             print(f"UPDATE -> ")
-            print(
-                f"""
-                update asset.arc_engine_sh 
-                    set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
-                    from (
-                        select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
-                            where result_id = {result_id[0]}
-                        ) as years
-                    where result_id = {result_id[0]};
-                update asset.arc_engine_sh sh
-                    set val = sh.year_order * {self.config_engine['expected_year']} + sh.compliance * {self.config_engine['compliance']}
-                    where result_id = {result_id[0]};
-                delete from asset.arc_output
-                    where result_id = {result_id[0]};
-                insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
-                    select arc_id, result_id, val, year, cost_constr
-                        from asset.arc_engine_sh
-                        where result_id = {result_id[0]};
-                """
-            )
             tools_db.execute_sql(
                 f"""
-                update asset.arc_engine_sh 
-                    set year_order = 10 * (1 - (coalesce(year, years.max) - years.min) / years.difference::real)
-                    from (
-                        select min(year), max(year), max(year) - min(year) difference from asset.arc_engine_sh
-                            where result_id = {result_id[0]}
-                        ) as years
-                    where result_id = {result_id[0]};
-                update asset.arc_engine_sh sh
-                    set val = sh.year_order * {self.config_engine['expected_year']} + sh.compliance * {self.config_engine['compliance']}
-                    where result_id = {result_id[0]};
                 delete from asset.arc_output
                     where result_id = {result_id[0]};
                 insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
