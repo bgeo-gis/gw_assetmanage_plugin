@@ -209,6 +209,10 @@ class CalculatePriority:
         (
             result_name,
             result_description,
+            exploitation,
+            presszone,
+            diameter,
+            material,
             config_diameter,
             config_material,
             config_engine,
@@ -220,10 +224,10 @@ class CalculatePriority:
             result_name,
             result_description,
             features=None,
-            exploitation=None,
-            presszone=None,
-            diameter=None,
-            material=None,
+            exploitation=exploitation,
+            presszone=presszone,
+            diameter=diameter,
+            material=material,
             budget=None,
             target_year=None,
             config_diameter=config_diameter,
@@ -370,6 +374,11 @@ class CalculatePriority:
 
         result_description = self.dlg_priority.txt_descript.text()
 
+        exploitation = tools_qt.get_combo_value(dlg, 'cmb_expl_selection') or None
+        presszone = tools_qt.get_combo_value(dlg, 'cmb_presszone') or None
+        diameter = tools_qt.get_combo_value(dlg, 'cmb_dnom') or None
+        material = tools_qt.get_combo_value(dlg, 'cmb_material') or None
+
         config_diameter = {}
         for dnom, cost_constr, cost_repmain, _, compliance, _ in table2data(
             self.qtbl_diameter
@@ -395,19 +404,23 @@ class CalculatePriority:
             }
 
         config_material = {}
-        for material, _, _, _, _, _, compliance, _ in table2data(self.qtbl_material):
+        for material_name, _, _, _, _, _, compliance, _ in table2data(self.qtbl_material):
             if not (0 <= compliance <= 10):
                 tools_qt.show_info_box(
-                    f"For material {material}, compliance must be a value between 0 and 10, inclusive!"
+                    f"For material {material_name}, compliance must be a value between 0 and 10, inclusive!"
                 )
                 return
-            config_material[material] = {"compliance": compliance}
+            config_material[material_name] = {"compliance": compliance}
 
         config_engine = {x[0]: x[1] for x in table2data(self.qtbl_engine)}
 
         return (
             result_name,
             result_description,
+            exploitation,
+            presszone,
+            diameter,
+            material,
             config_diameter,
             config_material,
             config_engine,
