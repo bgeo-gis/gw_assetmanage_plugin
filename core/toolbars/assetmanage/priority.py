@@ -252,7 +252,7 @@ class CalculatePriority:
         # Button Cancel behavior
         dlg.btn_cancel.clicked.disconnect()
         dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
-        return
+
         QgsApplication.taskManager().addTask(t)
 
         # # Manage selection
@@ -368,7 +368,7 @@ class CalculatePriority:
             )
             return
 
-        result_description = self.dlg_priority.txt_descript.text() or None
+        result_description = self.dlg_priority.txt_descript.text()
 
         config_diameter = {}
         for dnom, cost_constr, cost_repmain, _, compliance, _ in table2data(
