@@ -5,13 +5,15 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import partial
+from time import time
 import configparser
 import os
 import json
 
 from qgis.core import QgsApplication
+from qgis.PyQt.QtCore import QTimer
 from qgis.PyQt.QtWidgets import QMenu, QAbstractItemView, QAction, QActionGroup, QTableView
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -118,6 +120,20 @@ class CalculatePriority:
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
 
+    def _calculate_ended(self):
+        dlg = self.dlg_priority
+        dlg.btn_cancel.clicked.disconnect()
+        dlg.btn_cancel.clicked.connect(dlg.reject)
+        self.timer.stop()
+
+    def _cancel_thread(self, dlg):
+        self.thread.cancel()
+        tools_gw.fill_tab_log (
+            dlg,
+            {"info": {"values": [{"message": "Canceling task..."}]}}, 
+            reset_text=False, 
+            close=False
+        )
 
     def _manage_hidden_form(self):
         status = True
@@ -182,6 +198,8 @@ class CalculatePriority:
         return status
 
     def _manage_calculate(self):
+        dlg = self.dlg_priority
+
         inputs = self._validate_inputs()
         if not inputs:
             return
@@ -210,8 +228,31 @@ class CalculatePriority:
             config_material=config_material,
             config_engine=config_engine,
         )
+        t = self.thread
+        t.taskCompleted.connect(self._calculate_ended)
+        t.taskTerminated.connect(self._calculate_ended)
+
+        # Set timer
+        self.t0 = time()
+        self.timer = QTimer()
+        self.timer.timeout.connect(partial(self._update_timer, dlg.lbl_timer))
+        self.timer.start(250)
+
+        # Log behavior
+        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+
+        # Progress bar behavior
+        t.progressChanged.connect(dlg.progressBar.setValue)
+
+        # Button OK behavior
+        dlg.btn_calc.setEnabled(False)
+
+        # Button Cancel behavior
+        dlg.btn_cancel.clicked.disconnect()
+        dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
         return
-        QgsApplication.taskManager().addTask(self.thread)
+        QgsApplication.taskManager().addTask(t)
+
         # # Manage selection
         # if self.list_ids == {}:
         #     message = "No features selected"
@@ -301,6 +342,11 @@ class CalculatePriority:
         # self.connect_signal_selection_changed()
 
     # endregion
+
+    def _update_timer(self, widget):
+        elapsed_time = time() - self.t0
+        text = str(timedelta(seconds=round(elapsed_time)))
+        widget.setText(text)
 
     def _validate_inputs(self):
         dlg = self.dlg_priority
