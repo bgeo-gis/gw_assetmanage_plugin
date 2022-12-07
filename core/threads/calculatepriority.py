@@ -162,14 +162,13 @@ class GwCalculatePriority(GwTask):
                 replacement_cost = self.config_diameter[reference_dnom]["replacement_cost"]
                 cost_constr = replacement_cost * float(arc_length)
 
-                material_compliance = True
+                material_compliance = 10
                 if arc_material in self.config_material and self.config_material[arc_material]:
                     material_compliance = self.config_material[arc_material]["compliance"]
 
-                compliance = (
-                    0
-                    if self.config_diameter[reference_dnom]["compliance"] and material_compliance
-                    else 10
+                compliance = 10 - min(
+                    self.config_diameter[reference_dnom]["compliance"],
+                    material_compliance,
                 )
 
                 if rleak == 0 or rleak is None:
