@@ -235,7 +235,7 @@ class GwCalculatePriority(GwTask):
             tools_db.execute_sql(
                 f"""
                 insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
-                values ('{self.result_name}', '{self.result_type}', '{self.result_description}', NULL, NULL, NULL, current_user, now())
+                values ('{self.result_name}', '{self.result_type}', '{self.result_description}', {self.exploitation or 'NULL'}, NULL, NULL, current_user, now())
                 """
             )
 
