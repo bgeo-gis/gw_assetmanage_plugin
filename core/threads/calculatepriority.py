@@ -116,7 +116,23 @@ class GwCalculatePriority(GwTask):
                 + "left join asset.arc_input ai "
                 + "on (a.arc_id = ai.arc_id and ai.result_id = 0) "
             )
+            filters = []
+            if self.exploitation:
+                filters.append(f"a.expl_id = {self.exploitation}")
+            if self.presszone:
+                filters.append(f"a.presszone_id = '{self.presszone}'")
+            if self.diameter:
+                filters.append(f"a.dnom = {self.diameter}")
+            if self.material:
+                filters.append(f"a.matcat_id = '{self.material}'")
+            if filters:
+                sql += f"where {' and '.join(filters)}"
             arcs = tools_db.get_rows(sql)
+            if not arcs:
+                self._emit_report(
+                    "Task canceled:", "No pipes to process with selected filters."
+                )
+                return False
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
