@@ -126,6 +126,7 @@ class GwAssignation(GwTask):
                             and leak_diameter - 4 <= arc_diameter <= leak_diameter + 4
                         ),
                         "same_material": (
+                            # FIXME: Handle unknown materials
                             leak_material is not None and leak_material == arc_material
                         ),
                     }
