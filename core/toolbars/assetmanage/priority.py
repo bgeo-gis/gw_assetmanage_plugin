@@ -67,6 +67,7 @@ class CalculatePriority:
         self.dlg_priority = None
 
     def clicked_event(self):
+        print(gw_global_vars.dao.conn.closed)
         if gw_global_vars.dao.conn.closed:
             gw_global_vars.dao.reset_db()
 
@@ -104,15 +105,15 @@ class CalculatePriority:
 
 
         # Triggers
-        self._fill_table(self.dlg_priority, self.qtbl_diameter, "asset.config_diameter",
+        self._fill_table(self.dlg_priority, self.qtbl_diameter, "asset.config_diameter_def",
                          set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_diameter, "config_diameter", schema_name='asset')
-        self._fill_table(self.dlg_priority, self.qtbl_material, "asset.config_material",
+        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_diameter, "config_diameter_def", schema_name='asset')
+        self._fill_table(self.dlg_priority, self.qtbl_material, "asset.config_material_def",
                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_material, "config_material", schema_name='asset')
-        self._fill_table(self.dlg_priority, self.qtbl_engine, "asset.config_engine",
+        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_material, "config_material_def", schema_name='asset')
+        self._fill_table(self.dlg_priority, self.qtbl_engine, "asset.config_engine_def",
                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_engine, "config_engine", schema_name='asset')
+        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_engine, "config_engine_def", schema_name='asset')
 
         self.dlg_priority.btn_calc.clicked.connect(self._manage_calculate)
         self.dlg_priority.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority))
@@ -469,7 +470,7 @@ class CalculatePriority:
             # Set model
             model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
             model.setTable(table_name)
-            model.setEditStrategy(QSqlTableModel.OnFieldChange)
+            model.setEditStrategy(QSqlTableModel.OnManualSubmit)
             model.setSort(0, 0)
             model.select()
 
