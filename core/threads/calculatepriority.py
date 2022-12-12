@@ -171,11 +171,9 @@ class GwCalculatePriority(GwTask):
                 reference_dnom = get_min_greater_than(
                     self.config_diameter.keys(), arc_diameter
                 )
-                cost_repmain = self.config_diameter[reference_dnom]["repairing_cost"]
+                cost_repmain = self.config_diameter[reference_dnom]["cost_repmain"]
 
-                replacement_cost = self.config_diameter[reference_dnom][
-                    "replacement_cost"
-                ]
+                replacement_cost = self.config_diameter[reference_dnom]["cost_constr"]
                 cost_constr = replacement_cost * float(arc_length)
 
                 material_compliance = 10

@@ -29,10 +29,14 @@ def table2data(table_view):
     model = table_view.model()
     data = []
     for row in range(model.rowCount()):
-        data.append([])
-        for column in range(model.columnCount()):
-            index = model.index(row, column)
-            data[row].append(model.data(index))
+        record = model.record(row)
+        data.append(
+            {
+                record.fieldName(i): record.value(i)
+                for i in range(len(record))
+                if not table_view.isColumnHidden(i)
+            }
+        )
     return data
 
 
@@ -383,39 +387,40 @@ class CalculatePriority:
         material = tools_qt.get_combo_value(dlg, 'cmb_material') or None
 
         config_diameter = {}
-        for dnom, cost_constr, cost_repmain, _, compliance, _ in table2data(
-            self.qtbl_diameter
-        ):
-            if not cost_constr:
+        for row in table2data(self.qtbl_diameter):
+            if not row["dnom"]:
                 tools_qt.show_info_box(
-                    f"You should inform the replacing cost for diameter {dnom}!"
+                    f"There is an empty value for diameter in the 'Diameter' tab!"
                 )
                 return
-            if not cost_repmain:
+            if not row['cost_constr']:
                 tools_qt.show_info_box(
-                    f"You should inform the repairing cost for diameter {dnom}!"
+                    f"You should inform the replacing cost for diameter {row['dnom']}!"
                 )
                 return
-            if not (0 <= compliance <= 10):
+            if not row["cost_repmain"]:
                 tools_qt.show_info_box(
-                    f"For diameter {dnom}, compliance must be a value between 0 and 10, inclusive!"
+                    f"You should inform the repairing cost for diameter {row['dnom']}!"
                 )
-            config_diameter[int(dnom)] = {
-                "replacement_cost": cost_constr,
-                "repairing_cost": cost_repmain,
-                "compliance": compliance,
+                return
+            if not (0 <= row["compliance"] <= 10):
+                tools_qt.show_info_box(
+                    f"For diameter {row['dnom']}, compliance must be a value between 0 and 10, inclusive!"
+                )
+            config_diameter[int(row['dnom'])] = {
+                k:v for k, v in row.items() if k != "dnom"
             }
 
         config_material = {}
-        for material_name, _, _, _, _, _, compliance, _ in table2data(self.qtbl_material):
-            if not (0 <= compliance <= 10):
+        for row in table2data(self.qtbl_material):
+            if not (0 <= row['compliance'] <= 10):
                 tools_qt.show_info_box(
-                    f"For material {material_name}, compliance must be a value between 0 and 10, inclusive!"
+                    f"For material {row['material']}, compliance must be a value between 0 and 10, inclusive!"
                 )
                 return
-            config_material[material_name] = {"compliance": compliance}
+            config_material[row['material']] = {k:v for k, v in row.items() if k != "material"}
 
-        config_engine = {x[0]: float(x[1]) for x in table2data(self.qtbl_engine)}
+        config_engine = {x["parameter"]: float(x['value']) for x in table2data(self.qtbl_engine)}
 
         return (
             result_name,
