@@ -301,55 +301,71 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Generating result stats (5/5)...")
             self.setProgress(80)
 
-            invalid_diameters_count = tools_db.get_rows(
-                """
+            invalid_diameters_count = tools_db.get_row(
+                f"""
                 select count(*)
                 from asset.arc_asset
                 where dnom is null 
                     or dnom <= 0
-                    or dnom > (select max(dnom) from asset.config_diameter)
+                    or dnom > (
+                        select max(dnom)
+                        from asset.config_diameter
+                        where result_id = {result_id}
+                    )
                 """
-            )[0][0]
+            )[0]
 
-            invalid_diameters = [
-                x[0]
-                for x in tools_db.get_rows(
-                    """
-                    select distinct dnom
-                    from asset.arc_asset
-                    where dnom is null 
-                        or dnom <= 0
-                        or dnom > (select max(dnom) from asset.config_diameter)
-                    """
-                )
-            ]
+            invalid_diameters = []
+            if invalid_diameters_count:
+                invalid_diameters = [
+                    x[0]
+                    for x in tools_db.get_rows(
+                        f"""
+                        select distinct dnom
+                        from asset.arc_asset
+                        where dnom is null 
+                            or dnom <= 0
+                            or dnom > (
+                                select max(dnom)
+                                from asset.config_diameter
+                                where result_id = {result_id}
+                            )
+                        """
+                    )
+                ]
 
-            invalid_materials_count = tools_db.get_rows(
-                """
+            invalid_materials_count = tools_db.get_row(
+                f"""
                 select count(*)
                 from asset.arc_asset a
                 where not exists (
                     select 1
                     from asset.config_material
-                    where material = a.matcat_id
+                    where 
+                        material = a.matcat_id
+                        and result_id = {result_id}
                 )
                 """
-            )[0][0]
-
-            invalid_materials = [
-                x[0]
-                for x in tools_db.get_rows(
-                    """
-                    select distinct matcat_id
-                    from asset.arc_asset a
-                    where not exists (
-                        select 1
-                        from asset.config_material
-                        where material = a.matcat_id
+            )[0]
+            
+            invalid_materials = []
+            if invalid_materials_count:
+                invalid_materials = [
+                    x[0]
+                    for x in tools_db.get_rows(
+                        f"""
+                        select distinct matcat_id
+                        from asset.arc_asset a
+                        where not exists (
+                            select 1
+                            from asset.config_material
+                            where 
+                                material = a.matcat_id
+                                and result_id = {result_id}
+                        )
+                        """
                     )
-                    """
-                )
-            ]
+                ]
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
