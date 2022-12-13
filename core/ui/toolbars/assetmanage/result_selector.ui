@@ -25,22 +25,22 @@
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="1" column="0">
-        <widget class="QComboBox" name="cmb_result_selector"/>
+        <widget class="QComboBox" name="cmb_result_main"/>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="lbl_result_global">
+        <widget class="QLabel" name="lbl_result_compare">
          <property name="text">
-          <string>Result global (to compare):</string>
+          <string>Result to compare:</string>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QComboBox" name="cmb_result_global"/>
+        <widget class="QComboBox" name="cmb_result_compare"/>
        </item>
        <item row="0" column="0">
-        <widget class="QLabel" name="lbl_result_selector">
+        <widget class="QLabel" name="lbl_result_main">
          <property name="text">
-          <string>Result selector (to show):</string>
+          <string>Result to show:</string>
          </property>
         </widget>
        </item>
