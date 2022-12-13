@@ -254,10 +254,52 @@ class GwCalculatePriority(GwTask):
             )
 
             sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-            result_id = tools_db.get_row(sql)
+            result_id = tools_db.get_row(sql)[0]
+
+            config_diameter_fields = list(self.config_diameter.values())[0].keys()
+            save_config_diameter_sql = f"""
+                delete from asset.config_diameter where result_id = {result_id};
+                insert into asset.config_diameter 
+                    (result_id, dnom, {','.join(config_diameter_fields)})
+                values
+            """
+            for dnom, fields in self.config_diameter.items():
+                save_config_diameter_sql += f"""
+                    ({result_id},{dnom},{','.join([str(fields[x]) for x in config_diameter_fields])}),
+                """
+            save_config_diameter_sql = save_config_diameter_sql.strip()[:-1]
+            self._emit_report(save_config_diameter_sql)
+            tools_db.execute_sql(save_config_diameter_sql)
+
+            config_material_fields = list(self.config_material.values())[0].keys()
+            save_config_material_sql = f"""
+                delete from asset.config_material where result_id = {result_id};
+                insert into asset.config_material 
+                    (result_id, material, {','.join(config_material_fields)})
+                values
+            """
+            for material, fields in self.config_material.items():
+                save_config_material_sql += f"""
+                    ({result_id},'{material}',{','.join([str(fields[x]) for x in config_material_fields])}),
+                """
+            save_config_material_sql = save_config_material_sql.strip()[:-1]
+            self._emit_report(save_config_material_sql)
+            tools_db.execute_sql(save_config_material_sql)
+
+            save_config_engine_sql = f"""
+                delete from asset.config_engine where result_id = {result_id};
+                insert into asset.config_engine
+                    (result_id, parameter, value)
+                values
+            """
+            for k, v in self.config_engine.items():
+                save_config_engine_sql += f"({result_id}, '{k}', {v}),"
+            save_config_engine_sql = save_config_engine_sql.strip()[:-1]
+            self._emit_report(save_config_engine_sql)
+            tools_db.execute_sql(save_config_engine_sql)
 
             save_arcs_sql = f"""
-                delete from asset.arc_engine_sh where result_id = {result_id[0]};
+                delete from asset.arc_engine_sh where result_id = {result_id};
                 insert into asset.arc_engine_sh 
                 (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance, year_order, val)
                 values 
@@ -275,23 +317,21 @@ class GwCalculatePriority(GwTask):
                     val,
                 ) = arc
                 save_arcs_sql += (
-                    f"({arc_id}, {result_id[0]}, {cost_repmain}, {cost_repmain}, "
+                    f"({arc_id}, {result_id}, {cost_repmain}, {cost_repmain}, "
                     f"{cost_constr}, {break_growth_rate}, {year or 'NULL'}, "
                     f"{compliance}, {year_order}, {val}),"
                 )
             save_arcs_sql = save_arcs_sql[:-1]
 
-            print(f"QUERY INSERT -> {save_arcs_sql}")
             tools_db.execute_sql(save_arcs_sql)
-            print(f"UPDATE -> ")
             tools_db.execute_sql(
                 f"""
                 delete from asset.arc_output
-                    where result_id = {result_id[0]};
+                    where result_id = {result_id};
                 insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
                     select arc_id, result_id, val, year, cost_constr
                         from asset.arc_engine_sh
-                        where result_id = {result_id[0]};
+                        where result_id = {result_id};
                 """
             )
 
