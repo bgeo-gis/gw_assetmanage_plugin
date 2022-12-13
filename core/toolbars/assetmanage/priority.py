@@ -225,6 +225,65 @@ class CalculatePriority:
             config_engine,
         ) = inputs
 
+        invalid_diameters_count = tools_db.get_row(f"""
+            select count(*)
+            from asset.arc_asset
+            where dnom is null 
+                or dnom <= 0
+                or dnom > ({max(config_diameter.keys())})
+        """)[0]
+        if invalid_diameters_count:
+            invalid_diameters = [
+                x[0]
+                for x in tools_db.get_rows(
+                    f"""
+                    select distinct dnom
+                    from asset.arc_asset
+                    where dnom is null 
+                        or dnom <= 0
+                        or dnom > ({max(config_diameter.keys())})
+                    """
+                )
+            ]
+            text = (
+                f"Pipes with invalid diameters: {invalid_diameters_count}.\n"
+                f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
+                "A diameter value is invalid if it is zero, negative, NULL, "
+                "or is greater than the maximum diameter in the configuration table. "
+                "These pipes WILL NOT be assigned a priority value.\n\n"
+                "Do you want to proceed?"
+            )
+            if not tools_qt.show_question(text, force_action=True):
+                return
+
+        invalid_materials_count = tools_db.get_row(f"""
+            select count(*)
+            from asset.arc_asset a
+            where matcat_id not in ('{"','".join(config_material.keys())}')
+        """)[0]
+        if invalid_materials_count:
+            invalid_materials = [
+                x[0]
+                for x in tools_db.get_rows(
+                    f"""
+                    select distinct matcat_id
+                    from asset.arc_asset a
+                    where matcat_id not in ('{"','".join(config_material.keys())}')
+                    """
+                )
+            ]
+            text = (
+                f"Pipes with invalid material: {invalid_materials_count}.\n"
+                f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
+                "A material value is invalid if "
+                "it is not in the material configuration table. "
+                "These pipes will be assigned as compliant by default, "
+                "which may result in a lower priority value.\n\n"
+                "Do you want to proceed?"
+            )
+            if not tools_qt.show_question(text, force_action=True):
+                return
+
         self.thread = GwCalculatePriority(
             "Calculate Priority",
             self.type,
