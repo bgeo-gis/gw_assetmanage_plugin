@@ -219,6 +219,8 @@ class GwCalculatePriority(GwTask):
                 )
                 return False
 
+            self.setProgress(50)
+
             years = [x[4] for x in output_arcs if x[4]]
             min_year = min(years)
             max_year = max(years)
@@ -253,6 +255,8 @@ class GwCalculatePriority(GwTask):
                 """
             )
 
+            self.setProgress(63)
+
             sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
             result_id = tools_db.get_row(sql)[0]
 
@@ -268,8 +272,9 @@ class GwCalculatePriority(GwTask):
                     ({result_id},{dnom},{','.join([str(fields[x]) for x in config_diameter_fields])}),
                 """
             save_config_diameter_sql = save_config_diameter_sql.strip()[:-1]
-            self._emit_report(save_config_diameter_sql)
             tools_db.execute_sql(save_config_diameter_sql)
+
+            self.setProgress(66)
 
             config_material_fields = list(self.config_material.values())[0].keys()
             save_config_material_sql = f"""
@@ -283,8 +288,9 @@ class GwCalculatePriority(GwTask):
                     ({result_id},'{material}',{','.join([str(fields[x]) for x in config_material_fields])}),
                 """
             save_config_material_sql = save_config_material_sql.strip()[:-1]
-            self._emit_report(save_config_material_sql)
             tools_db.execute_sql(save_config_material_sql)
+
+            self.setProgress(69)
 
             save_config_engine_sql = f"""
                 delete from asset.config_engine where result_id = {result_id};
@@ -295,8 +301,9 @@ class GwCalculatePriority(GwTask):
             for k, v in self.config_engine.items():
                 save_config_engine_sql += f"({result_id}, '{k}', {v}),"
             save_config_engine_sql = save_config_engine_sql.strip()[:-1]
-            self._emit_report(save_config_engine_sql)
             tools_db.execute_sql(save_config_engine_sql)
+
+            self.setProgress(72)
 
             save_arcs_sql = f"""
                 delete from asset.arc_engine_sh where result_id = {result_id};
@@ -324,6 +331,9 @@ class GwCalculatePriority(GwTask):
             save_arcs_sql = save_arcs_sql[:-1]
 
             tools_db.execute_sql(save_arcs_sql)
+
+            self.setProgress(76)
+
             tools_db.execute_sql(
                 f"""
                 delete from asset.arc_output
@@ -387,7 +397,7 @@ class GwCalculatePriority(GwTask):
                 )
                 """
             )[0]
-            
+
             invalid_materials = []
             if invalid_materials_count:
                 invalid_materials = [
