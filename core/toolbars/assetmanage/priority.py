@@ -216,6 +216,7 @@ class CalculatePriority:
         (
             result_name,
             result_description,
+            features,
             exploitation,
             presszone,
             diameter,
@@ -289,11 +290,11 @@ class CalculatePriority:
             self.type,
             result_name,
             result_description,
-            features=None,
-            exploitation=exploitation,
-            presszone=presszone,
-            diameter=diameter,
-            material=material,
+            features,
+            exploitation,
+            presszone,
+            diameter,
+            material,
             budget=None,
             target_year=None,
             config_diameter=config_diameter,
@@ -324,26 +325,7 @@ class CalculatePriority:
         dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
 
         QgsApplication.taskManager().addTask(t)
-
-        # # Manage selection
-        # if self.list_ids == {}:
-        #     message = "No features selected"
-        #     tools_qgis.show_message(message, 0)
-        #     return
-
-        # function_name = 'gw_fct_assetmanage_selection'
-        # self.child_value = None
-
-        # # Manage extras
-        # self.list_ids = json.dumps(self.list_ids)
-        # self.dnom_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_dnom', 0)
-        # self.material_value = tools_qt.get_combo_value(self.dlg_priority, 'cmb_material', 0)
-
-        # extras = f'"selection":{self.list_ids}, "filters":{{"dnom":"{self.dnom_value}", "material":"{self.material_value}", "mapzone":"{self.mapzone_value}", "child":"{self.child_value}"}}'
-        # body = tools_gw.create_body(extras=extras)
-        # json_result = tools_gw.execute_procedure(function_name, body, schema_name='asset')
-        # print(f"JSON_RESULT -> {json_result}")
-
+        
     # region Selection
 
     def _manage_selection(self):
@@ -440,6 +422,10 @@ class CalculatePriority:
 
         result_description = self.dlg_priority.txt_descript.text()
 
+        features = None
+        if 'arc' in self.list_ids:
+            features = self.list_ids['arc'] or None
+
         exploitation = tools_qt.get_combo_value(dlg, 'cmb_expl_selection') or None
         presszone = tools_qt.get_combo_value(dlg, 'cmb_presszone') or None
         diameter = tools_qt.get_combo_value(dlg, 'cmb_dnom') or None
@@ -484,6 +470,7 @@ class CalculatePriority:
         return (
             result_name,
             result_description,
+            features,
             exploitation,
             presszone,
             diameter,
