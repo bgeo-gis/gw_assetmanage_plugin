@@ -26,13 +26,14 @@ class ResultSelector(dialog.GwAction):
         self.action_group = action_group
 
     def clicked_event(self):
-        self.open_manager()
-
-    def open_manager(self):
-
         self.dlg_result_selector = ResultSelectorUi()
-        dlg = self.dlg_result_selector
+        self._fill_combos()
+        self._set_signals()
+        tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection")
 
+    def _fill_combos(self):
+        # TODO: Check for connection
+        dlg = self.dlg_result_selector
         results = tools_db.get_rows(
             """
             select result_id id, result_name idval
@@ -68,5 +69,28 @@ class ResultSelector(dialog.GwAction):
                 dlg.cmb_result_compare, str(selected_compare[0]), 0, add_new=False
             )
 
-        # Open the dialog
-        tools_gw.open_dialog(dlg, dlg_name="result_selection")
+    def _save_selection(self):
+        # TODO: Check for connection
+        dlg = self.dlg_result_selector
+        result_main = tools_qt.get_combo_value(dlg, dlg.cmb_result_main)
+        result_compare = tools_qt.get_combo_value(dlg, dlg.cmb_result_compare)
+        tools_db.execute_sql(
+            f"""
+            delete from asset.selector_result_main
+                where cur_user = current_user;
+            delete from asset.selector_result_compare
+                where cur_user = current_user;
+            insert into asset.selector_result_main
+                (result_id, cur_user)
+                values ({result_main}, current_user);
+            insert into asset.selector_result_compare
+                (result_id, cur_user)
+                values ({result_compare}, current_user);
+            """
+        )
+        dlg.close()
+
+    def _set_signals(self):
+        dlg = self.dlg_result_selector
+        dlg.btn_cancel.clicked.connect(dlg.reject)
+        dlg.btn_accept.clicked.connect(self._save_selection)
