@@ -343,10 +343,18 @@ class GwCalculatePriority(GwTask):
                 f"""
                 delete from asset.arc_output
                     where result_id = {result_id};
-                insert into asset.arc_output (arc_id, result_id, val, expected_year, budget)
-                    select arc_id, result_id, val, year, cost_constr
-                        from asset.arc_engine_sh
-                        where result_id = {result_id};
+                insert into asset.arc_output 
+                        (arc_id, result_id, val, orderby, expected_year, budget, total)
+                    select arc_id,
+                        result_id,
+                        val,
+                        rank() over (order by val desc),
+                        year,
+                        cost_constr,
+                        sum(cost_constr) over (order by val desc, arc_id)
+                    from asset.arc_engine_sh
+                    where result_id = {result_id}
+                    order by sum;
                 """
             )
 
