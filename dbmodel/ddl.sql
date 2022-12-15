@@ -306,8 +306,34 @@ CREATE OR REPLACE VIEW v_asset_arc_output
     o.budget,
     o.total,
     a.the_geom
-   FROM arc_asset a,
+   FROM arc_asset a
      LEFT JOIN arc_input i USING (arc_id)
      JOIN arc_output o USING (arc_id)
      JOIN selector_result_main s ON s.result_id = o.result_id
+  WHERE s.cur_user = CURRENT_USER::text;
+
+CREATE OR REPLACE VIEW v_asset_arc_output_compare
+ AS
+ SELECT a.arc_id,
+    o.result_id,
+    a.sector_id,
+    a.macrosector_id,
+    a.presszone_id,
+    a.expl_id,
+    a.builtdate,
+    a.dnom,
+    a.matcat_id,
+    a.pavcat_id,
+    a.function_type,
+    i.rleak,
+    o.val,
+    o.orderby,
+    o.expected_year,
+    o.budget,
+    o.total,
+    a.the_geom
+   FROM arc_asset a
+     LEFT JOIN arc_input i USING (arc_id)
+     JOIN arc_output o USING (arc_id)
+     JOIN selector_result_compare s ON s.result_id = o.result_id
   WHERE s.cur_user = CURRENT_USER::text;
