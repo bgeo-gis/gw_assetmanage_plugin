@@ -28,6 +28,7 @@ class ResultSelector(dialog.GwAction):
     def clicked_event(self):
         self.dlg_result_selector = ResultSelectorUi()
         self._fill_combos()
+        self._update_descriptions()
         self._set_signals()
         tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection")
 
@@ -36,7 +37,7 @@ class ResultSelector(dialog.GwAction):
         dlg = self.dlg_result_selector
         results = tools_db.get_rows(
             """
-            select result_id id, result_name idval
+            select result_id id, result_name idval, descript
             from asset.cat_result
             """
         )
@@ -89,10 +90,19 @@ class ResultSelector(dialog.GwAction):
             """
         )
         dlg.close()
-        tools_qgis.set_layer_index('v_asset_arc_output')
-        tools_qgis.set_layer_index('v_asset_arc_output_compare')
+        tools_qgis.set_layer_index("v_asset_arc_output")
+        tools_qgis.set_layer_index("v_asset_arc_output_compare")
 
     def _set_signals(self):
         dlg = self.dlg_result_selector
         dlg.btn_cancel.clicked.connect(dlg.reject)
         dlg.btn_accept.clicked.connect(self._save_selection)
+        dlg.cmb_result_main.currentIndexChanged.connect(self._update_descriptions)
+        dlg.cmb_result_compare.currentIndexChanged.connect(self._update_descriptions)
+
+    def _update_descriptions(self):
+        dlg = self.dlg_result_selector
+        desc_main = tools_qt.get_combo_value(dlg, dlg.cmb_result_main, 2)
+        dlg.txt_result_main_desc.setText(desc_main)
+        desc_compare = tools_qt.get_combo_value(dlg, dlg.cmb_result_compare, 2)
+        dlg.txt_result_compare_desc.setText(desc_compare)
