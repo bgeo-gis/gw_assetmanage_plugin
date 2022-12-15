@@ -62,7 +62,7 @@ class AmPriority(dialog.GwAction):
 class CalculatePriority:
     def __init__(self, type="GLOBAL"):
         self.type = type
-        self.layer_to_work = 'v_asset_arc_output'
+        self.layer_to_work = 'v_asset_arc_input'
         self.layers = {}
         self.layers["arc"] = []
         self.list_ids = {}
@@ -336,7 +336,7 @@ class CalculatePriority:
     def _manage_btn_snapping(self):
 
         self.feature_type = "arc"
-        layer = tools_qgis.get_layer_by_tablename('v_asset_arc_output')
+        layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
         self.layers["arc"].append(layer)
 
         # Remove all previous selections
@@ -375,7 +375,7 @@ class CalculatePriority:
     def _trigger_action_select(self, num):
 
         # Set active layer
-        layer = tools_qgis.get_layer_by_tablename('v_asset_arc_output')
+        layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
         self.iface.setActiveLayer(layer)
 
         if num == 0:
