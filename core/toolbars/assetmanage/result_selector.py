@@ -7,7 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
 
-from ....settings import tools_qt, tools_gw, dialog, tools_db
+from ....settings import tools_qt, tools_gw, dialog, tools_db, tools_qgis
 from .... import global_vars
 
 from ...ui.ui_manager import ResultSelectorUi
@@ -89,6 +89,8 @@ class ResultSelector(dialog.GwAction):
             """
         )
         dlg.close()
+        tools_qgis.set_layer_index('v_asset_arc_output')
+        tools_qgis.set_layer_index('v_asset_arc_output_compare')
 
     def _set_signals(self):
         dlg = self.dlg_result_selector
