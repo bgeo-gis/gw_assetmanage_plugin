@@ -269,6 +269,22 @@ CREATE TABLE exploitation (
   CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id)
 );
 
+CREATE OR REPLACE VIEW v_arc_asset_input
+ AS
+ SELECT a.arc_id,
+    a.sector_id,
+    a.macrosector_id,
+    a.presszone_id,
+    a.expl_id,
+    a.builtdate,
+    a.dnom,
+    a.matcat_id,
+    a.pavcat_id,
+    a.function_type,
+    i.rleak,
+    a.the_geom
+   FROM arc_asset a
+     LEFT JOIN arc_input i USING (arc_id);
 
 CREATE OR REPLACE VIEW v_asset_output
  AS
