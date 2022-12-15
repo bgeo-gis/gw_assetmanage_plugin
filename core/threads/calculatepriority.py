@@ -117,6 +117,9 @@ class GwCalculatePriority(GwTask):
                 + "on (a.arc_id = ai.arc_id and ai.result_id = 0) "
             )
             filters = []
+            if self.features:
+                features = [str(x) for x in self.features]
+                filters.append(f"a.arc_id in ({','.join(features)})")
             if self.exploitation:
                 filters.append(f"a.expl_id = {self.exploitation}")
             if self.presszone:
@@ -222,13 +225,15 @@ class GwCalculatePriority(GwTask):
             self.setProgress(50)
 
             years = [x[4] for x in output_arcs if x[4]]
-            min_year = min(years)
-            max_year = max(years)
+            min_year = min(years) if years else None
+            max_year = max(years) if years else None
 
             for arc in output_arcs:
-                year_order = 10 * (
-                    1 - ((arc[4] or max_year) - min_year) / (max_year - min_year)
-                )
+                year_order = 0
+                if max_year and min_year:
+                    year_order = 10 * (
+                        1 - ((arc[4] or max_year) - min_year) / (max_year - min_year)
+                    )
                 val = (
                     year_order * self.config_engine["expected_year"]
                     + arc[5] * self.config_engine["compliance"]
