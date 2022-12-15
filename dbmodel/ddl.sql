@@ -269,7 +269,7 @@ CREATE TABLE exploitation (
   CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id)
 );
 
-CREATE OR REPLACE VIEW v_arc_asset_input
+CREATE OR REPLACE VIEW v_asset_arc_input
  AS
  SELECT a.arc_id,
     a.sector_id,
@@ -286,10 +286,10 @@ CREATE OR REPLACE VIEW v_arc_asset_input
    FROM arc_asset a
      LEFT JOIN arc_input i USING (arc_id);
 
-CREATE OR REPLACE VIEW v_asset_output
+CREATE OR REPLACE VIEW v_asset_arc_output
  AS
  SELECT a.arc_id,
-    s.result_id,
+    o.result_id,
     a.sector_id,
     a.macrosector_id,
     a.presszone_id,
@@ -301,14 +301,13 @@ CREATE OR REPLACE VIEW v_asset_output
     a.function_type,
     i.rleak,
     o.val,
-    o.mandatory,
     o.orderby,
-    o.target_year,
+    o.expected_year,
     o.budget,
     o.total,
     a.the_geom
-   FROM selector_result s,
-    arc_asset a
-     JOIN arc_input i USING (arc_id)
+   FROM arc_asset a,
+     LEFT JOIN arc_input i USING (arc_id)
      JOIN arc_output o USING (arc_id)
-  WHERE s.result_id = i.result_id AND s.result_id = o.result_id AND s.cur_user = CURRENT_USER::text;
+     JOIN selector_result_main s ON s.result_id = o.result_id
+  WHERE s.cur_user = CURRENT_USER::text;
