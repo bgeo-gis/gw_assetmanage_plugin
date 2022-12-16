@@ -108,14 +108,21 @@ class GwCalculatePriority(GwTask):
             self._emit_report("Getting pipe data from DB (2/5)...")
             self.setProgress(20)
 
-            sql = (
-                "select a.arc_id, a.matcat_id, a.dnom, "
-                + "st_length(a.the_geom) length, coalesce(ai.rleak, 0) rleak, "
-                + "a.expl_id, a.presszone_id "
-                + "from asset.arc_asset a "
-                + "left join asset.arc_input ai "
-                + "on (a.arc_id = ai.arc_id and ai.result_id = 0) "
-            )
+            sql = """
+                select a.arc_id,
+                    a.matcat_id,
+                    a.dnom,
+                    st_length(a.the_geom) length,
+                    coalesce(ai.rleak, 0) rleak, 
+                    a.expl_id,
+                    a.presszone_id,
+                    ai.plan,
+                    ai.social,
+                    ai.other
+                from asset.arc_asset a 
+                left join asset.arc_input ai 
+                    on (a.arc_id = ai.arc_id and ai.result_id = 0)
+            """
             filters = []
             if self.features:
                 features = [str(x) for x in self.features]
@@ -153,6 +160,9 @@ class GwCalculatePriority(GwTask):
                     rleak,
                     expl_id,
                     presszone_id,
+                    plan,
+                    social,
+                    other,
                 ) = arc
                 if (
                     arc_diameter is None
@@ -193,6 +203,8 @@ class GwCalculatePriority(GwTask):
                     material_compliance,
                 )
 
+                strategic = 10 if plan or social or other else 0
+
                 if rleak == 0 or rleak is None:
                     year = None
                 else:
@@ -214,6 +226,7 @@ class GwCalculatePriority(GwTask):
                         break_growth_rate,
                         year,
                         compliance,
+                        strategic,
                     ]
                 )
             if not len(output_arcs):
@@ -229,14 +242,16 @@ class GwCalculatePriority(GwTask):
             max_year = max(years) if years else None
 
             for arc in output_arcs:
+                _, _, _, _, year, compliance, strategic = arc
                 year_order = 0
                 if max_year and min_year:
                     year_order = 10 * (
-                        1 - ((arc[4] or max_year) - min_year) / (max_year - min_year)
+                        1 - ((year or max_year) - min_year) / (max_year - min_year)
                     )
                 val = (
                     year_order * self.config_engine["expected_year"]
-                    + arc[5] * self.config_engine["compliance"]
+                    + compliance * self.config_engine["compliance"]
+                    + strategic * self.config_engine["strategic"]
                 )
                 arc.extend([year_order, val])
 
@@ -312,9 +327,19 @@ class GwCalculatePriority(GwTask):
 
             save_arcs_sql = f"""
                 delete from asset.arc_engine_sh where result_id = {result_id};
-                insert into asset.arc_engine_sh 
-                (arc_id, result_id, cost_repmain, cost_leak, cost_constr, bratemain, year, compliance, year_order, val)
-                values 
+                insert into asset.arc_engine_sh (
+                    arc_id,
+                    result_id,
+                    cost_repmain,
+                    cost_leak,
+                    cost_constr,
+                    bratemain,
+                    year,
+                    compliance,
+                    strategic,
+                    year_order,
+                    val
+                ) values 
             """
 
             for arc in output_arcs:
@@ -325,15 +350,24 @@ class GwCalculatePriority(GwTask):
                     break_growth_rate,
                     year,
                     compliance,
+                    strategic,
                     year_order,
                     val,
                 ) = arc
-                save_arcs_sql += (
-                    f"({arc_id}, {result_id}, {cost_repmain}, {cost_repmain}, "
-                    f"{cost_constr}, {break_growth_rate}, {year or 'NULL'}, "
-                    f"{compliance}, {year_order}, {val}),"
-                )
-            save_arcs_sql = save_arcs_sql[:-1]
+                save_arcs_sql += f"""
+                    ({arc_id},
+                    {result_id},
+                    {cost_repmain},
+                    {cost_repmain},
+                    {cost_constr},
+                    {break_growth_rate},
+                    {year or 'NULL'},
+                    {compliance},
+                    {strategic},
+                    {year_order},
+                    {val}),
+                """
+            save_arcs_sql = save_arcs_sql.strip()[:-1]
 
             tools_db.execute_sql(save_arcs_sql)
 
