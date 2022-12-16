@@ -380,14 +380,16 @@ class GwCalculatePriority(GwTask):
                 insert into asset.arc_output 
                         (arc_id, result_id, val, orderby, expected_year, budget, total)
                     select arc_id,
-                        result_id,
+                        sh.result_id,
                         val,
-                        rank() over (order by val desc),
+                        rank() over (order by coalesce(i.mandatory, false) desc, val desc),
                         year,
                         cost_constr,
-                        sum(cost_constr) over (order by val desc, arc_id)
-                    from asset.arc_engine_sh
-                    where result_id = {result_id}
+                        sum(cost_constr) over (order by coalesce(i.mandatory, false) desc, val desc, arc_id),
+                        mandatory
+                    from asset.arc_engine_sh sh
+                    left join asset.arc_input i using (arc_id)
+                    where sh.result_id = {result_id}
                     order by sum;
                 """
             )
