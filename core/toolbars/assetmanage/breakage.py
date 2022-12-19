@@ -254,6 +254,10 @@ class AmBreakage(dialog.GwAction):
             tools_qt.show_info_box("The buffer should be a valid integer number!")
             return
 
+        if buffer > 1000:
+            tools_qt.show_info_box("The buffer must be an integer less than 1000!")
+            return
+
         try:
             years = int(dlg.txt_years.text())
         except ValueError:
