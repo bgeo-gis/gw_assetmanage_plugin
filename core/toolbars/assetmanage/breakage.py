@@ -179,6 +179,8 @@ class AmBreakage(dialog.GwAction):
                     plugin=global_vars.user_folder_name,
                 )
                 tools_qt.set_widget_text(self.dlg_assignation, widget, value)
+                if not self.dlg_assignation.txt_buffer.text():
+                    self.dlg_assignation.txt_buffer.setText('500')
             elif action == "save":
                 value = tools_qt.get_text(self.dlg_assignation, widget, False, False)
                 value = value.replace("%", "%%")
