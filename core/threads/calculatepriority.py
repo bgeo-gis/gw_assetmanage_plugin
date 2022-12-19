@@ -378,7 +378,7 @@ class GwCalculatePriority(GwTask):
                 delete from asset.arc_output
                     where result_id = {result_id};
                 insert into asset.arc_output 
-                        (arc_id, result_id, val, orderby, expected_year, budget, total)
+                        (arc_id, result_id, val, orderby, expected_year, budget, total, mandatory)
                     select arc_id,
                         sh.result_id,
                         val,
