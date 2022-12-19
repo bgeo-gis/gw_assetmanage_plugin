@@ -210,6 +210,11 @@ class AmBreakage(dialog.GwAction):
         method, _ = dlg.cmb_method.currentData()
         buffer, years = inputs
 
+        if not tools_qt.show_question(
+            "This task may take a while to complete. Do you want to continue?"
+        ):
+            return
+
         self.thread = GwAssignation(
             "Leak Assignation",
             method,
