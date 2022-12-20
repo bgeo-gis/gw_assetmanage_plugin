@@ -14,7 +14,7 @@ import json
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QMenu, QAbstractItemView, QAction, QActionGroup, QTableView
+from qgis.PyQt.QtWidgets import QLabel, QMenu, QAbstractItemView, QAction, QActionGroup, QTableView
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 
@@ -112,11 +112,8 @@ class CalculatePriority:
                         set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_material, "config_material_def", schema_name='asset')
 
-        self.dlg_priority.btn_calc.clicked.connect(self._manage_calculate)
-        self.dlg_priority.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority))
-        self.dlg_priority.rejected.connect(partial(tools_gw.close_dialog, self.dlg_priority))
-
         self._fill_engine_options()
+        self._set_signals()
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
@@ -137,7 +134,7 @@ class CalculatePriority:
         )
 
     def _fill_engine_options(self):
-        fields = []
+        self.config_engine_fields = []
         rows = tools_db.get_rows(
             """
             select parameter,
@@ -153,7 +150,7 @@ class CalculatePriority:
         )
 
         for row in rows:
-            fields.append({
+            self.config_engine_fields.append({
                 "widgetname": row[0],
                 "value": row[1],
                 "tooltip": row[2],
@@ -164,8 +161,25 @@ class CalculatePriority:
                 "widgettype": row[7],
                 "isMandatory": True,
             })
-        print(fields)
-        tools_gw.build_dialog_options(self.dlg_priority, [{"fields": fields}], 0, [])
+        tools_gw.build_dialog_options(
+            self.dlg_priority, [{"fields": self.config_engine_fields}], 0, []
+        )
+
+        lbl = QLabel()
+        lbl.setText("Total")
+        lbl_total_weight = QLabel()
+        self.dlg_priority.lbl_total_weight = lbl_total_weight
+        # FIXME: Alignment of options
+        position_config = {"layoutname": "lyt_weights", "layoutorder": 100}
+        tools_gw.add_widget(self.dlg_priority, position_config, lbl, lbl_total_weight)
+        self._update_total_weight()
+
+
+    def _get_weight_widgets(self):
+        is_weight = lambda x: x["layoutname"] == "lyt_weights"
+        fields = filter(is_weight, self.config_engine_fields)
+        return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
+
 
     def _manage_hidden_form(self):
         status = True
@@ -422,10 +436,30 @@ class CalculatePriority:
 
     # endregion
 
+    def _set_signals(self):
+        dlg = self.dlg_priority
+        dlg.btn_calc.clicked.connect(self._manage_calculate)
+        dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dlg))
+        dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
+
+        for widget in self._get_weight_widgets():
+            widget.textChanged.connect(self._update_total_weight)
+
     def _update_timer(self, widget):
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
         widget.setText(text)
+
+    def _update_total_weight(self):
+        try:
+            total = 0
+            for widget in self._get_weight_widgets():
+                total += float(widget.text())
+            self.total_weight = total
+            self.dlg_priority.lbl_total_weight.setText(str(round(self.total_weight, 2)))
+        except:
+            self.total_weight = None
+            self.dlg_priority.lbl_total_weight.setText("Error")
 
     def _validate_inputs(self):
         dlg = self.dlg_priority
