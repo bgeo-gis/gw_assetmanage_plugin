@@ -86,20 +86,23 @@
           <string>Calculo de prioridades</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_year">
+            <property name="text">
+             <string>Año horizonte:</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="txt_budget"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="cmb_year"/>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_budget">
             <property name="text">
              <string>Dotación:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lbl_year">
-            <property name="text">
-             <string>Año horizonte:</string>
             </property>
            </widget>
           </item>
@@ -138,16 +141,40 @@
              <attribute name="title">
               <string>Engine</string>
              </attribute>
-             <layout class="QGridLayout" name="gridLayout_4">
+             <layout class="QGridLayout" name="gridLayout_13">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_engine"/>
+               <widget class="QGroupBox" name="qgroupbox">
+                <property name="title">
+                 <string>Shamir-Howard parameters</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_12">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_sh_parameters"/>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QGroupBox" name="qgroupbox_2">
+                <property name="title">
+                 <string>Weights</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_14">
+                 <item row="0" column="0">
+                  <layout class="QGridLayout" name="lyt_weights"/>
+                 </item>
+                </layout>
+               </widget>
               </item>
              </layout>
             </widget>
            </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="cmb_year"/>
           </item>
          </layout>
         </widget>

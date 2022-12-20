@@ -104,10 +104,6 @@ class CalculatePriority:
         self.qtbl_material = self.dlg_priority.findChild(QTableView, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.qtbl_engine = self.dlg_priority.findChild(QTableView, "tbl_engine")
-        self.qtbl_engine.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-
         # Triggers
         self._fill_table(self.dlg_priority, self.qtbl_diameter, "asset.config_diameter_def",
                          set_edit_triggers=QTableView.DoubleClicked)
@@ -115,14 +111,12 @@ class CalculatePriority:
         self._fill_table(self.dlg_priority, self.qtbl_material, "asset.config_material_def",
                         set_edit_triggers=QTableView.DoubleClicked)
         tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_material, "config_material_def", schema_name='asset')
-        self._fill_table(self.dlg_priority, self.qtbl_engine, "asset.config_engine_def",
-                        set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_engine, "config_engine_def", schema_name='asset')
 
         self.dlg_priority.btn_calc.clicked.connect(self._manage_calculate)
         self.dlg_priority.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, self.dlg_priority))
         self.dlg_priority.rejected.connect(partial(tools_gw.close_dialog, self.dlg_priority))
 
+        self._fill_engine_options()
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
@@ -141,6 +135,37 @@ class CalculatePriority:
             reset_text=False, 
             close=False
         )
+
+    def _fill_engine_options(self):
+        fields = []
+        rows = tools_db.get_rows(
+            """
+            select parameter,
+                value,
+                descript,
+                layoutname,
+                layoutorder,
+                label,
+                datatype,
+                widgettype
+            from asset.config_engine_def
+            """
+        )
+
+        for row in rows:
+            fields.append({
+                "widgetname": row[0],
+                "value": row[1],
+                "tooltip": row[2],
+                "layoutname": row[3],
+                "layoutorder": row[4],
+                "label": row[5],
+                "datatype": row[6],
+                "widgettype": row[7],
+                "isMandatory": True,
+            })
+        print(fields)
+        tools_gw.build_dialog_options(self.dlg_priority, [{"fields": fields}], 0, [])
 
     def _manage_hidden_form(self):
         status = True
