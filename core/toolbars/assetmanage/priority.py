@@ -524,7 +524,19 @@ class CalculatePriority:
                 return
             config_material[row['material']] = {k:v for k, v in row.items() if k != "material"}
 
-        config_engine = {x["parameter"]: float(x['value']) for x in table2data(self.qtbl_engine)}
+        if round(self.total_weight, 5) != 1:
+            tools_qt.show_info_box("The sum of the weights must be equal to 1!")
+            return
+        config_engine = {}
+        for field in self.config_engine_fields:
+            widget_name = field["widgetname"]
+            try:
+                config_engine[widget_name] = float(
+                    tools_qt.get_widget(dlg, widget_name).text()
+                )
+            except:
+                tools_qt.show_info_box(f"The field {field['label']} must be a valid number!")
+                return
 
         return (
             result_name,
