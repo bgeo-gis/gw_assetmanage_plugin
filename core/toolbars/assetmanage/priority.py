@@ -169,7 +169,6 @@ class CalculatePriority:
         lbl.setText("Total")
         lbl_total_weight = QLabel()
         self.dlg_priority.lbl_total_weight = lbl_total_weight
-        # FIXME: Alignment of options
         position_config = {"layoutname": "lyt_weights", "layoutorder": 100}
         tools_gw.add_widget(self.dlg_priority, position_config, lbl, lbl_total_weight)
         self._update_total_weight()
