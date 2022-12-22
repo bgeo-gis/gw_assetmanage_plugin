@@ -325,53 +325,63 @@ class GwCalculatePriority(GwTask):
 
             self.setProgress(72)
 
-            save_arcs_sql = f"""
-                delete from asset.arc_engine_sh where result_id = {result_id};
-                insert into asset.arc_engine_sh (
-                    arc_id,
-                    result_id,
-                    cost_repmain,
-                    cost_leak,
-                    cost_constr,
-                    bratemain,
-                    year,
-                    compliance,
-                    strategic,
-                    year_order,
-                    val
-                ) values 
-            """
-
-            for arc in output_arcs:
-                (
-                    arc_id,
-                    cost_repmain,
-                    cost_constr,
-                    break_growth_rate,
-                    year,
-                    compliance,
-                    strategic,
-                    year_order,
-                    val,
-                ) = arc
-                save_arcs_sql += f"""
-                    ({arc_id},
-                    {result_id},
-                    {cost_repmain},
-                    {cost_repmain},
-                    {cost_constr},
-                    {break_growth_rate},
-                    {year or 'NULL'},
-                    {compliance},
-                    {strategic},
-                    {year_order},
-                    {val}),
+            tools_db.execute_sql(
+                f"delete from asset.arc_engine_sh where result_id = {result_id};"
+            )
+            index = 0
+            loop = 0
+            ended = False
+            while not ended:
+                save_arcs_sql = f"""
+                    insert into asset.arc_engine_sh (
+                        arc_id,
+                        result_id,
+                        cost_repmain,
+                        cost_leak,
+                        cost_constr,
+                        bratemain,
+                        year,
+                        compliance,
+                        strategic,
+                        year_order,
+                        val
+                    ) values 
                 """
-            save_arcs_sql = save_arcs_sql.strip()[:-1]
-
-            tools_db.execute_sql(save_arcs_sql)
-
-            self.setProgress(76)
+                for i in range(1000):
+                    try:
+                        (
+                            arc_id,
+                            cost_repmain,
+                            cost_constr,
+                            break_growth_rate,
+                            year,
+                            compliance,
+                            strategic,
+                            year_order,
+                            val,
+                        ) = output_arcs[index]
+                        save_arcs_sql += f"""
+                            ({arc_id},
+                            {result_id},
+                            {cost_repmain},
+                            {cost_repmain},
+                            {cost_constr},
+                            {break_growth_rate},
+                            {year or 'NULL'},
+                            {compliance},
+                            {strategic},
+                            {year_order},
+                            {val}),
+                        """
+                        index += 1
+                    except IndexError:
+                        ended = True
+                        break
+                save_arcs_sql = save_arcs_sql.strip()[:-1]
+                tools_db.execute_sql(save_arcs_sql)
+                loop += 1
+                progress = (76 - 72) / len(output_arcs) * 1000 * loop + 72
+                self.setProgress(progress)
 
             tools_db.execute_sql(
                 f"""
