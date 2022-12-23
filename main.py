@@ -9,16 +9,18 @@ import configparser
 import os.path
 import sys
 import inspect
+from pathlib import Path
 
 from qgis.PyQt.QtCore import QObject, QSettings
 from qgis.PyQt.QtWidgets import QActionGroup, QDockWidget, QToolBar
 from qgis.core import Qgis
+from qgis.utils import plugins
 
 from .plugin_toolbar import PluginToolbar
 from .core.toolbars import buttons
 from . import global_vars
 
-from .settings import tools_qgis, tools_os, tools_log, tools_gw, tools_db
+from .settings import tools_qgis, tools_os, tools_log, tools_gw, tools_db, gw_global_vars
 
 
 class GWAssetPlugin(QObject):
@@ -213,6 +215,18 @@ class GWAssetPlugin(QObject):
                     button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                     self.buttons[index_action] = button
 
+        config_path = Path(global_vars.plugin_dir) / "config" / "config.config"
+        config = configparser.ConfigParser()
+        config.read(config_path)
+        hide_gw_toolbars = config.getboolean("general", "hide_gw_toolbars", fallback=False)
+
+        input_layer = tools_qgis.get_layer_by_tablename("v_asset_arc_input")
+        output_layer = tools_qgis.get_layer_by_tablename("v_asset_arc_output")
+
+        if hide_gw_toolbars and input_layer and output_layer: 
+            gw = plugins[Path(gw_global_vars.plugin_dir).name]
+            for gwtoolbar in gw.load_project.plugin_toolbars.values():
+                gwtoolbar.toolbar.setVisible(False)
 
     def create_toolbar(self, toolbar_id):
 
