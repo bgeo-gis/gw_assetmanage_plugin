@@ -100,6 +100,7 @@ class AmBreakage(dialog.GwAction):
         self.dlg_assignation = AssignationUi()
         dlg = self.dlg_assignation
         tools_gw.load_settings(dlg)
+        dlg.executing = False
 
 
         # Manage form
@@ -248,6 +249,7 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.rejected.disconnect()
         dlg.buttonBox.rejected.connect(partial(self._cancel_thread, dlg))
 
+        dlg.executing = True
         QgsApplication.taskManager().addTask(t)
 
     def _validate_assignation_input(self):
@@ -289,4 +291,5 @@ class AmBreakage(dialog.GwAction):
         dlg = self.dlg_assignation
         dlg.buttonBox.rejected.disconnect()
         dlg.buttonBox.rejected.connect(dlg.reject)
+        dlg.executing = False
         self.timer.stop()

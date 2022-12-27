@@ -70,11 +70,19 @@ def get_ui_class(ui_file_name, subfolder='shared'):
 
 FORM_CLASS = get_ui_class('assignation.ui', 'assetmanage')
 class AssignationUi(GwDialog, FORM_CLASS):
-    pass
+    def closeEvent(self, event):
+        if self.executing:
+            event.ignore()
+        else:
+            event.accept()
 
 FORM_CLASS = get_ui_class('priority.ui', 'assetmanage')
 class PriorityUi(GwDialog, FORM_CLASS):
-    pass
+    def closeEvent(self, event):
+        if self.executing:
+            event.ignore()
+        else:
+            event.accept()
 
 FORM_CLASS = get_ui_class('priority_manager.ui', 'assetmanage')
 class PriorityManagerUi(GwDialog, FORM_CLASS):

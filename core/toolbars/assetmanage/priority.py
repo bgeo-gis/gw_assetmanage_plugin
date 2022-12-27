@@ -111,6 +111,8 @@ class CalculatePriority:
         self._fill_engine_options()
         self._set_signals()
 
+        self.dlg_priority.executing = False
+
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
 
@@ -118,6 +120,7 @@ class CalculatePriority:
         dlg = self.dlg_priority
         dlg.btn_cancel.clicked.disconnect()
         dlg.btn_cancel.clicked.connect(dlg.reject)
+        dlg.executing = False
         self.timer.stop()
 
     def _cancel_thread(self, dlg):
@@ -358,6 +361,7 @@ class CalculatePriority:
         dlg.btn_cancel.clicked.disconnect()
         dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
 
+        dlg.executing = True
         QgsApplication.taskManager().addTask(t)
         
     # region Selection
