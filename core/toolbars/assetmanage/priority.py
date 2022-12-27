@@ -561,7 +561,7 @@ class CalculatePriority:
         tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1, add_empty=True)
 
         # Combo exploitation
-        sql = "SELECT expl_id as id, name as idval FROM ws.exploitation;"
+        sql = "SELECT expl_id as id, name as idval FROM asset.exploitation;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(self.dlg_priority.cmb_expl_selection, rows, 1, add_empty=True)
 
