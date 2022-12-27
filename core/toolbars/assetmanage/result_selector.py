@@ -27,7 +27,8 @@ class ResultSelector(dialog.GwAction):
 
     def clicked_event(self):
         self.dlg_result_selector = ResultSelectorUi()
-        self._fill_combos()
+        if not self._fill_combos():
+            return
         self._update_descriptions()
         self._set_signals()
         tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection")
@@ -41,6 +42,9 @@ class ResultSelector(dialog.GwAction):
             from asset.cat_result
             """
         )
+        if not results:
+            tools_qt.show_info_box("No results available to display.")
+            return False
 
         # Combo result_main
         tools_qt.fill_combo_values(dlg.cmb_result_main, results, 1, sort_by=1)
