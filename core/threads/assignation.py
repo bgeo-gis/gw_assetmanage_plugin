@@ -21,19 +21,17 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
-            sql = (
-                "WITH "
-                + "leak_dates AS (SELECT "
-                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
-                + "FROM asset.leaks) "
-                + "SELECT "
-                + "max(date_leak) AS max_date, "
-                + "min(date_leak) AS min_date, "
-                + "max(date_leak) - min(date_leak) AS interval "
-                + "FROM leak_dates "
+            max_date, min_date, interval = tools_db.get_row(
+                """
+                WITH leak_dates AS (
+                    SELECT id, startdate AS date_leak
+                    FROM asset.leaks)
+                SELECT max(date_leak) AS max_date,
+                    min(date_leak) AS min_date,
+                    max(date_leak) - min(date_leak) AS INTERVAL
+                FROM leak_dates
+                """
             )
-            rows = tools_db.get_rows(sql)
-            max_date, min_date, interval = rows[0]
             if self.years > interval / 365:
                 self._emit_report(
                     "Task canceled: The number of years is greater than the interval disponible.",
@@ -45,15 +43,20 @@ class GwAssignation(GwTask):
             self._emit_report("Getting leak data from DB (1/4)...")
             self.setProgress(0)
 
-            sql = (
-                "WITH "
-                + "leak_dates AS (SELECT "
-                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
-                + "FROM asset.leaks), "
-                + "max_date AS (SELECT max(date_leak) FROM leak_dates) "
-                + "SELECT id FROM leak_dates "
-                + f"WHERE date_leak > ((select * from max_date) - interval '{self.years} year')::date "
-            )
+            sql = f"""
+                WITH
+                    leak_dates AS (
+                        SELECT id, startdate AS date_leak
+                        FROM asset.leaks),
+                    max_date AS (
+                        SELECT max(date_leak)
+                        FROM leak_dates)
+                SELECT id
+                FROM leak_dates
+                WHERE date_leak > (
+                    (SELECT * FROM max_date) - INTERVAL '{self.years} year'
+                )::date
+                """
             all_leaks = [x[0] for x in tools_db.get_rows(sql)]
 
             if self.isCanceled():
@@ -62,28 +65,33 @@ class GwAssignation(GwTask):
             self._emit_report("Getting pipe data from DB (2/4)...")
             self.setProgress(25)
 
-            sql = (
-                "WITH "
-                + "leak_dates AS (SELECT "
-                + "id, to_date(startdate, 'DD/MM/YYYY') AS date_leak "
-                + "FROM asset.leaks), "
-                + "max_date AS (SELECT max(date_leak) FROM leak_dates) "
-                + "SELECT "
-                + "l.id AS leak_id, "
-                + "l.diameter AS leak_diameter, "
-                + "l.material AS leak_material, "
-                + "a.arc_id AS arc_id, "
-                + "a.dnom AS arc_diameter, "
-                + "a.matcat_id AS arc_material, "
-                + "ST_DISTANCE(l.the_geom, a.the_geom) AS distance, "
-                + f"ST_LENGTH(ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)) AS length "
-                + "FROM asset.leaks AS l "
-                + "JOIN leak_dates AS d USING (id) "
-                + "JOIN asset.arc_asset AS a "
-                + f"ON ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer}) "
-                + f"WHERE d.date_leak > ((select * from max_date) - interval '{self.years} year')::date "
+            rows = tools_db.get_rows(
+                f"""
+                WITH
+                    leak_dates AS (
+                        SELECT id, startdate AS date_leak
+                        FROM asset.leaks),
+                    max_date AS (
+                        SELECT max(date_leak)
+                        FROM leak_dates)
+                SELECT l.id AS leak_id,
+                    l.diameter AS leak_diameter,
+                    l.material AS leak_material,
+                    a.arc_id AS arc_id,
+                    a.dnom AS arc_diameter,
+                    a.matcat_id AS arc_material,
+                    ST_DISTANCE(l.the_geom, a.the_geom) AS distance,
+                    ST_LENGTH(
+                        ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
+                    ) AS length
+                FROM asset.leaks AS l
+                JOIN leak_dates AS d USING (id)
+                JOIN asset.arc_asset AS a ON 
+                    ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})
+                WHERE d.date_leak > (
+                    (SELECT * FROM max_date) - INTERVAL '{self.years} year')::date
+                """
             )
-            rows = tools_db.get_rows(sql)
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -127,7 +135,8 @@ class GwAssignation(GwTask):
                         ),
                         "same_material": (
                             # FIXME: Handle unknown materials
-                            leak_material is not None and leak_material == arc_material
+                            leak_material is not None
+                            and leak_material == arc_material
                         ),
                     }
                 )
