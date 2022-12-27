@@ -71,10 +71,6 @@ class CalculatePriority:
         self.dlg_priority = None
 
     def clicked_event(self):
-        print(gw_global_vars.dao.conn.closed)
-        if gw_global_vars.dao.conn.closed:
-            gw_global_vars.dao.reset_db()
-
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
         dlg.setWindowTitle(dlg.windowTitle() + f" ({self.type})")
