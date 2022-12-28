@@ -74,6 +74,8 @@ class ResultSelector(dialog.GwAction):
                 dlg.cmb_result_compare, str(selected_compare[0]), 0, add_new=False
             )
 
+        return True
+
     def _save_selection(self):
         # TODO: Check for connection
         dlg = self.dlg_result_selector
