@@ -14,11 +14,27 @@ import json
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer
-from qgis.PyQt.QtWidgets import QLabel, QMenu, QAbstractItemView, QAction, QActionGroup, QTableView
+from qgis.PyQt.QtWidgets import (
+    QLabel,
+    QMenu,
+    QAbstractItemView,
+    QAction,
+    QActionGroup,
+    QTableView,
+)
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
 
-from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
+from ....settings import (
+    tools_qgis,
+    tools_qt,
+    tools_gw,
+    dialog,
+    tools_os,
+    tools_log,
+    tools_db,
+    gw_global_vars,
+)
 from .... import global_vars
 
 from ...threads.calculatepriority import GwCalculatePriority
@@ -41,8 +57,8 @@ def table2data(table_view):
 
 
 class AmPriority(dialog.GwAction):
-    """ Button 2: Selection & priority calculation button
-    Select features and calculate priorities """
+    """Button 2: Selection & priority calculation button
+    Select features and calculate priorities"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -59,10 +75,11 @@ class AmPriority(dialog.GwAction):
         calculate_priority = CalculatePriority(type="SELECTION")
         calculate_priority.clicked_event()
 
+
 class CalculatePriority:
     def __init__(self, type="GLOBAL"):
         self.type = type
-        self.layer_to_work = 'v_asset_arc_input'
+        self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
         self.layers["arc"] = []
         self.list_ids = {}
@@ -77,7 +94,9 @@ class CalculatePriority:
 
         tools_gw.disable_tab_log(self.dlg_priority)
 
-        icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20")
+        icons_folder = os.path.join(
+            global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}20x20"
+        )
         icon_path = os.path.join(icons_folder, str(137) + ".png")
         if os.path.exists(icon_path):
             self.dlg_priority.btn_snapping.setIcon(QIcon(icon_path))
@@ -101,12 +120,30 @@ class CalculatePriority:
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Triggers
-        self._fill_table(self.dlg_priority, self.qtbl_diameter, "asset.config_diameter_def",
-                         set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_diameter, "config_diameter_def", schema_name='asset')
-        self._fill_table(self.dlg_priority, self.qtbl_material, "asset.config_material_def",
-                        set_edit_triggers=QTableView.DoubleClicked)
-        tools_gw.set_tablemodel_config(self.dlg_priority, self.qtbl_material, "config_material_def", schema_name='asset')
+        self._fill_table(
+            self.dlg_priority,
+            self.qtbl_diameter,
+            "asset.config_diameter_def",
+            set_edit_triggers=QTableView.DoubleClicked,
+        )
+        tools_gw.set_tablemodel_config(
+            self.dlg_priority,
+            self.qtbl_diameter,
+            "config_diameter_def",
+            schema_name="asset",
+        )
+        self._fill_table(
+            self.dlg_priority,
+            self.qtbl_material,
+            "asset.config_material_def",
+            set_edit_triggers=QTableView.DoubleClicked,
+        )
+        tools_gw.set_tablemodel_config(
+            self.dlg_priority,
+            self.qtbl_material,
+            "config_material_def",
+            schema_name="asset",
+        )
 
         self._fill_engine_options()
         self._set_signals()
@@ -114,7 +151,7 @@ class CalculatePriority:
         self.dlg_priority.executing = False
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority, dlg_name='priority')
+        tools_gw.open_dialog(self.dlg_priority, dlg_name="priority")
 
     def _calculate_ended(self):
         dlg = self.dlg_priority
@@ -125,11 +162,11 @@ class CalculatePriority:
 
     def _cancel_thread(self, dlg):
         self.thread.cancel()
-        tools_gw.fill_tab_log (
+        tools_gw.fill_tab_log(
             dlg,
-            {"info": {"values": [{"message": "Canceling task..."}]}}, 
-            reset_text=False, 
-            close=False
+            {"info": {"values": [{"message": "Canceling task..."}]}},
+            reset_text=False,
+            close=False,
         )
 
     def _fill_engine_options(self):
@@ -149,17 +186,19 @@ class CalculatePriority:
         )
 
         for row in rows:
-            self.config_engine_fields.append({
-                "widgetname": row[0],
-                "value": row[1],
-                "tooltip": row[2],
-                "layoutname": row[3],
-                "layoutorder": row[4],
-                "label": row[5],
-                "datatype": row[6],
-                "widgettype": row[7],
-                "isMandatory": True,
-            })
+            self.config_engine_fields.append(
+                {
+                    "widgetname": row[0],
+                    "value": row[1],
+                    "tooltip": row[2],
+                    "layoutname": row[3],
+                    "layoutorder": row[4],
+                    "label": row[5],
+                    "datatype": row[6],
+                    "widgettype": row[7],
+                    "isMandatory": True,
+                }
+            )
         tools_gw.build_dialog_options(
             self.dlg_priority, [{"fields": self.config_engine_fields}], 0, []
         )
@@ -172,12 +211,10 @@ class CalculatePriority:
         tools_gw.add_widget(self.dlg_priority, position_config, lbl, lbl_total_weight)
         self._update_total_weight()
 
-
     def _get_weight_widgets(self):
         is_weight = lambda x: x["layoutname"] == "lyt_weights"
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
-
 
     def _manage_hidden_form(self):
         status = True
@@ -187,11 +224,15 @@ class CalculatePriority:
             elif self.type == "SELECTION":
                 dialog_type = "dialog_priority_selection"
             else:
-                raise ValueError(f"Type of priority dialog shoud be 'GLOBAL' or 'SELECTION'. Value passed: '{self.type}'.")
+                raise ValueError(
+                    f"Type of priority dialog shoud be 'GLOBAL' or 'SELECTION'. Value passed: '{self.type}'."
+                )
 
             # Read the config file
             config = configparser.ConfigParser()
-            config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
+            config_path = os.path.join(
+                global_vars.plugin_dir, f"config{os.sep}config.config"
+            )
             if not os.path.exists(config_path):
                 print(f"Config file not found: {config_path}")
                 return
@@ -202,43 +243,83 @@ class CalculatePriority:
             if tools_os.set_boolean(config.get(dialog_type, "show_budget")) is not True:
                 self.dlg_priority.lbl_budget.setVisible(False)
                 self.dlg_priority.txt_budget.setVisible(False)
-            if tools_os.set_boolean(config.get(dialog_type, "show_target_year")) is not True:
+            if (
+                tools_os.set_boolean(config.get(dialog_type, "show_target_year"))
+                is not True
+            ):
                 self.dlg_priority.lbl_year.setVisible(False)
                 self.dlg_priority.cmb_year.setVisible(False)
-            if tools_os.set_boolean(config.get(dialog_type, "show_selection")) is not True:
+            if (
+                tools_os.set_boolean(config.get(dialog_type, "show_selection"))
+                is not True
+            ):
                 self.dlg_priority.grb_selection.setVisible(False)
             else:
-                if tools_os.set_boolean(config.get(dialog_type, "show_maptool")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_maptool"))
+                    is not True
+                ):
                     self.dlg_priority.btn_snapping.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_diameter")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_diameter"))
+                    is not True
+                ):
                     self.dlg_priority.lbl_dnom.setVisible(False)
                     self.dlg_priority.cmb_dnom.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_material")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_material"))
+                    is not True
+                ):
                     self.dlg_priority.lbl_material.setVisible(False)
                     self.dlg_priority.cmb_material.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_exploitation")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_exploitation"))
+                    is not True
+                ):
                     self.dlg_priority.lbl_expl_selection.setVisible(False)
                     self.dlg_priority.cmb_expl_selection.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_presszone")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_presszone"))
+                    is not True
+                ):
                     self.dlg_priority.lbl_presszone.setVisible(False)
                     self.dlg_priority.cmb_presszone.setVisible(False)
-            if tools_os.set_boolean(config.get(dialog_type, "show_ivi_button")) is not True:
-                #TODO: next approach
+            if (
+                tools_os.set_boolean(config.get(dialog_type, "show_ivi_button"))
+                is not True
+            ):
+                # TODO: next approach
                 pass
             if tools_os.set_boolean(config.get(dialog_type, "show_config")) is not True:
                 self.dlg_priority.grb_global.setVisible(False)
             else:
-                if tools_os.set_boolean(config.get(dialog_type, "show_config_diameter")) is not True:
+                if (
+                    tools_os.set_boolean(
+                        config.get(dialog_type, "show_config_diameter")
+                    )
+                    is not True
+                ):
                     self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_config_arc")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_config_arc"))
+                    is not True
+                ):
                     self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_config_material")) is not True:
+                if (
+                    tools_os.set_boolean(
+                        config.get(dialog_type, "show_config_material")
+                    )
+                    is not True
+                ):
                     self.dlg_priority.tab_widget.tab_material.setVisible(False)
-                if tools_os.set_boolean(config.get(dialog_type, "show_config_engine")) is not True:
+                if (
+                    tools_os.set_boolean(config.get(dialog_type, "show_config_engine"))
+                    is not True
+                ):
                     self.dlg_priority.tab_widget.tab_engine.setVisible(False)
 
         except Exception as e:
-            print('read_config_file error %s' % e)
+            print("read_config_file error %s" % e)
             status = False
 
         return status
@@ -263,13 +344,15 @@ class CalculatePriority:
             config_engine,
         ) = inputs
 
-        invalid_diameters_count = tools_db.get_row(f"""
+        invalid_diameters_count = tools_db.get_row(
+            f"""
             select count(*)
             from asset.arc_asset
             where dnom is null 
                 or dnom <= 0
                 or dnom > ({max(config_diameter.keys())})
-        """)[0]
+            """
+        )[0]
         if invalid_diameters_count:
             invalid_diameters = [
                 x[0]
@@ -294,11 +377,13 @@ class CalculatePriority:
             if not tools_qt.show_question(text, force_action=True):
                 return
 
-        invalid_materials_count = tools_db.get_row(f"""
+        invalid_materials_count = tools_db.get_row(
+            f"""
             select count(*)
             from asset.arc_asset a
             where matcat_id not in ('{"','".join(config_material.keys())}')
-        """)[0]
+            """
+        )[0]
         if invalid_materials_count:
             invalid_materials = [
                 x[0]
@@ -349,7 +434,9 @@ class CalculatePriority:
         self.timer.start(250)
 
         # Log behavior
-        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+        t.report.connect(
+            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False)
+        )
 
         # Progress bar behavior
         t.progressChanged.connect(dlg.progressBar.setValue)
@@ -363,11 +450,11 @@ class CalculatePriority:
 
         dlg.executing = True
         QgsApplication.taskManager().addTask(t)
-        
+
     # region Selection
 
     def _manage_selection(self):
-        """ Slot function for signal 'canvas.selectionChanged' """
+        """Slot function for signal 'canvas.selectionChanged'"""
 
         self._manage_btn_snapping()
 
@@ -380,22 +467,41 @@ class CalculatePriority:
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
 
-
         self.dlg_priority.btn_snapping.clicked.connect(
-            partial(tools_gw.selection_init, self, self.dlg_priority, self.layer_to_work))
-
+            partial(
+                tools_gw.selection_init, self, self.dlg_priority, self.layer_to_work
+            )
+        )
 
     def old_manage_btn_snapping(self):
-        """ Fill btn_snapping QMenu """
+        """Fill btn_snapping QMenu"""
 
         # Functions
-        icons_folder = os.path.join(global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg")
+        icons_folder = os.path.join(
+            global_vars.plugin_dir, f"icons{os.sep}dialogs{os.sep}svg"
+        )
 
         values = [
-            [0, "Select Feature(s)", os.path.join(icons_folder, "mActionSelectRectangle.svg")],
-            [1, "Select Features by Polygon", os.path.join(icons_folder, "mActionSelectPolygon.svg")],
-            [2, "Select Features by Freehand", os.path.join(icons_folder, "mActionSelectRadius.svg")],
-            [3, "Select Features by Radius", os.path.join(icons_folder, "mActionSelectRadius.svg")],
+            [
+                0,
+                "Select Feature(s)",
+                os.path.join(icons_folder, "mActionSelectRectangle.svg"),
+            ],
+            [
+                1,
+                "Select Features by Polygon",
+                os.path.join(icons_folder, "mActionSelectPolygon.svg"),
+            ],
+            [
+                2,
+                "Select Features by Freehand",
+                os.path.join(icons_folder, "mActionSelectRadius.svg"),
+            ],
+            [
+                3,
+                "Select Features by Radius",
+                os.path.join(icons_folder, "mActionSelectRadius.svg"),
+            ],
         ]
 
         # Create and populate QMenu
@@ -408,7 +514,6 @@ class CalculatePriority:
             action.triggered.connect(partial(self._trigger_action_select, num))
 
         self.dlg_priority.btn_snapping.setMenu(select_menu)
-
 
     def _trigger_action_select(self, num):
 
@@ -425,9 +530,8 @@ class CalculatePriority:
         elif num == 3:
             self.iface.actionSelectRadius().trigger()
 
-
     def _selection_init(self):
-        """ Set canvas map tool to an instance of class 'GwSelectManager' """
+        """Set canvas map tool to an instance of class 'GwSelectManager'"""
 
         # tools_gw.disconnect_signal('feature_delete')
         self.iface.actionSelect().trigger()
@@ -481,13 +585,13 @@ class CalculatePriority:
         result_description = self.dlg_priority.txt_descript.text()
 
         features = None
-        if 'arc' in self.list_ids:
-            features = self.list_ids['arc'] or None
+        if "arc" in self.list_ids:
+            features = self.list_ids["arc"] or None
 
-        exploitation = tools_qt.get_combo_value(dlg, 'cmb_expl_selection') or None
-        presszone = tools_qt.get_combo_value(dlg, 'cmb_presszone') or None
-        diameter = tools_qt.get_combo_value(dlg, 'cmb_dnom') or None
-        material = tools_qt.get_combo_value(dlg, 'cmb_material') or None
+        exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection") or None
+        presszone = tools_qt.get_combo_value(dlg, "cmb_presszone") or None
+        diameter = tools_qt.get_combo_value(dlg, "cmb_dnom") or None
+        material = tools_qt.get_combo_value(dlg, "cmb_material") or None
 
         config_diameter = {}
         for row in table2data(self.qtbl_diameter):
@@ -496,7 +600,7 @@ class CalculatePriority:
                     f"There is an empty value for diameter in the 'Diameter' tab!"
                 )
                 return
-            if not row['cost_constr']:
+            if not row["cost_constr"]:
                 tools_qt.show_info_box(
                     f"You should inform the replacing cost for diameter {row['dnom']}!"
                 )
@@ -510,18 +614,20 @@ class CalculatePriority:
                 tools_qt.show_info_box(
                     f"For diameter {row['dnom']}, compliance must be a value between 0 and 10, inclusive!"
                 )
-            config_diameter[int(row['dnom'])] = {
-                k:v for k, v in row.items() if k != "dnom"
+            config_diameter[int(row["dnom"])] = {
+                k: v for k, v in row.items() if k != "dnom"
             }
 
         config_material = {}
         for row in table2data(self.qtbl_material):
-            if not (0 <= row['compliance'] <= 10):
+            if not (0 <= row["compliance"] <= 10):
                 tools_qt.show_info_box(
                     f"For material {row['material']}, compliance must be a value between 0 and 10, inclusive!"
                 )
                 return
-            config_material[row['material']] = {k:v for k, v in row.items() if k != "material"}
+            config_material[row["material"]] = {
+                k: v for k, v in row.items() if k != "material"
+            }
 
         if round(self.total_weight, 5) != 1:
             tools_qt.show_info_box("The sum of the weights must be equal to 1!")
@@ -534,7 +640,9 @@ class CalculatePriority:
                     tools_qt.get_widget(dlg, widget_name).text()
                 )
             except:
-                tools_qt.show_info_box(f"The field {field['label']} must be a valid number!")
+                tools_qt.show_info_box(
+                    f"The field {field['label']} must be a valid number!"
+                )
                 return
 
         return (
@@ -557,34 +665,48 @@ class CalculatePriority:
         # Combo dnom
         sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True
+        )
 
         # Combo material
         sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_material, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority.cmb_material, rows, 1, add_empty=True
+        )
 
         # Combo exploitation
         sql = "SELECT expl_id as id, name as idval FROM asset.exploitation;"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_expl_selection, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority.cmb_expl_selection, rows, 1, add_empty=True
+        )
 
         # Combo presszone
         sql = "SELECT presszone_id as id, name as idval FROM asset.presszone"
         rows = tools_db.get_rows(sql)
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_presszone, rows, 1, add_empty=True)
-
-
+        tools_qt.fill_combo_values(
+            self.dlg_priority.cmb_presszone, rows, 1, add_empty=True
+        )
 
     # endregion
 
-    def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
-        """ Set a model with selected filter.
-            Attach that model to selected table
-            @setEditStrategy:
-            0: OnFieldChange
-            1: OnRowChange
-            2: OnManualSubmit
+    def _fill_table(
+        self,
+        dialog,
+        widget,
+        table_name,
+        hidde=False,
+        set_edit_triggers=QTableView.NoEditTriggers,
+        expr=None,
+    ):
+        """Set a model with selected filter.
+        Attach that model to selected table
+        @setEditStrategy:
+        0: OnFieldChange
+        1: OnRowChange
+        2: OnManualSubmit
         """
         try:
 
