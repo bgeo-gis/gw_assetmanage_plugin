@@ -207,28 +207,28 @@ class GwAssignation(GwTask):
             self._emit_report("Saving results to DB (4/4)...")
             self.setProgress(75)
             sql = (
-                "UPDATE asset.arc_input SET rleak = NULL WHERE result_id = 0; "
-                + "INSERT INTO asset.arc_input (arc_id, result_id, rleak) VALUES "
+                "UPDATE asset.arc_input SET rleak = NULL; "
+                + "INSERT INTO asset.arc_input (arc_id, rleak) VALUES "
             )
             for arc_id, rleak in rleaks:
-                sql += f"({arc_id}, 0, {rleak}),"
+                sql += f"({arc_id}, {rleak}),"
             sql = (
                 sql[:-1]
-                + " ON CONFLICT(arc_id, result_id) DO UPDATE SET rleak=excluded.rleak;"
+                + " ON CONFLICT(arc_id) DO UPDATE SET rleak=excluded.rleak;"
             )
             tools_db.execute_sql(sql)
 
             orphan_pipes = tools_db.get_rows(
                 """
                 SELECT count(*) FROM asset.arc_input
-                    WHERE result_id = 0 AND (rleak IS NULL or rleak = 0)
+                    WHERE rleak IS NULL or rleak = 0
                 """
             )[0][0]
 
             max_rleak, min_rleak = tools_db.get_rows(
                 """
                 SELECT max(rleak), min(rleak) FROM asset.arc_input
-                    WHERE result_id = 0 AND rleak IS NOT NULL AND rleak <> 0
+                    WHERE rleak IS NOT NULL AND rleak <> 0
                 """
             )[0]
 

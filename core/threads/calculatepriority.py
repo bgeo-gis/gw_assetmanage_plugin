@@ -143,8 +143,7 @@ class GwCalculatePriority(GwTask):
                 ai.social,
                 ai.other
             from asset.arc_asset a 
-            left join asset.arc_input ai 
-                on (a.arc_id = ai.arc_id and ai.result_id = 0)
+            left join asset.arc_input ai using (arc_id)
         """
         filters = []
         if self.features:
