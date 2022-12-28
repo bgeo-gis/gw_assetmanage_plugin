@@ -433,20 +433,35 @@ class GwCalculatePriority(GwTask):
             f"""
             delete from asset.arc_output
                 where result_id = {result_id};
-            insert into asset.arc_output 
-                    (arc_id, result_id, val, orderby, expected_year, budget, total, mandatory)
+            insert into asset.arc_output (arc_id,
+                    result_id,
+                    val,
+                    orderby,
+                    expected_year,
+                    budget,
+                    total,
+                    length,
+                    cum_length,
+                    mandatory)
                 select arc_id,
                     sh.result_id,
                     val,
-                    rank() over (order by coalesce(i.mandatory, false) desc, val desc),
+                    rank()
+                        over (order by coalesce(i.mandatory, false) desc, val desc),
                     year,
                     cost_constr,
-                    sum(cost_constr) over (order by coalesce(i.mandatory, false) desc, val desc, arc_id),
+                    sum(cost_constr)
+                        over (order by coalesce(i.mandatory, false) desc, val desc, arc_id)
+                        as total,
+                    st_length(a.the_geom),
+                    sum(st_length(a.the_geom))
+                        over (order by coalesce(i.mandatory, false) desc, val desc, arc_id),
                     mandatory
                 from asset.arc_engine_sh sh
                 left join asset.arc_input i using (arc_id)
+                left join asset.arc_asset a using (arc_id)
                 where sh.result_id = {result_id}
-                order by sum;
+                order by total;
             """
         )
 
