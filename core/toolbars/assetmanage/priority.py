@@ -240,82 +240,42 @@ class CalculatePriority:
             config.read(config_path)
 
             # Get configuration parameters
-            if tools_os.set_boolean(config.get(dialog_type, "show_budget")) is not True:
+            if config.getboolean(dialog_type, "show_budget") is not True:
                 self.dlg_priority.lbl_budget.setVisible(False)
                 self.dlg_priority.txt_budget.setVisible(False)
-            if (
-                tools_os.set_boolean(config.get(dialog_type, "show_target_year"))
-                is not True
-            ):
+            if config.getboolean(dialog_type, "show_target_year") is not True:
                 self.dlg_priority.lbl_year.setVisible(False)
                 self.dlg_priority.cmb_year.setVisible(False)
-            if (
-                tools_os.set_boolean(config.get(dialog_type, "show_selection"))
-                is not True
-            ):
+            if config.getboolean(dialog_type, "show_selection") is not True:
                 self.dlg_priority.grb_selection.setVisible(False)
             else:
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_maptool"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_maptool") is not True:
                     self.dlg_priority.btn_snapping.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_diameter"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_diameter") is not True:
                     self.dlg_priority.lbl_dnom.setVisible(False)
                     self.dlg_priority.cmb_dnom.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_material"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_material") is not True:
                     self.dlg_priority.lbl_material.setVisible(False)
                     self.dlg_priority.cmb_material.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_exploitation"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_exploitation") is not True:
                     self.dlg_priority.lbl_expl_selection.setVisible(False)
                     self.dlg_priority.cmb_expl_selection.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_presszone"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_presszone") is not True:
                     self.dlg_priority.lbl_presszone.setVisible(False)
                     self.dlg_priority.cmb_presszone.setVisible(False)
-            if (
-                tools_os.set_boolean(config.get(dialog_type, "show_ivi_button"))
-                is not True
-            ):
+            if config.getboolean(dialog_type, "show_ivi_button") is not True:
                 # TODO: next approach
                 pass
-            if tools_os.set_boolean(config.get(dialog_type, "show_config")) is not True:
+            if config.getboolean(dialog_type, "show_config") is not True:
                 self.dlg_priority.grb_global.setVisible(False)
             else:
-                if (
-                    tools_os.set_boolean(
-                        config.get(dialog_type, "show_config_diameter")
-                    )
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_config_diameter") is not True:
                     self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_config_arc"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_config_arc") is not True:
                     self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if (
-                    tools_os.set_boolean(
-                        config.get(dialog_type, "show_config_material")
-                    )
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_config_material") is not True:
                     self.dlg_priority.tab_widget.tab_material.setVisible(False)
-                if (
-                    tools_os.set_boolean(config.get(dialog_type, "show_config_engine"))
-                    is not True
-                ):
+                if config.getboolean(dialog_type, "show_config_engine") is not True:
                     self.dlg_priority.tab_widget.tab_engine.setVisible(False)
 
         except Exception as e:
