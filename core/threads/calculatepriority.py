@@ -148,8 +148,7 @@ class GwCalculatePriority(GwTask):
         """
         filters = []
         if self.features:
-            features = [str(x) for x in self.features]
-            filters.append(f"a.arc_id in ({','.join(features)})")
+            filters.append(f"""a.arc_id in ('{"','".join(self.features)}')""")
         if self.exploitation:
             filters.append(f"a.expl_id = {self.exploitation}")
         if self.presszone:
@@ -289,10 +288,37 @@ class GwCalculatePriority(GwTask):
             self._emit_report("This result name already exist.")
             return False
 
+        str_features = (
+            f"""ARRAY['{"','".join(self.features)}']""" if self.features else "NULL"
+        )
+        str_presszone_id = f"'{self.presszone}'" if self.presszone else "NULL"
+        str_material_id = f"'{self.material}'" if self.material else "NULL"
         tools_db.execute_sql(
             f"""
-            insert into asset.cat_result (result_name, result_type, descript, expl_id, budget, target_year, cur_user, tstamp)
-            values ('{self.result_name}', '{self.result_type}', '{self.result_description}', {self.exploitation or 'NULL'}, NULL, NULL, current_user, now())
+            insert into asset.cat_result (result_name, 
+                result_type, 
+                descript,
+                features,
+                expl_id,
+                presszone_id,
+                dnom,
+                material_id,
+                budget,
+                target_year,
+                cur_user,
+                tstamp)
+            values ('{self.result_name}',
+                '{self.result_type}',
+                '{self.result_description}',
+                {str_features},
+                {self.exploitation or 'NULL'},
+                {str_presszone_id},
+                {self.diameter or 'NULL'},
+                {str_material_id},
+                NULL,
+                NULL,
+                current_user,
+                now())
             """
         )
 
