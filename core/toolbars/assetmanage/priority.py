@@ -257,10 +257,20 @@ class CalculatePriority:
                 if config.getboolean(dialog_type, "show_material") is not True:
                     self.dlg_priority.lbl_material.setVisible(False)
                     self.dlg_priority.cmb_material.setVisible(False)
-                if config.getboolean(dialog_type, "show_exploitation") is not True:
+                # Hide Explotation filter if there's arcs without expl_id
+                if config.getboolean(
+                    dialog_type, "show_exploitation"
+                ) is not True or tools_db.get_row(
+                    "SELECT 1 FROM asset.arc_asset WHERE expl_id IS NULL"
+                ):
                     self.dlg_priority.lbl_expl_selection.setVisible(False)
                     self.dlg_priority.cmb_expl_selection.setVisible(False)
-                if config.getboolean(dialog_type, "show_presszone") is not True:
+                # Hide Presszone filter if there's arcs without presszone_id
+                if config.getboolean(
+                    dialog_type, "show_presszone"
+                ) is not True or tools_db.get_row(
+                    "SELECT 1 FROM asset.arc_asset WHERE presszone_id IS NULL"
+                ):
                     self.dlg_priority.lbl_presszone.setVisible(False)
                     self.dlg_priority.cmb_presszone.setVisible(False)
             if config.getboolean(dialog_type, "show_ivi_button") is not True:
