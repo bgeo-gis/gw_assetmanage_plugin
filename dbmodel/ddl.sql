@@ -1,276 +1,263 @@
+CREATE SCHEMA asset;
 
-SET search_path = SCHEMA_NAME, public;
+SET search_path = asset, public;
 
-CREATE TABLE arc_input
-(arc_id integer,
-result_id integer,
-dnom numeric(12,3),
-material character varying(50),
-length numeric(12,3),
-age smallint ,
-longevity numeric(12,3),
-rleak numeric(12,3),
-ndvi numeric(12,3),
-nconn integer,
-lconn numeric(12,3),
-depth numeric(12,3),
-traffic character varying(30),
-pressure numeric(12,3),
-terrain character varying(50),
-pavement character varying(50),
-wtable numeric(12,3),
-npresszone integer,
-nhydro integer,
-flow numeric(12,3),
-cserv numeric(12,3),
-water numeric(12,3),
-nrw numeric(12,3),
-plan boolean,
-social boolean,
-other boolean,
-mandatory boolean,
-compliance boolean,
- CONSTRAINT arc_input_pkey PRIMARY KEY (arc_id, result_id));
+--
+-- TABLES:
+--
 
-
-
-CREATE TABLE arc_engine_wm 
-(arc_id integer,
-result_id integer,
-rleak integer,
-mleak integer,
-ndvi integer,
-nconn integer,
-lconn integer,
-longevity integer,
-depth integer,
-traffic integer,
-pressure integer,
-npresszone integer,
-terrain integer,
-pavement integer,
-wtable integer,
-nhydro integer,
-flow integer,
-cserv integer,
-water integer,
-nrw integer,
-strategic integer,
-compliance integer,
-val_first integer,
-val integer,
- CONSTRAINT arc_engine_wm_pkey PRIMARY KEY (arc_id, result_id));
-
-
-CREATE TABLE arc_engine_sh 
-(arc_id integer,
-result_id integer,
-cost_repmain numeric(12,2),
-cost_repserv numeric(12,2),
-cost_water numeric(12,2),
-cost_nhydr numeric(12,2),
-cost_cserv numeric(12,2),
-cost_leak numeric(12,2),
-cost_constr numeric(12,2),
-bratemain numeric(12,3),
-brateserv numeric(12,3),
-year integer,
-year_order integer,
-strategic integer,
-compliance integer,
-val integer,
- CONSTRAINT arc_engine_sh_pkey PRIMARY KEY (arc_id, result_id));
-
-
-
-CREATE TABLE arc_output 
-(arc_id integer,
-result_id integer,
-val integer,
-mandatory boolean,
-orderby integer,
-target_year integer,
-budget numeric (12,2),
-total numeric (12,2),
- CONSTRAINT arc_output_pkey PRIMARY KEY (arc_id, result_id));
-
-
-CREATE TABLE config_diameter 
-(dnom numeric(12,2),
-cost_constr	numeric (12,2),
-cost_repmain numeric (12,2),
-cost_repserv numeric (12,2),
-compliance	boolean,
- CONSTRAINT config_diameter_pkey PRIMARY KEY (dnom));
-
-
-CREATE TABLE config_material 
-(material character varying(50),
-pleak numeric (12,2),
-age_max	smallint,
-age_med	smallint,
-age_min	smallint,
-builtdate_vdef	smallint,
-compliance	boolean,
- CONSTRAINT config_material_pkey PRIMARY KEY (material));
-
-
-CREATE TABLE cat_result
-(result_id integer,
-descript text,
-expl_id integer,
-budget numeric(12,2),
-current_ivi numeric(12,2),
-target_year smallint,
-target_ivi numeric(12,2), 
-tstamp timestamp,
-cur_user text,
-status smallint,
- CONSTRAINT cat_result_pkey PRIMARY KEY (result_id));
-
-
-
-CREATE TABLE config_engine 
-(parameter character varying(50) NOT NULL,
-value text,
-method	character varying(30),
-round smallint,
-descript text,
-active boolean,
-/*layoutname	character varying(50),
-layoutorder	integer,
-label character varying(200),
-datatype character varying(50),
-widgettype character varying(50),
-dv_querytext text,	
-dv_filterbyfield text,
-isenabled boolean,
-project_type character varying,
-dv_isparent boolean,
-isautoupdate boolean,
-ismandatory boolean,
-iseditable boolean,
-dv_orderby_id boolean,
-dv_isnullvalue boolean,
-stylesheet json,
-widgetcontrols json,
-placeholder text,
-standardvalue text,*/
- CONSTRAINT config_engine_pkey PRIMARY KEY (parameter));
-
-
-
-CREATE TABLE log_config 
-(result_id integer,
-cost_water numeric(12,2),
-cost_nhydr numeric(12,2),
-cost_cserv numeric(12,2),
-cost_repserv numeric(12,2),
-rleak numeric(12,3),
-mleak integer,
-ndvi numeric(12,3),
-nconn integer,
-lconn numeric(12,3),
-longevity numeric(12,3),
-depth numeric(12,3),
-npresszone integer,
-traffic character varying(30),
-pressure numeric(12,3),
-terrain character varying(50),
-pavement character varying(50),
-wtable numeric(12,3),
-nhydro integer,
-flow numeric(12,3),
-cserv boolean,
-bratemain numeric(12,3),
-brateserv numeric(12,3),
-drate numeric(12,3),
-risk numeric(12,3),
-nrw numeric(12,3),
-compliance integer,
-strategic integer,
- CONSTRAINT log_config_pkey PRIMARY KEY (result_id));
-
-
-CREATE TABLE leaks
-(id serial, 
-ext_code text, 
-address text, 
-province character varying(100),
-county character varying(100),
-district character varying(100),
-system character varying(100),
-zone character varying(100),
-type text,
-material character varying(100), 
-startdate date, 
-enddate date, 
-days integer, 
-the_geom geometry(Point,5367),
- CONSTRAINT leaks_pkey PRIMARY KEY (id));
-
-
-CREATE TABLE arc_asset
-(arc_id integer,
-code text,
-sector_id integer,
-macrosector_id integer,
-pressurezone_id character varying(30),
-expl_id integer,
-builtdate  date,
-dnom integer,
-matcat_id character varying(30),
-pavcat_id character varying(30),
-function_type character varying(50),
-the_geom geometry(Linestring,5367),
- CONSTRAINT arc_asset_pkey PRIMARY KEY (arc_id));
-
-
-CREATE TABLE selector_result
-(
-  result_id integer NOT NULL,
-  cur_user text NOT NULL DEFAULT "current_user"(),
-  CONSTRAINT selector_result_pkey PRIMARY KEY (result_id, cur_user),
-  CONSTRAINT cat_result_result_id_fkey FOREIGN KEY (result_id)
-      REFERENCES cat_result (result_id) MATCH SIMPLE
-      ON UPDATE CASCADE ON DELETE CASCADE
+CREATE TABLE asset.leaks (
+    id serial,
+    material character varying(100),
+    diameter integer,
+    "date" date,
+    the_geom public.geometry(MultiPoint,SCHEMA_SRID),
+    CONSTRAINT leaks_pkey PRIMARY KEY (id)
 );
 
-
-
-CREATE TABLE macrosector (
-  macrosector_id serial4 NOT NULL,
-  name text,
-  the_geom public.geometry(multipolygon, 5367),
-  CONSTRAINT macrosector_pkey PRIMARY KEY (macrosector_id)
+CREATE TABLE asset.arc_input (
+    arc_id character varying(60) NOT NULL,
+    longevity numeric(12,3),
+    rleak numeric(12,3),
+    pressure numeric(12,3),
+    flow numeric(12,3),
+    nrw numeric(12,3),
+    strategic boolean,
+    mandatory boolean,
+    compliance integer,
+    CONSTRAINT arc_input_pkey PRIMARY KEY (arc_id)
 );
 
-CREATE TABLE sector (
-  sector_id serial4 NOT NULL,
-  name text,
-  macrosector_id int4,
-  the_geom public.geometry(multipolygon, 5367),
-  CONSTRAINT sector_pkey PRIMARY KEY (sector_id)
-);
-  
-
-
-CREATE TABLE presszone (
-  presszone_id serial4 NOT NULL,
-  name text,
-  the_geom public.geometry(multipolygon, 5367),
-  CONSTRAINT presszone_pkey PRIMARY KEY (presszone_id)
-);
-
-CREATE TABLE exploitation (
-  expl_id serial4 NOT NULL,
-  "name" text,
-  the_geom public.geometry(multipolygon, 5367),
-  CONSTRAINT exploitation_pkey PRIMARY KEY (expl_id)
+CREATE TABLE asset.cat_result (
+    result_id serial,
+    result_name text,
+    result_type character varying(50),
+    descript text,
+    expl_id integer,
+    budget numeric(12,2),
+    _current_ivi numeric(12,2),
+    target_year smallint,
+    _target_ivi numeric(12,2),
+    tstamp timestamp without time zone,
+    cur_user text,
+    status smallint,
+    presszone_id character varying(30),
+    material_id character varying(30),
+    features character varying[],
+    dnom numeric(12,3),
+    CONSTRAINT cat_result_pkey PRIMARY KEY (result_id),
+    CONSTRAINT cat_result_result_type_check CHECK (((result_type)::text = ANY (ARRAY[('GLOBAL'::character varying)::text, ('SELECTION'::character varying)::text])))
 );
 
-CREATE OR REPLACE VIEW v_asset_arc_input
- AS
+CREATE TABLE asset.config_diameter_def (
+    dnom numeric(12,2) NOT NULL,
+    cost_constr numeric(12,2),
+    cost_repmain numeric(12,2),
+    compliance integer,
+    CONSTRAINT config_diameter_def_pkey PRIMARY KEY (dnom)
+);
+
+CREATE TABLE asset.config_diameter (
+    dnom numeric(12,2) NOT NULL,
+    cost_constr numeric(12,2),
+    cost_repmain numeric(12,2),
+    compliance integer,
+    result_id integer NOT NULL,
+    CONSTRAINT config_diameter_pkey PRIMARY KEY (dnom, result_id)
+);
+
+CREATE TABLE asset.config_material_def (
+    material character varying(50) NOT NULL,
+    pleak numeric(12,2),
+    age_max smallint,
+    age_med smallint,
+    age_min smallint,
+    builtdate_vdef smallint,
+    compliance integer,
+    CONSTRAINT config_material_def_pkey PRIMARY KEY (material)
+);
+
+CREATE TABLE asset.config_material (
+    material character varying(50) NOT NULL,
+    pleak numeric(12,2),
+    age_max smallint,
+    age_med smallint,
+    age_min smallint,
+    builtdate_vdef smallint,
+    compliance integer,
+    result_id integer NOT NULL,
+    CONSTRAINT config_material_pkey PRIMARY KEY (material, result_id)
+);
+
+CREATE TABLE asset.config_engine_def (
+    parameter character varying(50) NOT NULL,
+    value text,
+    method character varying(30),
+    round smallint,
+    descript text,
+    active boolean,
+    layoutname character varying(50),
+    layoutorder integer,
+    label character varying(200),
+    datatype character varying(50),
+    widgettype character varying(50),
+    dv_querytext text,
+    dv_controls json,
+    ismandatory boolean,
+    iseditable boolean,
+    stylesheet json,
+    widgetcontrols json,
+    placeholder text,
+    standardvalue text,
+    CONSTRAINT config_engine_def_pkey PRIMARY KEY (parameter, method)
+);
+
+CREATE TABLE asset.config_engine (
+    parameter character varying(50) NOT NULL,
+    value text,
+    method character varying(30),
+    round smallint,
+    descript text,
+    active boolean,
+    layoutname character varying(50),
+    layoutorder integer,
+    label character varying(200),
+    datatype character varying(50),
+    widgettype character varying(50),
+    dv_querytext text,
+    dv_controls json,
+    ismandatory boolean,
+    iseditable boolean,
+    stylesheet json,
+    widgetcontrols json,
+    placeholder text,
+    standardvalue text,
+    result_id integer NOT NULL,
+    CONSTRAINT config_engine_pkey PRIMARY KEY (parameter, result_id)
+);
+
+CREATE TABLE asset.arc_engine_sh (
+    arc_id character varying(16) NOT NULL,
+    result_id integer NOT NULL,
+    cost_repmain numeric(12,2),
+    cost_constr numeric(12,2),
+    bratemain numeric(12,3),
+    brateserv numeric(12,3),
+    year integer,
+    year_order double precision,
+    strategic integer,
+    compliance integer,
+    val double precision,
+    CONSTRAINT arc_engine_sh_pkey PRIMARY KEY (arc_id, result_id)
+);
+
+CREATE TABLE asset.arc_engine_wm (
+    arc_id character varying(16) NOT NULL,
+    result_id integer NOT NULL,
+    rleak integer,
+    longevity integer,
+    pressure integer,
+    flow integer,
+    nrw integer,
+    strategic integer,
+    compliance integer,
+    val_first double precision,
+    val double precision,
+    CONSTRAINT arc_engine_wm_pkey PRIMARY KEY (arc_id, result_id)
+);
+
+CREATE TABLE asset.arc_output (
+    arc_id character varying(16) NOT NULL,
+    result_id integer NOT NULL,
+    val double precision,
+    mandatory boolean,
+    orderby integer,
+    expected_year integer,
+    budget numeric(12,2),
+    total numeric(12,2),
+    length numeric(12,3),
+    cum_length numeric(12,3),
+    CONSTRAINT arc_output_pkey PRIMARY KEY (arc_id, result_id)
+);
+
+CREATE TABLE asset.selector_result_main (
+    -- TODO: check FK
+    result_id integer NOT NULL,
+    cur_user text DEFAULT "current_user"() NOT NULL,
+    CONSTRAINT selector_result_main_pkey PRIMARY KEY (cur_user, result_id)
+);
+
+CREATE TABLE asset.selector_result_compare (
+    -- TODO: check FK
+    result_id integer NOT NULL,
+    cur_user text DEFAULT "current_user"() NOT NULL,
+    CONSTRAINT selector_result_compare_pkey PRIMARY KEY (cur_user, result_id)
+);
+
+CREATE TABLE asset.config_form_tableview (
+    location_type character varying(50) NOT NULL,
+    project_type character varying(50) NOT NULL,
+    tablename character varying(50) NOT NULL,
+    columnname character varying(50) NOT NULL,
+    columnindex smallint,
+    visible boolean,
+    width integer,
+    alias character varying(50),
+    style json,
+    CONSTRAINT config_form_tableview_pkey PRIMARY KEY (tablename, columnname)
+);
+
+--
+-- VIEWS:
+--
+
+CREATE VIEW asset.exploitation AS
+ SELECT exploitation.expl_id,
+    exploitation.name,
+    exploitation.the_geom
+   FROM PARENT_SCHEMA.exploitation;
+
+CREATE VIEW asset.macrosector AS
+ SELECT macrosector.macrosector_id,
+    macrosector.name,
+    macrosector.the_geom
+   FROM PARENT_SCHEMA.macrosector;
+
+CREATE VIEW asset.sector AS
+ SELECT sector.sector_id,
+    sector.name,
+    sector.macrosector_id,
+    sector.the_geom
+   FROM PARENT_SCHEMA.sector;
+
+CREATE VIEW asset.presszone AS
+ SELECT presszone.presszone_id,
+    presszone.name,
+    presszone.the_geom
+   FROM PARENT_SCHEMA.presszone;
+
+CREATE VIEW asset.cat_mat_arc AS
+ SELECT cat_mat_arc.id,
+    cat_mat_arc.descript
+   FROM PARENT_SCHEMA.cat_mat_arc
+  WHERE (cat_mat_arc.active = true);
+
+CREATE VIEW asset.arc_asset AS
+ SELECT v_edit_arc.arc_id,
+    v_edit_arc.sector_id,
+    v_edit_arc.macrosector_id,
+    v_edit_arc.presszone_id,
+    v_edit_arc.builtdate,
+    v_edit_arc.cat_dnom AS dnom,
+    v_edit_arc.cat_matcat_id AS matcat_id,
+    v_edit_arc.pavcat_id,
+    v_edit_arc.function_type,
+    v_edit_arc.the_geom,
+    v_edit_arc.code,
+    v_edit_arc.expl_id
+   FROM PARENT_SCHEMA.v_edit_arc;
+
+CREATE VIEW asset.v_asset_arc_input AS
  SELECT a.arc_id,
     a.sector_id,
     a.macrosector_id,
@@ -283,11 +270,10 @@ CREATE OR REPLACE VIEW v_asset_arc_input
     a.function_type,
     i.rleak,
     a.the_geom
-   FROM arc_asset a
-     LEFT JOIN arc_input i USING (arc_id);
+   FROM (asset.arc_asset a
+     LEFT JOIN asset.arc_input i USING (arc_id));
 
-CREATE OR REPLACE VIEW v_asset_arc_output
- AS
+CREATE VIEW asset.v_asset_arc_output AS
  SELECT a.arc_id,
     o.result_id,
     a.sector_id,
@@ -305,15 +291,16 @@ CREATE OR REPLACE VIEW v_asset_arc_output
     o.expected_year,
     o.budget,
     o.total,
-    a.the_geom
-   FROM arc_asset a
-     LEFT JOIN arc_input i USING (arc_id)
-     JOIN arc_output o USING (arc_id)
-     JOIN selector_result_main s ON s.result_id = o.result_id
-  WHERE s.cur_user = CURRENT_USER::text;
+    a.the_geom,
+    o.length,
+    o.cum_length
+   FROM (((asset.arc_asset a
+     LEFT JOIN asset.arc_input i USING (arc_id))
+     JOIN asset.arc_output o USING (arc_id))
+     JOIN asset.selector_result_main s ON ((s.result_id = o.result_id)))
+  WHERE (s.cur_user = (CURRENT_USER)::text);
 
-CREATE OR REPLACE VIEW v_asset_arc_output_compare
- AS
+CREATE VIEW asset.v_asset_arc_output_compare AS
  SELECT a.arc_id,
     o.result_id,
     a.sector_id,
@@ -331,9 +318,11 @@ CREATE OR REPLACE VIEW v_asset_arc_output_compare
     o.expected_year,
     o.budget,
     o.total,
-    a.the_geom
-   FROM arc_asset a
-     LEFT JOIN arc_input i USING (arc_id)
-     JOIN arc_output o USING (arc_id)
-     JOIN selector_result_compare s ON s.result_id = o.result_id
-  WHERE s.cur_user = CURRENT_USER::text;
+    a.the_geom,
+    o.length,
+    o.cum_length
+   FROM (((asset.arc_asset a
+     LEFT JOIN asset.arc_input i USING (arc_id))
+     JOIN asset.arc_output o USING (arc_id))
+     JOIN asset.selector_result_compare s ON ((s.result_id = o.result_id)))
+  WHERE (s.cur_user = (CURRENT_USER)::text);
