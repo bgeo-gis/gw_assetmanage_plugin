@@ -120,7 +120,7 @@ class GwCalculatePriority(GwTask):
         last_leak_year = tools_db.get_rows(
             """
             select max(year) from (select 
-                date_part('year', startdate) as year
+                date_part('year', "date") as year
                 FROM asset.leaks) years
             """
         )[0][0]

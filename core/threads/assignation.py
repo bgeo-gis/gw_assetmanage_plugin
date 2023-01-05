@@ -24,7 +24,7 @@ class GwAssignation(GwTask):
             max_date, min_date, interval = tools_db.get_row(
                 """
                 WITH leak_dates AS (
-                    SELECT id, startdate AS date_leak
+                    SELECT id, "date" AS date_leak
                     FROM asset.leaks)
                 SELECT max(date_leak) AS max_date,
                     min(date_leak) AS min_date,
@@ -46,7 +46,7 @@ class GwAssignation(GwTask):
             sql = f"""
                 WITH
                     leak_dates AS (
-                        SELECT id, startdate AS date_leak
+                        SELECT id, "date" AS date_leak
                         FROM asset.leaks),
                     max_date AS (
                         SELECT max(date_leak)
@@ -69,7 +69,7 @@ class GwAssignation(GwTask):
                 f"""
                 WITH
                     leak_dates AS (
-                        SELECT id, startdate AS date_leak
+                        SELECT id, "date" AS date_leak
                         FROM asset.leaks),
                     max_date AS (
                         SELECT max(date_leak)
