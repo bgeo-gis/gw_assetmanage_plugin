@@ -383,7 +383,6 @@ class GwCalculatePriority(GwTask):
                     arc_id,
                     result_id,
                     cost_repmain,
-                    cost_leak,
                     cost_constr,
                     bratemain,
                     year,
@@ -409,7 +408,6 @@ class GwCalculatePriority(GwTask):
                     save_arcs_sql += f"""
                         ({arc_id},
                         {result_id},
-                        {cost_repmain},
                         {cost_repmain},
                         {cost_constr},
                         {break_growth_rate},
