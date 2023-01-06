@@ -12,6 +12,7 @@ PORT = None
 # Giswater schema parameters
 PARENT_SCHEMA = None
 SCHEMA_SRID = None
+LANGUAGE = "es_ES"
 
 if (
     not DBNAME
@@ -21,11 +22,12 @@ if (
     or not PORT
     or not PARENT_SCHEMA
     or not SCHEMA_SRID
+    or not LANGUAGE
 ):
     print("There are some constants that have not been defined.")
     exit()
 
-files = ["ddl.sql", "tablect.sql", "dml.sql"]
+files = ["ddl.sql", "tablect.sql", "dml.sql", f"i18n/{LANGUAGE}.sql"]
 sql_folder = Path(getsourcefile(lambda: 0)).parent
 
 conn = psycopg2.connect(
@@ -35,7 +37,7 @@ cur = conn.cursor()
 
 try:
     for file in files:
-        with open(sql_folder / file) as f:
+        with open(sql_folder / file, encoding='utf8') as f:
             sql = (
                 f.read()
                 .replace("PARENT_SCHEMA", PARENT_SCHEMA)
