@@ -30,11 +30,11 @@ INSERT INTO asset.config_diameter_def VALUES (1110.00, 700.00, 1400.00, 10);
 
 INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM asset.cat_mat_arc;
 
-INSERT INTO asset.config_engine_def VALUES ('strategic', '0.2', 'S-H', NULL, 'Peso en la matriz final por factores estrategicos', true, 'lyt_weights', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('expected_year', '0.7', 'S-H', NULL, 'Peso en la matriz final por año de renovación', true, 'lyt_weights', 1, 'Weight expected year', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('compliance', '0.1', 'S-H', NULL, 'Peso en la matriz final por cumplimiento normativo', true, 'lyt_weights', 2, 'Weight compliance', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('bratemain0', '0.05', 'S-H', NULL, 'Tasa de crecimiento de fugas tuberias a falta de datos Break rate 0', true, 'lyt_sh_parameters', 1, 'Break rate on mains', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('drate', '0.05', 'S-H', NULL, 'Tasa de actualización real de precios (discount rate). Tiene en cuenta el incremento de precios descontando la inflación', true, 'lyt_sh_parameters', 2, 'Discount rate', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('strategic', '0.2', 'SH', NULL, 'Peso en la matriz final por factores estrategicos', true, 'lyt_weights', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('expected_year', '0.7', 'SH', NULL, 'Peso en la matriz final por año de renovación', true, 'lyt_weights', 1, 'Weight expected year', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('compliance', '0.1', 'SH', NULL, 'Peso en la matriz final por cumplimiento normativo', true, 'lyt_weights', 2, 'Weight compliance', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('bratemain0', '0.05', 'SH', NULL, 'Tasa de crecimiento de fugas tuberias a falta de datos Break rate 0', true, 'lyt_sh_parameters', 1, 'Break rate on mains', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('drate', '0.05', 'SH', NULL, 'Tasa de actualización real de precios (discount rate). Tiene en cuenta el incremento de precios descontando la inflación', true, 'lyt_sh_parameters', 2, 'Discount rate', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 --
 -- config_form_tableview
