@@ -27,8 +27,8 @@ if (
     print("There are some constants that have not been defined.")
     exit()
 
-files = ["ddl.sql", "tablect.sql", "dml.sql", f"i18n/{LANGUAGE}.sql"]
 sql_folder = Path(getsourcefile(lambda: 0)).parent
+files = ["ddl.sql", "tablect.sql", "dml.sql", f"i18n/{LANGUAGE}.sql", "sample.sql"]
 
 conn = psycopg2.connect(
     dbname=DBNAME, user=USER, password=PASSWORD, host=HOST, port=PORT
