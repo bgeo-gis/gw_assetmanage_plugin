@@ -25,7 +25,7 @@ if (
     print("There are some constants that have not been defined.")
     exit()
 
-files = ["ddl.sql", "tablect.sql"]
+files = ["ddl.sql", "tablect.sql", "dml.sql"]
 sql_folder = Path(getsourcefile(lambda: 0)).parent
 
 conn = psycopg2.connect(
