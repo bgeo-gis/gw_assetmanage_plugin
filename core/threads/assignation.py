@@ -39,19 +39,14 @@ class GwAssignation(GwTask):
 
             arcs = self._assign_leaks()
 
+            if not arcs:
+                return False
+
             if self.isCanceled():
                 self._emit_report("Task canceled.")
                 return False
 
-            lengths = tools_db.get_rows(
-                "SELECT arc_id, ST_LENGTH(the_geom) AS length FROM asset.arc_asset"
-            )
-
-            for row in lengths:
-                arc_id, length = row
-                arcs[arc_id]["length"] = length
-
-            
+            arcs = self._calculate_rleak(arcs)
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -160,6 +155,7 @@ class GwAssignation(GwTask):
                 a.arc_id AS arc_id,
                 a.dnom AS arc_diameter,
                 a.matcat_id AS arc_material,
+                ST_LENGTH(a.the_geom) AS arc_length,
                 ST_DISTANCE(l.the_geom, a.the_geom) AS distance,
                 ST_LENGTH(
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
@@ -189,6 +185,7 @@ class GwAssignation(GwTask):
                 arc_id,
                 arc_diameter,
                 arc_material,
+                arc_length,
                 distance,
                 length,
             ) = row
@@ -204,6 +201,9 @@ class GwAssignation(GwTask):
             leaks[leak_id].append(
                 {
                     "arc_id": arc_id,
+                    "arc_material": arc_material,
+                    "arc_diameter": arc_diameter,
+                    "arc_length": arc_length,
                     "index": index,
                     "same_diameter": (
                         # Diameters within 4mm are the same
@@ -251,7 +251,13 @@ class GwAssignation(GwTask):
             for arc in valid_arcs:
                 arc_id = arc["arc_id"]
                 if arc_id not in arcs:
-                    arcs[arc_id] = {"arc_id": arc_id, "leaks": 0}
+                    arcs[arc_id] = {
+                        "id": arc_id,
+                        "material": arc["arc_material"],
+                        "diameter": arc["arc_diameter"],
+                        "length": arc["arc_length"],
+                        "leaks": 0,
+                    }
                 arcs[arc_id]["leaks"] += arc["index"] / sum_indexes
 
         return arcs
