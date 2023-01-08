@@ -10,14 +10,18 @@ class GwAssignation(GwTask):
     step = pyqtSignal(str)
 
     def __init__(
-        self, description, method, buffer, years, use_material=False, use_diameter=False
+        self,
+        description,
+        buffer,
+        years,
+        filter_material=False,
+        diameter_range=None,
     ):
         super().__init__(description, QgsTask.CanCancel)
-        self.method = method
         self.buffer = buffer
         self.years = years
-        self.use_material = use_material
-        self.use_diameter = use_diameter
+        self.filter_material = filter_material
+        self.diameter_range = diameter_range
 
     def run(self):
         try:
@@ -190,10 +194,7 @@ class GwAssignation(GwTask):
                 length,
             ) = row
 
-            distance_index = (self.buffer - distance) / self.buffer
-            if self.method == "exponential":
-                distance_index = distance_index**2
-            index = distance_index * length
+            index = ((self.buffer - distance) / self.buffer) ** 2 * length
 
             if leak_id not in leaks:
                 leaks[leak_id] = []
