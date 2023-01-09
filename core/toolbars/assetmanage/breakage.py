@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import os
+import re
 
 from functools import partial
 from time import time
@@ -108,9 +109,6 @@ class AmBreakage(dialog.GwAction):
         # Hidden widgets
         self._manage_hidden_form_leaks()
 
-        # Fill combos
-        self._fill_assign_combos()
-
         tools_qt.double_validator(dlg.txt_buffer, min_=0, decimals=0)
         tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
 
@@ -157,13 +155,6 @@ class AmBreakage(dialog.GwAction):
 
         return status
 
-
-    def _fill_assign_combos(self):
-        # Combo method
-        rows = [['linear', 'lineal'],
-                ['exponential', 'exponencial']]
-        tools_qt.fill_combo_values(self.dlg_assignation.cmb_method, rows, 1)
-
     def _assignation_user_values(self, action):
         widgets = [
             "cmb_method",
@@ -206,10 +197,8 @@ class AmBreakage(dialog.GwAction):
         inputs = self._validate_assignation_input()
         if not inputs:
             return
-        use_diameter = dlg.chk_diameter.isChecked()
         use_material = dlg.chk_material.isChecked()
-        method, _ = dlg.cmb_method.currentData()
-        buffer, years = inputs
+        buffer, years, max_distance, cluster_length, diameter_range = inputs
 
         if not tools_qt.show_question(
             "This task may take a while to complete. Do you want to continue?"
@@ -218,11 +207,12 @@ class AmBreakage(dialog.GwAction):
 
         self.thread = GwAssignation(
             "Leak Assignation",
-            method,
             buffer,
             years,
+            max_distance,
+            cluster_length,
             use_material,
-            use_diameter,
+            diameter_range,
         )
         t = self.thread
         t.taskCompleted.connect(self._assignation_ended)
@@ -268,10 +258,39 @@ class AmBreakage(dialog.GwAction):
         try:
             years = int(dlg.txt_years.text())
         except ValueError:
-            tools_qt.show_info_box("The number of years should be a valid integer number!")
+            tools_qt.show_info_box(
+                "The number of years should be a valid integer number!"
+            )
             return
 
-        return buffer, years
+        try:
+            max_distance = int(dlg.txt_max_distance.text())
+        except ValueError:
+            tools_qt.show_info_box(
+                "The maximum distance should be a valid integer number!"
+            )
+            return
+
+        try:
+            cluster_length = int(dlg.txt_cluster_length.text())
+        except ValueError:
+            tools_qt.show_info_box(
+                "The cluster length should be a valid integer number!"
+            )
+            return
+
+        if dlg.chk_diameter.isChecked():
+            diameter_range_string = dlg.txt_diameter_range.text()
+            if not re.fullmatch("\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
+                tools_qt.show_info_box(
+                    "The cluster length should be in the following format:\n [minimum factor]-[maximum factor] (example: 0.75-1.5)"
+                )
+                return
+            diameter_range = tuple(float(x) for x in diameter_range_string.split("-"))
+        else:
+            diameter_range = None
+
+        return buffer, years, max_distance, cluster_length, diameter_range
 
     def _update_timer(self, widget):
         elapsed_time = time() - self.t0
@@ -282,8 +301,8 @@ class AmBreakage(dialog.GwAction):
         self.thread.cancel()
         tools_gw.fill_tab_log (
             dlg,
-            {"info": {"values": [{"message": "Canceling task..."}]}}, 
-            reset_text=False, 
+            {"info": {"values": [{"message": "Canceling task..."}]}},
+            reset_text=False,
             close=False
         )
 
