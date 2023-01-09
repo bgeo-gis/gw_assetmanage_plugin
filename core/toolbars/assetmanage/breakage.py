@@ -15,10 +15,26 @@ from datetime import timedelta
 
 from qgis.core import QgsApplication
 from qgis.PyQt.QtCore import QTimer, QPoint
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QFileDialog, QTableView, QAbstractItemView
+from qgis.PyQt.QtWidgets import (
+    QMenu,
+    QAction,
+    QActionGroup,
+    QFileDialog,
+    QTableView,
+    QAbstractItemView,
+)
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
-from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
+from ....settings import (
+    tools_qgis,
+    tools_qt,
+    tools_gw,
+    dialog,
+    tools_os,
+    tools_log,
+    tools_db,
+    gw_global_vars,
+)
 from .... import global_vars
 
 from .priority import CalculatePriority
@@ -28,8 +44,8 @@ from ...ui.ui_manager import AssignationUi, PriorityUi
 
 
 class AmBreakage(dialog.GwAction):
-    """ Button 1: Breakage button
-    Dropdown with two options: 'Incremental load' and 'Assigning' """
+    """Button 1: Breakage button
+    Dropdown with two options: 'Incremental load' and 'Assigning'"""
 
     def __init__(self, icon_path, action_name, text, toolbar, action_group):
 
@@ -59,12 +75,11 @@ class AmBreakage(dialog.GwAction):
 
     def clicked_event(self):
         button = self.action.associatedWidgets()[1]
-        menu_point = button.mapToGlobal(QPoint(0,button.height()))
+        menu_point = button.mapToGlobal(QPoint(0, button.height()))
         self.menu.exec(menu_point)
 
-
     def _fill_action_menu(self):
-        """ Fill action menu """
+        """Fill action menu"""
 
         # disconnect and remove previuos signals and actions
         actions = self.menu.actions()
@@ -74,23 +89,22 @@ class AmBreakage(dialog.GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ['ASIGNACIÓN ROTURAS', 'CÁLCULO PRIORIDADES (GLOBAL)']
+        actions = ["ASIGNACIÓN ROTURAS", "CÁLCULO PRIORIDADES (GLOBAL)"]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
             obj_action.triggered.connect(partial(self._get_selected_action, action))
 
     def _get_selected_action(self, name):
-        """ Gets selected action """
+        """Gets selected action"""
 
-        if name == 'ASIGNACIÓN ROTURAS':
+        if name == "ASIGNACIÓN ROTURAS":
             self.assignation()
-        elif name == 'CÁLCULO PRIORIDADES (GLOBAL)':
+        elif name == "CÁLCULO PRIORIDADES (GLOBAL)":
             self.priority_config()
         else:
             msg = f"No action found"
             tools_qgis.show_warning(msg, parameter=name)
-
 
     def priority_config(self):
         calculate_priority = CalculatePriority(type="GLOBAL")
@@ -102,7 +116,6 @@ class AmBreakage(dialog.GwAction):
         dlg = self.dlg_assignation
         tools_gw.load_settings(dlg)
         dlg.executing = False
-
 
         # Manage form
 
@@ -121,8 +134,7 @@ class AmBreakage(dialog.GwAction):
         self._set_assignation_signals()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_assignation, dlg_name='assignation')
-
+        tools_gw.open_dialog(self.dlg_assignation, dlg_name="assignation")
 
     def _manage_hidden_form_leaks(self):
 
@@ -131,7 +143,9 @@ class AmBreakage(dialog.GwAction):
 
             # Read the config file
             config = configparser.ConfigParser()
-            config_path = os.path.join(global_vars.plugin_dir, f"config{os.sep}config.config")
+            config_path = os.path.join(
+                global_vars.plugin_dir, f"config{os.sep}config.config"
+            )
             if not os.path.exists(config_path):
                 print(f"Config file not found: {config_path}")
                 return
@@ -139,18 +153,23 @@ class AmBreakage(dialog.GwAction):
             config.read(config_path)
 
             # Get configuration parameters
-            if tools_os.set_boolean(config.get("dialog_leaks", "show_check_material")) is not True:
+            if (
+                tools_os.set_boolean(config.get("dialog_leaks", "show_check_material"))
+                is not True
+            ):
                 self.dlg_assignation.lbl_material.setVisible(False)
                 self.dlg_assignation.chk_material.setChecked(False)
                 self.dlg_assignation.chk_material.setVisible(False)
-            if tools_os.set_boolean(config.get("dialog_leaks", "show_check_diameter")) is not True:
+            if (
+                tools_os.set_boolean(config.get("dialog_leaks", "show_check_diameter"))
+                is not True
+            ):
                 self.dlg_assignation.lbl_diameter.setVisible(False)
                 self.dlg_assignation.chk_diameter.setChecked(False)
                 self.dlg_assignation.chk_diameter.setVisible(False)
 
-
         except Exception as e:
-            print('read_config_file error %s' % e)
+            print("read_config_file error %s" % e)
             status = False
 
         return status
@@ -172,7 +191,7 @@ class AmBreakage(dialog.GwAction):
                 )
                 tools_qt.set_widget_text(self.dlg_assignation, widget, value)
                 if not self.dlg_assignation.txt_buffer.text():
-                    self.dlg_assignation.txt_buffer.setText('500')
+                    self.dlg_assignation.txt_buffer.setText("500")
             elif action == "save":
                 value = tools_qt.get_text(self.dlg_assignation, widget, False, False)
                 value = value.replace("%", "%%")
@@ -225,7 +244,9 @@ class AmBreakage(dialog.GwAction):
         self.timer.start(250)
 
         # Log behavior
-        t.report.connect(partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False))
+        t.report.connect(
+            partial(tools_gw.fill_tab_log, dlg, reset_text=False, close=False)
+        )
 
         # Progress bar behavior
         dlg.progressBar.show()
@@ -299,11 +320,11 @@ class AmBreakage(dialog.GwAction):
 
     def _cancel_thread(self, dlg):
         self.thread.cancel()
-        tools_gw.fill_tab_log (
+        tools_gw.fill_tab_log(
             dlg,
             {"info": {"values": [{"message": "Canceling task..."}]}},
             reset_text=False,
-            close=False
+            close=False,
         )
 
     def _assignation_ended(self):
