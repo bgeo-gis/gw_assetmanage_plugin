@@ -124,6 +124,7 @@ class AmBreakage(dialog.GwAction):
 
         tools_qt.double_validator(dlg.txt_buffer, min_=0, decimals=0)
         tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
+        # FIXME: Add validator for new fields
 
         # Disable tab log
         tools_gw.disable_tab_log(dlg)
@@ -175,6 +176,7 @@ class AmBreakage(dialog.GwAction):
         return status
 
     def _assignation_user_values(self, action):
+        # FIXME: Save and load new user values
         widgets = [
             "cmb_method",
             "txt_buffer",

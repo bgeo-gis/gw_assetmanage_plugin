@@ -82,6 +82,7 @@ class GwAssignation(GwTask):
             sql = sql[:-1] + " ON CONFLICT(arc_id) DO UPDATE SET rleak=excluded.rleak;"
             tools_db.execute_sql(sql)
 
+            # FIXME: Reimplement the final report
             orphan_pipes = tools_db.get_rows(
                 """
                 SELECT count(*) FROM asset.arc_input
@@ -123,6 +124,7 @@ class GwAssignation(GwTask):
             # ]
 
             # self._emit_report(*final_report)
+            self._emit_report("Task finished!")
             return True
 
         except Exception as e:
