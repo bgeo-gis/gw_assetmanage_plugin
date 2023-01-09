@@ -1,7 +1,11 @@
+import configparser
+from pathlib import Path
+
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
+from ... import global_vars
 from ...settings import tools_db
 
 
@@ -14,14 +18,23 @@ class GwAssignation(GwTask):
         description,
         buffer,
         years,
+        max_distance,
+        cluster_length,
         filter_material=False,
         diameter_range=None,
     ):
         super().__init__(description, QgsTask.CanCancel)
         self.buffer = buffer
         self.years = years
+        self.max_distance = max_distance
+        self.cluster_length = cluster_length
         self.filter_material = filter_material
         self.diameter_range = diameter_range
+
+        config_path = Path(global_vars.plugin_dir) / "config" / "config.config"
+        config = configparser.ConfigParser()
+        config.read(config_path)
+        self.unknown_material = config.get("dialog_leaks", "unknown_material")
 
     def run(self):
         try:
@@ -62,8 +75,10 @@ class GwAssignation(GwTask):
                 "UPDATE asset.arc_input SET rleak = NULL; "
                 + "INSERT INTO asset.arc_input (arc_id, rleak) VALUES "
             )
-            for arc_id, rleak in rleaks:
-                sql += f"({arc_id}, {rleak}),"
+            for arc in arcs.values():
+                # Convert rleak to leaks/km.year
+                rleak = arc.get("rleak", 0) * 1000 / self.years
+                sql += f"('{arc['id']}', {rleak}),"
             sql = sql[:-1] + " ON CONFLICT(arc_id) DO UPDATE SET rleak=excluded.rleak;"
             tools_db.execute_sql(sql)
 
@@ -100,14 +115,14 @@ class GwAssignation(GwTask):
             # if any_pipe:
             #     final_report.append(f"Leaks assigned to any nearby pipes: {any_pipe}.")
 
-            final_report += [
-                f"Total of pipes: {total_pipes}.",
-                f"Pipes with zero leaks per km per year: {orphan_pipes}.",
-                f"Max rleak: {max_rleak} leaks/km.year.",
-                f"Min non-zero rleak: {min_rleak} leaks/km.year.",
-            ]
+            # final_report += [
+            #     f"Total of pipes: {total_pipes}.",
+            #     f"Pipes with zero leaks per km per year: {orphan_pipes}.",
+            #     f"Max rleak: {max_rleak} leaks/km.year.",
+            #     f"Min non-zero rleak: {min_rleak} leaks/km.year.",
+            # ]
 
-            self._emit_report(*final_report)
+            # self._emit_report(*final_report)
             return True
 
         except Exception as e:
@@ -213,8 +228,8 @@ class GwAssignation(GwTask):
                         and leak_diameter - 4 <= arc_diameter <= leak_diameter + 4
                     ),
                     "same_material": (
-                        # FIXME: Handle unknown materials
                         leak_material is not None
+                        and leak_material != self.unknown_material
                         and leak_material == arc_material
                     ),
                 }
@@ -260,11 +275,82 @@ class GwAssignation(GwTask):
                         "leaks": 0,
                     }
                 arcs[arc_id]["leaks"] += arc["index"] / sum_indexes
+        return arcs
+
+    def _calculate_rleak(self, arcs):
+        arc_list = sorted(arcs.values(), key=lambda a: a["length"], reverse=True)
+        where_clause = self._where_clause()
+        for arc in arc_list:
+            if arc.get("done", False):
+                continue
+            if arc.get("leaks", 0) == 0:
+                continue
+            if arc.get("length", 0) > self.cluster_length:
+                continue
+            cluster = tools_db.get_rows(
+                f"""
+                WITH start_pipe AS (
+                        SELECT arc_id, matcat_id, dnom, the_geom
+                        FROM asset.arc_asset
+                        WHERE arc_id = '{arc["id"]}'),
+                    ordered_list AS (
+                        SELECT a.arc_id, 
+                            a.arc_id = s.arc_id AS start, 
+                            a.matcat_id,
+                            a.dnom,
+                            a.the_geom <-> s.the_geom AS dist,
+                            ST_LENGTH(a.the_geom) AS length
+                        FROM asset.arc_asset AS a, start_pipe AS s
+                        {where_clause}
+                        ORDER BY start DESC, dist ASC),
+                    cum_list AS (
+                        SELECT arc_id, matcat_id, dnom, dist, length,
+                            SUM(length) OVER (ORDER BY start DESC, dist ASC) AS cum_length
+                        FROM ordered_list
+                        WHERE dist < {self.max_distance})
+                SELECT arc_id, length
+                FROM cum_list
+                WHERE cum_length <= COALESCE(
+                    (SELECT MIN(cum_length) FROM cum_list WHERE cum_length > {self.cluster_length}),
+                    {self.cluster_length})
+                """
+            )
+            if not cluster:
+                continue
+
+            sum_leaks = 0
+            sum_length = 0
+
+            for row in cluster:
+                id, length = row
+                if id not in arcs:
+                    arcs[id] = {"id": id, "length": length}
+                sum_leaks += arcs[id].get("leaks", 0)
+                sum_length += length
+
+            rleak = sum_leaks / sum_length
+            for row in cluster:
+                id, _ = row
+                arcs[id]["rleak"] = rleak
+                arcs[id]["leaks"] = rleak * arcs[id]["length"]
+                arcs[id]["done"] = True
 
         return arcs
 
-    def _calculate_rleak(self):
-        pass
-
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
+
+    def _where_clause(self):
+        conditions = []
+        if self.filter_material:
+            conditions.append("a.matcat_id = s.matcat_id")
+        if self.diameter_range:
+            conditions.append(
+                f"""
+                a.dnom::numeric >= s.dnom::numeric * {self.diameter_range[0]}
+                AND a.dnom::numeric <= s.dnom::numeric * {self.diameter_range[1]}
+                """
+            )
+        if conditions:
+            return "WHERE " + " AND ".join(conditions)
+        return ""
