@@ -43,9 +43,7 @@ INSERT INTO asset.config_engine_def VALUES ('drate', '0.05', 'SH', NULL, NULL, t
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'dnom', 0, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'cost_constr', 1, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'cost_repmain', 2, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'cost_repserv', 3, false, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'compliance', 4, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'result_id', 5, false, NULL, NULL, '{"stretch": true}');
+INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_diameter_def', 'compliance', 3, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'material', 0, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'pleak', 1, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'age_max', 2, true, NULL, NULL, '{"stretch": true}');
@@ -53,7 +51,6 @@ INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'con
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'age_min', 4, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'builtdate_vdef', 5, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'compliance', 6, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'result_id', 7, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'parameter', 0, true, NULL, NULL, NULL);
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'value', 1, true, NULL, NULL, NULL);
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'method', 2, false, NULL, NULL, '{"stretch": true}');
@@ -73,7 +70,6 @@ INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'con
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'widgetcontrols', 16, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'planceholder', 17, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'standardvalue', 18, false, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_engine_def', 'result_id', 19, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_manager', 'utils', 'result_selection', 'id', 0, false, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_manager', 'utils', 'result_selection', 'result_id', 1, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_manager', 'utils', 'result_selection', 'selection_id', 2, true, NULL, NULL, '{"stretch": true}');
