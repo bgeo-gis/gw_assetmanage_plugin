@@ -319,8 +319,8 @@ class CalculatePriority:
             select count(*)
             from asset.arc_asset
             where dnom is null 
-                or dnom <= 0
-                or dnom > ({max(config_diameter.keys())})
+                or dnom::numeric <= 0
+                or dnom::numeric > ({max(config_diameter.keys())})
             """
         )[0]
         if invalid_diameters_count:
@@ -331,8 +331,8 @@ class CalculatePriority:
                     select distinct dnom
                     from asset.arc_asset
                     where dnom is null 
-                        or dnom <= 0
-                        or dnom > ({max(config_diameter.keys())})
+                        or dnom::numeric <= 0
+                        or dnom::numeric > ({max(config_diameter.keys())})
                     """
                 )
             ]
@@ -347,6 +347,7 @@ class CalculatePriority:
             if not tools_qt.show_question(text, force_action=True):
                 return
 
+        # FIXME: Take into account the unknown material from config.config
         invalid_materials_count = tools_db.get_row(
             f"""
             select count(*)
