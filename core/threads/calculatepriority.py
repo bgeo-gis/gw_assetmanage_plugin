@@ -139,9 +139,7 @@ class GwCalculatePriority(GwTask):
                 coalesce(ai.rleak, 0) rleak, 
                 a.expl_id,
                 a.presszone_id,
-                ai.plan,
-                ai.social,
-                ai.other
+                ai.strategic
             from asset.arc_asset a 
             left join asset.arc_input ai using (arc_id)
         """
@@ -181,14 +179,12 @@ class GwCalculatePriority(GwTask):
                 rleak,
                 expl_id,
                 presszone_id,
-                plan,
-                social,
-                other,
+                strategic
             ) = arc
             if (
                 arc_diameter is None
-                or arc_diameter <= 0
-                or arc_diameter > max(self.config_diameter.keys())
+                or int(arc_diameter) <= 0
+                or int(arc_diameter) > max(self.config_diameter.keys())
             ):
                 continue
             if arc_length is None:
@@ -203,7 +199,7 @@ class GwCalculatePriority(GwTask):
                 continue
 
             reference_dnom = get_min_greater_than(
-                self.config_diameter.keys(), arc_diameter
+                self.config_diameter.keys(), int(arc_diameter)
             )
             cost_repmain = self.config_diameter[reference_dnom]["cost_repmain"]
 
@@ -222,7 +218,7 @@ class GwCalculatePriority(GwTask):
                 material_compliance,
             )
 
-            strategic = 10 if plan or social or other else 0
+            strategic_val = 10 if strategic else 0
 
             if rleak == 0 or rleak is None:
                 year = None
@@ -245,7 +241,7 @@ class GwCalculatePriority(GwTask):
                     break_growth_rate,
                     year,
                     compliance,
-                    strategic,
+                    strategic_val,
                 ]
             )
         if not len(output_arcs):
@@ -474,8 +470,8 @@ class GwCalculatePriority(GwTask):
             select count(*)
             from asset.arc_asset
             where dnom is null 
-                or dnom <= 0
-                or dnom > (
+                or dnom::numeric <= 0
+                or dnom::numeric > (
                     select max(dnom)
                     from asset.config_diameter
                     where result_id = {result_id}
@@ -492,8 +488,8 @@ class GwCalculatePriority(GwTask):
                     select distinct dnom
                     from asset.arc_asset
                     where dnom is null 
-                        or dnom <= 0
-                        or dnom > (
+                        or dnom::numeric <= 0
+                        or dnom::numeric > (
                             select max(dnom)
                             from asset.config_diameter
                             where result_id = {result_id}
