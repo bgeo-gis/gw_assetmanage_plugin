@@ -240,16 +240,13 @@ class GwAssignation(GwTask):
         # any_pipe = 0
         arcs = {}
         for leak_id, leak_arcs in leaks.items():
-            same_material_exists = any([a["same_material"] for a in leak_arcs])
-            same_diameter_exists = any([a["same_diameter"] for a in leak_arcs])
-
-            if same_material_exists and same_diameter_exists:
+            if any(a["same_material"] and a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
                 # by_material_diameter += 1
-            elif same_material_exists:
+            elif any(a["same_material"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_material"]
                 # by_material += 1
-            elif same_diameter_exists:
+            elif any(a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_diameter"]
                 # by_diameter += 1
             else:
