@@ -288,6 +288,8 @@ class GwAssignation(GwTask):
             if arc.get("leaks", 0) == 0:
                 continue
             if arc.get("length", 0) > self.cluster_length:
+                if "rleak" not in arc:
+                    arc["rleak"] = arc["leaks"] / arc["length"]
                 continue
             cluster = tools_db.get_rows(
                 f"""
