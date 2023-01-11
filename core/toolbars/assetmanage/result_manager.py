@@ -8,7 +8,16 @@ or (at your option) any later version.
 from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
-from ....settings import tools_qgis, tools_qt, tools_gw, dialog, tools_os, tools_log, tools_db, gw_global_vars
+from ....settings import (
+    tools_qgis,
+    tools_qt,
+    tools_gw,
+    dialog,
+    tools_os,
+    tools_log,
+    tools_db,
+    gw_global_vars,
+)
 from .... import global_vars
 
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
@@ -28,33 +37,46 @@ class ResultManager(dialog.GwAction):
         self.toolbar = toolbar
         self.action_group = action_group
 
-
     def clicked_event(self):
         self.open_manager()
-
 
     def open_manager(self):
 
         self.dlg_priority_manager = PriorityManagerUi()
 
         # Fill results table
-        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_results, "asset.cat_result")
-        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_results,
-                                       "cat_result", schema_name='asset')
+        self._fill_table(
+            self.dlg_priority_manager,
+            self.dlg_priority_manager.tbl_results,
+            "asset.cat_result",
+        )
+        tools_gw.set_tablemodel_config(
+            self.dlg_priority_manager,
+            self.dlg_priority_manager.tbl_results,
+            "cat_result",
+            schema_name="asset",
+        )
 
         self._set_signals()
-                                               
+
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name='priority_manager')
+        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager")
 
-
-    def _fill_table(self, dialog, widget, table_name, hidde=False, set_edit_triggers=QTableView.NoEditTriggers, expr=None):
-        """ Set a model with selected filter.
-            Attach that model to selected table
-            @setEditStrategy:
-            0: OnFieldChange
-            1: OnRowChange
-            2: OnManualSubmit
+    def _fill_table(
+        self,
+        dialog,
+        widget,
+        table_name,
+        hidde=False,
+        set_edit_triggers=QTableView.NoEditTriggers,
+        expr=None,
+    ):
+        """Set a model with selected filter.
+        Attach that model to selected table
+        @setEditStrategy:
+        0: OnFieldChange
+        1: OnRowChange
+        2: OnManualSubmit
         """
         try:
 
