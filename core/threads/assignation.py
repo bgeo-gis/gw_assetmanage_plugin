@@ -180,7 +180,10 @@ class GwAssignation(GwTask):
                 a.dnom AS arc_diameter,
                 a.matcat_id AS arc_material,
                 ST_LENGTH(a.the_geom) AS arc_length,
-                ST_DISTANCE(l.the_geom, a.the_geom) AS distance
+                ST_DISTANCE(l.the_geom, a.the_geom) AS distance,
+                ST_LENGTH(
+                    ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
+                ) AS length
             FROM asset.leaks AS l
             JOIN leak_dates AS d USING (id)
             JOIN asset.arc_asset AS a ON 
@@ -208,9 +211,10 @@ class GwAssignation(GwTask):
                 arc_material,
                 arc_length,
                 distance,
+                length,
             ) = row
 
-            index = ((self.buffer - distance) / self.buffer) ** 2
+            index = ((self.buffer - distance) / self.buffer) ** 2 * length
 
             if leak_id not in leaks:
                 leaks[leak_id] = []
