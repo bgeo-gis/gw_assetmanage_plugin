@@ -37,18 +37,13 @@ class ResultManager(dialog.GwAction):
 
         self.dlg_priority_manager = PriorityManagerUi()
 
-        # Fill table global
-        filter = f"result_type = 'GLOBAL'"
-        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_global, "asset.cat_result",
-                         set_edit_triggers=QTableView.DoubleClicked, expr=filter)
-        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_global,
+        # Fill results table
+        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_results, "asset.cat_result")
+        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_results,
                                        "cat_result", schema_name='asset')
-        # Fill table selection
-        filter = f"result_type = 'SELECTION'"
-        self._fill_table(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection, "asset.cat_result",
-                         set_edit_triggers=QTableView.DoubleClicked, expr=filter)
-        tools_gw.set_tablemodel_config(self.dlg_priority_manager, self.dlg_priority_manager.tbl_selection,
-                                       "cat_result", schema_name='asset')
+
+        self._set_signals()
+                                               
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_manager, dlg_name='priority_manager')
 
@@ -89,3 +84,7 @@ class ResultManager(dialog.GwAction):
                 self.refresh_table(dialog, widget)
         except Exception as e:
             print(f"EXCEPTION -> {e}")
+
+    def _set_signals(self):
+        dlg = self.dlg_priority_manager
+        dlg.btn_close.clicked.connect(dlg.reject)

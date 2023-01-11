@@ -14,136 +14,8 @@
    <string>Gestor de resultados</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QTabWidget" name="mainTab">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="tab_global">
-      <attribute name="title">
-       <string>Global</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_4">
-         <item row="1" column="2">
-          <widget class="QPushButton" name="btn_load_global">
-           <property name="text">
-            <string>Cargar</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QPushButton" name="btn_delete_global">
-           <property name="text">
-            <string>Eliminar</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="txt_filter_global"/>
-         </item>
-         <item row="2" column="0" colspan="4">
-          <widget class="QTableView" name="tbl_global"/>
-         </item>
-         <item row="0" column="0" colspan="4">
-          <widget class="QLabel" name="lbl_filter_global">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Filltro por resultado:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_selection">
-      <attribute name="title">
-       <string>Selección</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_6">
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_5">
-         <item row="1" column="2">
-          <widget class="QPushButton" name="btn_load_selection">
-           <property name="text">
-            <string>Cargar</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QPushButton" name="btn_delete_selection">
-           <property name="text">
-            <string>Eliminar</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="txt_filter_selection"/>
-         </item>
-         <item row="2" column="0" colspan="4">
-          <widget class="QTableView" name="tbl_selection"/>
-         </item>
-         <item row="0" column="0" colspan="4">
-          <widget class="QLabel" name="lbl_filter_selection">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Filltro por resultado:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
+   <item row="2" column="0" colspan="3">
     <layout class="QGridLayout" name="gridLayout_3">
-     <item row="0" column="1">
-      <widget class="QPushButton" name="btn_close">
-       <property name="text">
-        <string>Cerrar</string>
-       </property>
-      </widget>
-     </item>
      <item row="0" column="0">
       <spacer name="horizontalSpacer_2">
        <property name="orientation">
@@ -157,7 +29,30 @@
        </property>
       </spacer>
      </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btn_close">
+       <property name="text">
+        <string>Cerrar</string>
+       </property>
+      </widget>
+     </item>
     </layout>
+   </item>
+   <item row="0" column="1">
+    <spacer name="horizontalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QTableView" name="tbl_results"/>
    </item>
   </layout>
  </widget>
