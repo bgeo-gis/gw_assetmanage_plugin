@@ -65,6 +65,8 @@ class GwAssignation(GwTask):
                 return False
 
             arcs = self._calculate_rleak(arcs)
+            if not arcs:
+                return False
 
             if self.isCanceled():
                 self._emit_report("Task canceled.")
@@ -331,6 +333,9 @@ class GwAssignation(GwTask):
                 arcs[id]["leaks"] = rleak * arcs[id]["length"]
                 arcs[id]["done"] = True
 
+            if self.isCanceled():
+                self._emit_report("Task canceled.")
+                return False
         return arcs
 
     def _emit_report(self, *args):
