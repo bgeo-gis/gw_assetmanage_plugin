@@ -190,6 +190,9 @@ class GwAssignation(GwTask):
                 ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})
             WHERE d.date_leak > (
                 (SELECT * FROM max_date) - INTERVAL '{self.years} year')::date
+                AND ST_LENGTH(
+                    ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
+                ) > 0
             """
         )
 
