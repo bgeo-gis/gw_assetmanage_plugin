@@ -1,4 +1,5 @@
 import configparser
+import traceback
 from pathlib import Path
 
 from qgis.core import QgsTask
@@ -127,8 +128,8 @@ class GwAssignation(GwTask):
             self._emit_report("Task finished!")
             return True
 
-        except Exception as e:
-            self._emit_report(f"Error: {e}")
+        except Exception:
+            self._emit_report(traceback.format_exc())
             return False
 
     def _assign_leaks(self):
