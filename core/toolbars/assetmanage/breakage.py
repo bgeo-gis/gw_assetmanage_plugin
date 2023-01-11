@@ -176,11 +176,13 @@ class AmBreakage(dialog.GwAction):
         return status
 
     def _assignation_user_values(self, action):
-        # FIXME: Save and load new user values
+        # FIXME: Save and load checkboxes values
         widgets = [
-            "cmb_method",
             "txt_buffer",
             "txt_years",
+            "txt_max_distance",
+            "txt_cluster_length",
+            "txt_diameter_range",
         ]
         for widget in widgets:
             if action == "load":
@@ -193,7 +195,9 @@ class AmBreakage(dialog.GwAction):
                 )
                 tools_qt.set_widget_text(self.dlg_assignation, widget, value)
                 if not self.dlg_assignation.txt_buffer.text():
-                    self.dlg_assignation.txt_buffer.setText("500")
+                    self.dlg_assignation.txt_buffer.setText("50")
+                if not self.dlg_assignation.txt_diameter_range.text():
+                    self.dlg_assignation.txt_diameter_range.setText("0.5-2")
             elif action == "save":
                 value = tools_qt.get_text(self.dlg_assignation, widget, False, False)
                 value = value.replace("%", "%%")
@@ -206,6 +210,8 @@ class AmBreakage(dialog.GwAction):
 
     def _set_assignation_signals(self):
         dlg = self.dlg_assignation
+
+        # FIXME: Disable txt_diameter_text if chk_diameter is unchecked
 
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
