@@ -5,7 +5,14 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
+from functools import partial
+from qgis.PyQt.QtWidgets import (
+    QAbstractItemView,
+    QMenu,
+    QAction,
+    QActionGroup,
+    QTableView,
+)
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
 from ....settings import (
@@ -20,7 +27,7 @@ from ....settings import (
 )
 from .... import global_vars
 
-from ...ui.ui_manager import PriorityUi, PriorityManagerUi
+from ...ui.ui_manager import PriorityUi, PriorityManagerUi, StatusSelectorUi
 
 
 class ResultManager(dialog.GwAction):
@@ -45,6 +52,7 @@ class ResultManager(dialog.GwAction):
         self.dlg_priority_manager = PriorityManagerUi()
 
         # Fill results table
+        # TODO: use a join to translate type and status of a result
         self._fill_table(
             self.dlg_priority_manager,
             self.dlg_priority_manager.tbl_results,
@@ -61,6 +69,50 @@ class ResultManager(dialog.GwAction):
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager")
+
+    def _delete_result(self):
+        table = self.dlg_priority_manager.tbl_results
+        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
+        for result_id in selected:
+            row = tools_db.get_row(
+                f"""
+                SELECT result_name, status 
+                FROM asset.cat_result 
+                WHERE result_id = {result_id}
+                """
+            )
+            if not row:
+                continue
+            result_name, status = row
+            if status == "CANCELED":
+                if tools_qt.show_question(
+                    f"Do you really want to delete the result {result_id}-{result_name}? "
+                    "This operation cannot be undone."
+                ):
+                    tools_db.execute_sql(
+                        f"""
+                        DELETE FROM asset.cat_result
+                        WHERE result_id = {result_id}
+                        """
+                    )
+            else:
+                tools_qt.show_info_box(
+                    f"The result {result_id}-{result_name} cannot be deleted "
+                    "because his status is not CANCELED."
+                )
+        table.model().select()
+
+    def _dlg_status_accept(self, result_id):
+        new_status = tools_qt.get_combo_value(self.dlg_status, "cmb_status")
+        tools_db.execute_sql(
+            f"""
+            UPDATE asset.cat_result
+            SET status = '{new_status}'
+            WHERE result_id = {result_id}
+            """
+        )
+        self.dlg_status.close()
+        self.dlg_priority_manager.tbl_results.model().select()
 
     def _fill_table(
         self,
@@ -90,6 +142,7 @@ class ResultManager(dialog.GwAction):
             # When change some field we need to refresh Qtableview and filter by psector_id
             # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
             widget.setEditTriggers(set_edit_triggers)
+            widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
             # Check for errors
             if model.lastError().isValid():
@@ -107,6 +160,43 @@ class ResultManager(dialog.GwAction):
         except Exception as e:
             print(f"EXCEPTION -> {e}")
 
+    def _open_status_selector(self):
+        table = self.dlg_priority_manager.tbl_results
+        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
+
+        if len(selected) != 1:
+            tools_qt.show_info_box("Select only one result before change its status.")
+            return
+
+        row = tools_db.get_row(
+            f"""
+            SELECT result_id, result_name, status
+            FROM asset.cat_result
+            WHERE result_id = {selected[0]}
+            """
+        )
+        if not row:
+            return
+
+        result_id, result_name, status = row
+        if status == "FINISHED":
+            tools_qt.show_info_box(
+                "You cannot change the status of a result with status FINISHED."
+            )
+            return
+
+        self.dlg_status = StatusSelectorUi()
+        self.dlg_status.lbl_result.setText(f"{result_id}: {result_name}")
+        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        tools_qt.fill_combo_values(self.dlg_status.cmb_status, rows, 1)
+        tools_qt.set_combo_value(self.dlg_status.cmb_status, status, 0, add_new=False)
+        self.dlg_status.btn_accept.clicked.connect(partial(self._dlg_status_accept, result_id))
+        self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
+
+        tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")
+
     def _set_signals(self):
         dlg = self.dlg_priority_manager
+        dlg.btn_status.clicked.connect(self._open_status_selector)
+        dlg.btn_delete.clicked.connect(self._delete_result)
         dlg.btn_close.clicked.connect(dlg.reject)

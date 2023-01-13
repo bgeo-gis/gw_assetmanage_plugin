@@ -88,6 +88,10 @@ FORM_CLASS = get_ui_class('priority_manager.ui', 'assetmanage')
 class PriorityManagerUi(GwDialog, FORM_CLASS):
     pass
 
+FORM_CLASS = get_ui_class('status_selector.ui', 'assetmanage')
+class StatusSelectorUi(GwDialog, FORM_CLASS):
+    pass
+
 FORM_CLASS = get_ui_class('result_selector.ui', 'assetmanage')
 class ResultSelectorUi(GwDialog, FORM_CLASS):
     pass
