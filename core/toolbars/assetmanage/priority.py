@@ -78,7 +78,7 @@ class AmPriority(dialog.GwAction):
 
 class CalculatePriority:
     def __init__(self, type="GLOBAL"):
-        self.type = type
+            self.type = type
         self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
         self.layers["arc"] = []
@@ -304,6 +304,7 @@ class CalculatePriority:
         (
             result_name,
             result_description,
+            status,
             features,
             exploitation,
             presszone,
@@ -383,6 +384,7 @@ class CalculatePriority:
             self.type,
             result_name,
             result_description,
+            status,
             features,
             exploitation,
             presszone,
@@ -554,6 +556,7 @@ class CalculatePriority:
             return
 
         result_description = self.dlg_priority.txt_descript.text()
+        status = tools_qt.get_combo_value(dlg, dlg.cmb_status)
 
         features = None
         if "arc" in self.list_ids:
@@ -619,6 +622,7 @@ class CalculatePriority:
         return (
             result_name,
             result_description,
+            status,
             features,
             exploitation,
             presszone,
@@ -632,6 +636,15 @@ class CalculatePriority:
     # region Attribute
 
     def _manage_attr(self):
+        # Combo status
+        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_status, rows, 1)
+        tools_qt.set_combo_value(
+            self.dlg_priority.cmb_status, "ON PLANNING", 0, add_new=False
+        )
+        tools_qt.set_combo_item_select_unselectable(
+            self.dlg_priority.cmb_status, list_id=["FINISHED"]
+        )
 
         # Combo dnom
         sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"

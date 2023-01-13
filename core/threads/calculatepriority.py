@@ -63,6 +63,7 @@ class GwCalculatePriority(GwTask):
         result_type,
         result_name,
         result_description,
+        status,
         features,
         exploitation,
         presszone,
@@ -78,6 +79,7 @@ class GwCalculatePriority(GwTask):
         self.result_type = result_type
         self.result_name = result_name
         self.result_description = result_description
+        self.status = status
         self.features = features
         self.exploitation = exploitation
         self.presszone = presszone
@@ -293,6 +295,7 @@ class GwCalculatePriority(GwTask):
             insert into asset.cat_result (result_name, 
                 result_type, 
                 descript,
+                status,
                 features,
                 expl_id,
                 presszone_id,
@@ -305,6 +308,7 @@ class GwCalculatePriority(GwTask):
             values ('{self.result_name}',
                 '{self.result_type}',
                 '{self.result_description}',
+                '{self.status}',
                 {str_features},
                 {self.exploitation or 'NULL'},
                 {str_presszone_id},
