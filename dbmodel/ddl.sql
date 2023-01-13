@@ -40,13 +40,24 @@ CREATE TABLE asset.cat_result (
     _target_ivi numeric(12,2),
     tstamp timestamp without time zone,
     cur_user text,
-    status smallint,
+    status character varying(50),
     presszone_id character varying(30),
     material_id character varying(30),
     features character varying[],
     dnom numeric(12,3),
     CONSTRAINT cat_result_pkey PRIMARY KEY (result_id),
-    CONSTRAINT cat_result_result_type_check CHECK (((result_type)::text = ANY (ARRAY[('GLOBAL'::character varying)::text, ('SELECTION'::character varying)::text])))
+    CONSTRAINT cat_result_result_type_check CHECK (result_type = ANY (ARRAY['GLOBAL', 'SELECTION'])),
+    CONSTRAINT cat_result_status_check CHECK (status = ANY (ARRAY['CANCELED', 'ON PLANNING', 'FINISHED']))
+);
+
+CREATE TABLE asset.value_result_type (
+    id character varying(50),
+    idval character varying(50)
+);
+
+CREATE TABLE asset.value_status (
+    id character varying(50),
+    idval character varying(50)
 );
 
 CREATE TABLE asset.config_diameter_def (
@@ -181,14 +192,12 @@ CREATE TABLE asset.arc_output (
 );
 
 CREATE TABLE asset.selector_result_main (
-    -- TODO: check FK
     result_id integer NOT NULL,
     cur_user text DEFAULT "current_user"() NOT NULL,
     CONSTRAINT selector_result_main_pkey PRIMARY KEY (cur_user, result_id)
 );
 
 CREATE TABLE asset.selector_result_compare (
-    -- TODO: check FK
     result_id integer NOT NULL,
     cur_user text DEFAULT "current_user"() NOT NULL,
     CONSTRAINT selector_result_compare_pkey PRIMARY KEY (cur_user, result_id)

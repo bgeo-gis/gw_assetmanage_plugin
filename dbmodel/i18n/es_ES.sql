@@ -1,3 +1,10 @@
+INSERT INTO asset.value_result_type VALUES ('GLOBAL', 'GLOBAL');
+INSERT INTO asset.value_result_type VALUES ('SELECTION', 'SELECCIÓN');
+
+INSERT INTO asset.value_status VALUES ('CANCELED', 'CANCELADO');
+INSERT INTO asset.value_status VALUES ('ON PLANNING', 'EN PLANIFICACIÓN');
+INSERT INTO asset.value_status VALUES ('FINISHED', 'FINALIZADO');
+
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por factores estratégicos' WHERE parameter = 'strategic' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por año de renovación' WHERE parameter = 'expected_year' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por cumplimiento normativo' WHERE parameter = 'compliance' AND method = 'SH';
