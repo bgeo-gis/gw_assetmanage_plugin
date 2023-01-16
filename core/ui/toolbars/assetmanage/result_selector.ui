@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_priority</class>
- <widget class="QDialog" name="dlg_priority">
+ <class>dlg_result_selector</class>
+ <widget class="QDialog" name="dlg_result_selector">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>328</width>
-    <height>338</height>
+    <height>376</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Selector de resultados</string>
+   <string>Result Selector</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
@@ -84,14 +84,14 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label">
+        <widget class="QLabel" name="lbl_descript">
          <property name="text">
           <string>Description:</string>
          </property>
         </widget>
        </item>
        <item row="6" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="lbl_descript_compare">
          <property name="text">
           <string>Description:</string>
          </property>
@@ -106,14 +106,14 @@
      <item row="1" column="2">
       <widget class="QPushButton" name="btn_cancel">
        <property name="text">
-        <string>Cancelar</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="QPushButton" name="btn_accept">
        <property name="text">
-        <string>Aceptar</string>
+        <string>OK</string>
        </property>
       </widget>
      </item>
@@ -134,6 +134,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cmb_result_main</tabstop>
+  <tabstop>cmb_result_compare</tabstop>
+  <tabstop>btn_accept</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>tab_widget</tabstop>
+  <tabstop>txt_result_main_desc</tabstop>
+  <tabstop>txt_result_compare_desc</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

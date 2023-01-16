@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dlg_incremental</class>
- <widget class="QDialog" name="dlg_incremental">
+ <class>dlg_priority</class>
+ <widget class="QDialog" name="dlg_priority">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CÁLCULO PRIORIDADES</string>
+   <string>Priority Calculation</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="5" column="1">
@@ -28,7 +28,7 @@
      </property>
      <widget class="QWidget" name="tab_calc">
       <attribute name="title">
-       <string>Cálculo</string>
+       <string>Calculation</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0">
@@ -45,7 +45,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Identificador de Resultado:</string>
+            <string>Result name:</string>
            </property>
           </widget>
          </item>
@@ -65,7 +65,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Descripción:</string>
+            <string>Description:</string>
            </property>
           </widget>
          </item>
@@ -93,13 +93,13 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Calculo de prioridades</string>
+          <string>Calculation parameters</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_9">
           <item row="1" column="0">
            <widget class="QLabel" name="lbl_year">
             <property name="text">
-             <string>Año horizonte:</string>
+             <string>Horizon year:</string>
             </property>
            </widget>
           </item>
@@ -112,7 +112,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_budget">
             <property name="text">
-             <string>Dotación:</string>
+             <string>Budget:</string>
             </property>
            </widget>
           </item>
@@ -153,7 +153,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_13">
               <item row="0" column="0">
-               <widget class="QGroupBox" name="qgroupbox">
+               <widget class="QGroupBox" name="grb_sh">
                 <property name="title">
                  <string>Shamir-Howard parameters</string>
                 </property>
@@ -184,7 +184,7 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QGroupBox" name="qgroupbox_2">
+               <widget class="QGroupBox" name="grb_weights">
                 <property name="title">
                  <string>Weights</string>
                 </property>
@@ -227,11 +227,14 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Selección de prioridades</string>
+          <string>Selection of features</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_8">
           <item row="0" column="1">
            <widget class="QPushButton" name="btn_snapping">
+            <property name="toolTip">
+             <string>Select features on canvas</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -259,7 +262,7 @@
              <item row="3" column="0">
               <widget class="QLabel" name="lbl_dnom">
                <property name="text">
-                <string>Diametro:</string>
+                <string>Diameter:</string>
                </property>
               </widget>
              </item>
@@ -357,7 +360,7 @@
    <item row="5" column="3">
     <widget class="QPushButton" name="btn_calc">
      <property name="text">
-      <string>Calcular</string>
+      <string>Calculate</string>
      </property>
     </widget>
    </item>
@@ -376,6 +379,25 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>txt_result_id</tabstop>
+  <tabstop>cmb_status</tabstop>
+  <tabstop>txt_descript</tabstop>
+  <tabstop>btn_snapping</tabstop>
+  <tabstop>cmb_expl_selection</tabstop>
+  <tabstop>cmb_presszone</tabstop>
+  <tabstop>cmb_dnom</tabstop>
+  <tabstop>cmb_material</tabstop>
+  <tabstop>txt_budget</tabstop>
+  <tabstop>cmb_year</tabstop>
+  <tabstop>tbl_diameter</tabstop>
+  <tabstop>tbl_material</tabstop>
+  <tabstop>btn_calc</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>mainTab</tabstop>
+  <tabstop>tab_widget</tabstop>
+  <tabstop>txt_infolog</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
