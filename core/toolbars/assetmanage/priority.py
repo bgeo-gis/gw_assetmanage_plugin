@@ -78,7 +78,7 @@ class AmPriority(dialog.GwAction):
 
 class CalculatePriority:
     def __init__(self, type="GLOBAL"):
-            self.type = type
+        self.type = type
         self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
         self.layers["arc"] = []
