@@ -43,7 +43,8 @@ class ResultSelector(dialog.GwAction):
             """
         )
         if not results:
-            tools_qt.show_info_box("No results available to display.")
+            msg = "There are no results available to display."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return False
 
         # Combo result_main

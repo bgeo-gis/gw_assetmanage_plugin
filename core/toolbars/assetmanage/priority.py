@@ -90,7 +90,7 @@ class CalculatePriority:
     def clicked_event(self):
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
-        dlg.setWindowTitle(dlg.windowTitle() + f" ({self.type})")
+        dlg.setWindowTitle(dlg.windowTitle() + f" ({self._tr(self.type)})")
 
         tools_gw.disable_tab_log(self.dlg_priority)
 
@@ -164,7 +164,7 @@ class CalculatePriority:
         self.thread.cancel()
         tools_gw.fill_tab_log(
             dlg,
-            {"info": {"values": [{"message": "Canceling task..."}]}},
+            {"info": {"values": [{"message": self._tr("Canceling task...")}]}},
             reset_text=False,
             close=False,
         )
@@ -204,7 +204,7 @@ class CalculatePriority:
         )
 
         lbl = QLabel()
-        lbl.setText("Total")
+        lbl.setText(self._tr("Total"))
         lbl_total_weight = QLabel()
         self.dlg_priority.lbl_total_weight = lbl_total_weight
         position_config = {"layoutname": "lyt_weights", "layoutorder": 100}
@@ -225,7 +225,12 @@ class CalculatePriority:
                 dialog_type = "dialog_priority_selection"
             else:
                 raise ValueError(
-                    f"Type of priority dialog shoud be 'GLOBAL' or 'SELECTION'. Value passed: '{self.type}'."
+                    self._tr(
+                        "Invalid value for type of priority dialog. "
+                        "Please pass either 'GLOBAL' or 'SELECTION'. "
+                        "Value passed:"
+                    )
+                    + f" '{self.type}'."
                 )
 
             # Read the config file
@@ -337,15 +342,20 @@ class CalculatePriority:
                     """
                 )
             ]
-            text = (
-                f"Pipes with invalid diameters: {invalid_diameters_count}.\n"
-                f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
-                "A diameter value is invalid if it is zero, negative, NULL, "
-                "or is greater than the maximum diameter in the configuration table. "
-                "These pipes WILL NOT be assigned a priority value.\n\n"
-                "Do you want to proceed?"
+            msg = (
+                self._tr("Pipes with invalid diameters:")
+                + f" {invalid_diameters_count}.\n"
+                + self._tr("Invalid diameters:")
+                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
+                + self._tr(
+                    "A diameter value is considered invalid if it is zero, negative, "
+                    "NULL or greater than the maximum diameter in the configuration table. "
+                    "As a result, these pipes will NOT be assigned a priority value."
+                )
+                + "\n\n"
+                + self._tr("Do you want to proceed?")
             )
-            if not tools_qt.show_question(text, force_action=True):
+            if not tools_qt.show_question(msg, force_action=True):
                 return
 
         # FIXME: Take into account the unknown material from config.config
@@ -367,20 +377,23 @@ class CalculatePriority:
                     """
                 )
             ]
-            text = (
-                f"Pipes with invalid material: {invalid_materials_count}.\n"
-                f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
-                "A material value is invalid if "
-                "it is not in the material configuration table. "
-                "These pipes will be assigned as compliant by default, "
-                "which may result in a lower priority value.\n\n"
-                "Do you want to proceed?"
+            msg = (
+                self._tr("Pipes with invalid materials:")
+                + f" {invalid_materials_count}.\n"
+                + self._tr("Invalid materials:")
+                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
+                + self._tr(
+                    "A material is considered invalid if it is not listed in the material configuration table. "
+                    "As a result, these pipes will be set as compliant by default, which may affect the priority value."
+                )
+                + "\n\n"
+                + self._tr("Do you want to proceed?")
             )
-            if not tools_qt.show_question(text, force_action=True):
+            if not tools_qt.show_question(msg, force_action=True):
                 return
 
         self.thread = GwCalculatePriority(
-            "Calculate Priority",
+            self._tr("Calculate Priority"),
             self.type,
             result_name,
             result_description,
@@ -521,6 +534,9 @@ class CalculatePriority:
         for widget in self._get_weight_widgets():
             widget.textChanged.connect(self._update_total_weight)
 
+    def _tr(self, msg):
+        return tools_qt.tr(msg, context_name=global_vars.plugin_name)
+
     def _update_timer(self, widget):
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
@@ -542,7 +558,8 @@ class CalculatePriority:
 
         result_name = dlg.txt_result_id.text()
         if not result_name:
-            tools_qt.show_info_box("You should inform an Result Identifier!")
+            msg = "Please provide a result name."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
         if tools_db.get_row(
             f"""
@@ -550,8 +567,13 @@ class CalculatePriority:
             where result_name = '{result_name}'
             """
         ):
+            msg = "This result name already exists"
+            info = "Please choose a different name."
             tools_qt.show_info_box(
-                f"'{result_name}' already exists. Please choose another Result Identifier."
+                msg,
+                inf_text=info,
+                context_name=global_vars.plugin_name,
+                parameter=result_name,
             )
             return
 
@@ -570,23 +592,29 @@ class CalculatePriority:
         config_diameter = {}
         for row in table2data(self.qtbl_diameter):
             if not row["dnom"]:
-                tools_qt.show_info_box(
-                    f"There is an empty value for diameter in the 'Diameter' tab!"
-                )
+                msg = "Empty value detected in 'Diameter' tab. Please enter a value for diameter."
+                tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
                 return
             if not row["cost_constr"]:
+                msg = "Please provide the replacing cost for diameter"
                 tools_qt.show_info_box(
-                    f"You should inform the replacing cost for diameter {row['dnom']}!"
+                    msg, context_name=global_vars.plugin_name, parameter=row["dnom"]
                 )
                 return
             if not row["cost_repmain"]:
+                msg = "Please provide the repairing cost for diameter"
                 tools_qt.show_info_box(
-                    f"You should inform the repairing cost for diameter {row['dnom']}!"
+                    msg, context_name=global_vars.plugin_name, parameter=row["dnom"]
                 )
                 return
             if not (0 <= row["compliance"] <= 10):
+                msg = "Invalid compliance value for diameter"
+                info = "Compliance value must be between 0 and 10 inclusive."
                 tools_qt.show_info_box(
-                    f"For diameter {row['dnom']}, compliance must be a value between 0 and 10, inclusive!"
+                    msg,
+                    inf_text=info,
+                    context_name=global_vars.plugin_name,
+                    parameter=row["dnom"],
                 )
             config_diameter[int(row["dnom"])] = {
                 k: v for k, v in row.items() if k != "dnom"
@@ -595,8 +623,13 @@ class CalculatePriority:
         config_material = {}
         for row in table2data(self.qtbl_material):
             if not (0 <= row["compliance"] <= 10):
+                msg = "Invalid compliance value for material"
+                info = "Compliance value must be between 0 and 10 inclusive."
                 tools_qt.show_info_box(
-                    f"For material {row['material']}, compliance must be a value between 0 and 10, inclusive!"
+                    msg,
+                    inf_text=info,
+                    context_name=global_vars.plugin_name,
+                    parameter=row["material"],
                 )
                 return
             config_material[row["material"]] = {
@@ -604,7 +637,10 @@ class CalculatePriority:
             }
 
         if round(self.total_weight, 5) != 1:
-            tools_qt.show_info_box("The sum of the weights must be equal to 1!")
+            msg = (
+                "The sum of weights must equal 1. Please adjust the values accordingly."
+            )
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
         config_engine = {}
         for field in self.config_engine_fields:
@@ -614,8 +650,13 @@ class CalculatePriority:
                     tools_qt.get_widget(dlg, widget_name).text()
                 )
             except:
+                msg = "Invalid value for field"
+                info = "Please enter a valid number."
                 tools_qt.show_info_box(
-                    f"The field {field['label']} must be a valid number!"
+                    msg,
+                    inf_text=info,
+                    context_name=global_vars.plugin_name,
+                    parameter=field["label"],
                 )
                 return
 

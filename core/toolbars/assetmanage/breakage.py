@@ -67,9 +67,6 @@ class AmBreakage(dialog.GwAction):
             self.action.setMenu(self.menu)
             toolbar.addAction(self.action)
 
-        # Incremental variables
-        self.dlg_incremental = None
-
         # Assignation variables
         self.dlg_assignation = None
 
@@ -89,7 +86,10 @@ class AmBreakage(dialog.GwAction):
             del action
         ag = QActionGroup(self.iface.mainWindow())
 
-        actions = ["ASIGNACIÓN ROTURAS", "CÁLCULO PRIORIDADES (GLOBAL)"]
+        actions = [
+            self._tr("Leak Assignation"),
+            self._tr("Priority Calculation (Global)"),
+        ]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
             self.menu.addAction(obj_action)
@@ -98,9 +98,9 @@ class AmBreakage(dialog.GwAction):
     def _get_selected_action(self, name):
         """Gets selected action"""
 
-        if name == "ASIGNACIÓN ROTURAS":
+        if name == self._tr("Leak Assignation"):
             self.assignation()
-        elif name == "CÁLCULO PRIORIDADES (GLOBAL)":
+        elif name == self._tr("Priority Calculation (Global)"):
             self.priority_config()
         else:
             msg = f"No action found"
@@ -148,7 +148,14 @@ class AmBreakage(dialog.GwAction):
                 global_vars.plugin_dir, f"config{os.sep}config.config"
             )
             if not os.path.exists(config_path):
-                print(f"Config file not found: {config_path}")
+                print(
+                    self._tr(
+                        "Configuration file not found, "
+                        "please make sure it is located in the correct directory "
+                        "and try again"
+                    )
+                    + f": {config_path}"
+                )
                 return
 
             config.read(config_path)
@@ -227,13 +234,12 @@ class AmBreakage(dialog.GwAction):
         use_material = dlg.chk_material.isChecked()
         buffer, years, max_distance, cluster_length, diameter_range = inputs
 
-        if not tools_qt.show_question(
-            "This task may take a while to complete. Do you want to continue?"
-        ):
+        msg = "This task may take some time to complete, do you want to proceed?"
+        if not tools_qt.show_question(msg, context_name=global_vars.plugin_name):
             return
 
         self.thread = GwAssignation(
-            "Leak Assignation",
+            self._tr("Leak Assignation"),
             buffer,
             years,
             max_distance,
@@ -277,43 +283,45 @@ class AmBreakage(dialog.GwAction):
         try:
             buffer = int(dlg.txt_buffer.text())
         except ValueError:
-            tools_qt.show_info_box("The buffer should be a valid integer number!")
+            msg = "Invalid buffer value. Please enter an valid integer."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         if buffer > 1000:
-            tools_qt.show_info_box("The buffer must be an integer less than 1000!")
+            msg = "Invalid buffer value. Please enter an integer less than 1000."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         try:
             years = int(dlg.txt_years.text())
         except ValueError:
-            tools_qt.show_info_box(
-                "The number of years should be a valid integer number!"
-            )
+            msg = "Please enter a valid integer for the number of years."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         try:
             max_distance = int(dlg.txt_max_distance.text())
         except ValueError:
-            tools_qt.show_info_box(
-                "The maximum distance should be a valid integer number!"
-            )
+            msg = "Please enter a valid integer for the maximum distance."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         try:
             cluster_length = int(dlg.txt_cluster_length.text())
         except ValueError:
-            tools_qt.show_info_box(
-                "The cluster length should be a valid integer number!"
-            )
+            msg = "Please enter a valid integer for the cluster length."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         if dlg.chk_diameter.isChecked():
             diameter_range_string = dlg.txt_diameter_range.text()
             if not re.fullmatch("\d+(\.\d*)?-\d+(\.\d*)?", diameter_range_string):
-                tools_qt.show_info_box(
-                    "The cluster length should be in the following format:\n [minimum factor]-[maximum factor] (example: 0.75-1.5)"
+                msg = (
+                    "Please enter the diameter range in this format: "
+                    "[minimum factor]-[maximum factor]. "
+                    "For example, 0.75-1.5"
                 )
+                tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
                 return
             diameter_range = tuple(float(x) for x in diameter_range_string.split("-"))
         else:
@@ -330,7 +338,7 @@ class AmBreakage(dialog.GwAction):
         self.thread.cancel()
         tools_gw.fill_tab_log(
             dlg,
-            {"info": {"values": [{"message": "Canceling task..."}]}},
+            {"info": {"values": [{"message": self._tr("Canceling task...")}]}},
             reset_text=False,
             close=False,
         )
@@ -341,3 +349,6 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.rejected.connect(dlg.reject)
         dlg.executing = False
         self.timer.stop()
+
+    def _tr(self, msg):
+        return tools_qt.tr(msg, context_name=global_vars.plugin_name)

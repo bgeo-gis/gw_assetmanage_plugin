@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ... import global_vars
-from ...settings import tools_db
+from ...settings import tools_db, tools_qt
 
 
 def get_min_greater_than(iterable, value):
@@ -96,6 +96,8 @@ class GwCalculatePriority(GwTask):
         config.read(config_path)
         self.method = config.get("general", "engine_method")
 
+        self.msg_task_canceled = self._tr("Task canceled.")
+
     def run(self):
         try:
             if self.method == "SH":
@@ -103,7 +105,12 @@ class GwCalculatePriority(GwTask):
             elif self.method == "WM":
                 return self._run_wm()
             else:
-                raise ValueError("The method is not defined in the configuration file.")
+                raise ValueError(
+                    self._tr(
+                        "Method of calculation not defined in configuration file. ",
+                        "Please check config file.",
+                    )
+                )
 
         except Exception as e:
             self._emit_report(f"Error: {e}")
@@ -113,7 +120,7 @@ class GwCalculatePriority(GwTask):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
     def _run_sh(self):
-        self._emit_report("Getting auxiliary data from DB (1/5)...")
+        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
         self.setProgress(0)
 
         discount_rate = float(self.config_engine["drate"])
@@ -128,9 +135,9 @@ class GwCalculatePriority(GwTask):
         )[0][0]
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report("Getting pipe data from DB (2/5)...")
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
         self.setProgress(20)
 
         sql = """
@@ -161,14 +168,15 @@ class GwCalculatePriority(GwTask):
         arcs = tools_db.get_rows(sql)
         if not arcs:
             self._emit_report(
-                "Task canceled:", "No pipes to process with selected filters."
+                self._tr("Task canceled:"),
+                self._tr("No pipes found matching your selected filters."),
             )
             return False
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report("Calculating values (3/5)...")
+        self._emit_report(self._tr("Calculating values") + " (3/5)...")
         self.setProgress(40)
 
         output_arcs = []
@@ -181,7 +189,7 @@ class GwCalculatePriority(GwTask):
                 rleak,
                 expl_id,
                 presszone_id,
-                strategic
+                strategic,
             ) = arc
             if (
                 arc_diameter is None
@@ -248,7 +256,8 @@ class GwCalculatePriority(GwTask):
             )
         if not len(output_arcs):
             self._emit_report(
-                "Task canceled:", "No pipes to process with selected filters."
+                self._tr("Task canceled:"),
+                self._tr("No pipes found matching your selected filters."),
             )
             return False
 
@@ -273,16 +282,18 @@ class GwCalculatePriority(GwTask):
             arc.extend([year_order, val])
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report("Updating tables (4/5)...")
+        self._emit_report(self._tr("Updating tables") + " (4/5)...")
         self.setProgress(60)
 
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
         result_id = tools_db.get_row(sql)
         print(f"RESULT_ID 11 -> {result_id}")
         if result_id is not None:
-            self._emit_report("This result name already exist.")
+            self._emit_report(
+                self._tr("Result name already in use, please choose a different name.")
+            )
             return False
 
         str_features = (
@@ -464,9 +475,9 @@ class GwCalculatePriority(GwTask):
         )
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report("Generating result stats (5/5)...")
+        self._emit_report(self._tr("Generating result stats") + " (5/5)...")
         self.setProgress(80)
 
         invalid_diameters_count = tools_db.get_row(
@@ -536,30 +547,41 @@ class GwCalculatePriority(GwTask):
             ]
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
 
         self._emit_report(
-            "Task finished!",
-            "Warnings:" if invalid_diameters_count or invalid_materials_count else "",
+            self._tr("Task finished!"),
+            self._tr("Warnings:")
+            if invalid_diameters_count or invalid_materials_count
+            else "",
         )
 
         if invalid_diameters_count:
             self._emit_report(
-                f"Pipes with invalid diameters: {invalid_diameters_count}.",
-                f"Invalid diameters: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.",
-                "These pipes WERE NOT assigned a priority value.",
+                self._tr("Pipes with invalid diameters:")
+                + f" {invalid_diameters_count}.",
+                self._tr("Invalid diameters:")
+                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.",
+                self._tr("These pipes have NOT been assigned a priority value."),
             )
 
         if invalid_materials_count:
             self._emit_report(
-                f"Pipes with invalid materials: {invalid_materials_count}.",
-                f"Invalid materials: {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.",
-                "These pipes were assigned as compliant by default, "
-                + "which may result in a lower priority value.",
+                self._tr("Pipes with invalid materials:")
+                + f" {invalid_materials_count}.",
+                self._tr("Invalid materials:")
+                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.",
+                self._tr(
+                    "These pipes have been assigned as compliant by default, "
+                    "which may affect their priority value."
+                ),
             )
 
         return True
 
     def _run_wm(self):
         pass
+
+    def _tr(self, msg):
+        return tools_qt.tr(msg, context_name=global_vars.plugin_name)

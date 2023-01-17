@@ -85,9 +85,13 @@ class ResultManager(dialog.GwAction):
                 continue
             result_name, status = row
             if status == "CANCELED":
+                msg = "You are about to delete the result"
+                info = "This action cannot be undone. Do you want to proceed?"
                 if tools_qt.show_question(
-                    f"Do you really want to delete the result {result_id}-{result_name}? "
-                    "This operation cannot be undone."
+                    msg,
+                    inf_text=info,
+                    context_name=global_vars.plugin_name,
+                    parameter=f"{result_id}-{result_name}",
                 ):
                     tools_db.execute_sql(
                         f"""
@@ -96,9 +100,13 @@ class ResultManager(dialog.GwAction):
                         """
                     )
             else:
+                msg = "The result cannot be deleted"
+                info = "You can only delete results with the status 'CANCELED'."
                 tools_qt.show_info_box(
-                    f"The result {result_id}-{result_name} cannot be deleted "
-                    "because his status is not CANCELED."
+                    msg,
+                    inf_text=info,
+                    context_name=global_vars.plugin_name,
+                    parameter=f"{result_id}-{result_name}",
                 )
         table.model().select()
 
@@ -165,7 +173,8 @@ class ResultManager(dialog.GwAction):
         selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
 
         if len(selected) != 1:
-            tools_qt.show_info_box("Select only one result before change its status.")
+            msg = "Please select only one result before changing its status."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         row = tools_db.get_row(
@@ -180,9 +189,8 @@ class ResultManager(dialog.GwAction):
 
         result_id, result_name, status = row
         if status == "FINISHED":
-            tools_qt.show_info_box(
-                "You cannot change the status of a result with status FINISHED."
-            )
+            msg = "You cannot change the status of a result with status 'FINISHED'."
+            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
         self.dlg_status = StatusSelectorUi()
@@ -190,7 +198,9 @@ class ResultManager(dialog.GwAction):
         rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
         tools_qt.fill_combo_values(self.dlg_status.cmb_status, rows, 1)
         tools_qt.set_combo_value(self.dlg_status.cmb_status, status, 0, add_new=False)
-        self.dlg_status.btn_accept.clicked.connect(partial(self._dlg_status_accept, result_id))
+        self.dlg_status.btn_accept.clicked.connect(
+            partial(self._dlg_status_accept, result_id)
+        )
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
         tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")

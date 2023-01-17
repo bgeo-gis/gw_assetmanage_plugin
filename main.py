@@ -20,7 +20,7 @@ from .plugin_toolbar import PluginToolbar
 from .core.toolbars import buttons
 from . import global_vars
 
-from .settings import tools_qgis, tools_os, tools_log, tools_gw, tools_db, gw_global_vars
+from .settings import tools_qgis, tools_os, tools_log, tools_gw, tools_qt, tools_db, gw_global_vars
 
 
 class GWAssetPlugin(QObject):
@@ -237,7 +237,7 @@ class GWAssetPlugin(QObject):
         if type(list_actions) != list:
             list_actions = [list_actions]
 
-        toolbar_name = f'toolbar_{toolbar_id}_name'
+        toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name', context_name=global_vars.plugin_name)
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
         # Check if there is a giswater toolbar suiting for the plugin buttons

@@ -7,7 +7,7 @@ from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
 from ... import global_vars
-from ...settings import tools_db
+from ...settings import tools_db, tools_qt
 
 
 class GwAssignation(GwTask):
@@ -37,6 +37,8 @@ class GwAssignation(GwTask):
         config.read(config_path)
         self.unknown_material = config.get("dialog_leaks", "unknown_material")
 
+        self.msg_task_canceled = self._tr("Task canceled.")
+
     def run(self):
         try:
             # sql = f"""
@@ -61,7 +63,7 @@ class GwAssignation(GwTask):
                 return False
 
             if self.isCanceled():
-                self._emit_report("Task canceled.")
+                self._emit_report(self.msg_task_canceled)
                 return False
 
             arcs = self._calculate_rleak(arcs)
@@ -69,10 +71,10 @@ class GwAssignation(GwTask):
                 return False
 
             if self.isCanceled():
-                self._emit_report("Task canceled.")
+                self._emit_report(self.msg_task_canceled)
                 return False
 
-            self._emit_report("Saving results to DB (4/4)...")
+            self._emit_report(self._tr("Saving results to DB") + " (4/4)...")
             self.setProgress(75)
             sql = (
                 "UPDATE asset.arc_input SET rleak = NULL; "
@@ -127,7 +129,7 @@ class GwAssignation(GwTask):
             # ]
 
             # self._emit_report(*final_report)
-            self._emit_report("Task finished!")
+            self._emit_report(self._tr("Task finished!"))
             return True
 
         except Exception:
@@ -148,20 +150,22 @@ class GwAssignation(GwTask):
         )
         if self.years > interval / 365:
             self._emit_report(
-                "Task canceled: The number of years is greater than the interval disponible.",
-                f"Oldest leak: {min_date}.",
-                f"Newest leak: {max_date}.",
+                self._tr(
+                    "Task canceled: The number of years is greater than the interval disponible."
+                ),
+                self._tr("Oldest leak") + f": {min_date}.",
+                self._tr("Newest leak") + f": {max_date}.",
             )
             return False
 
-        self._emit_report("Getting leak data from DB (1/4)...")
+        self._emit_report(self._tr("Getting leak data from DB") + " (1/4)...")
         self.setProgress(0)
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report("Getting pipe data from DB (2/4)...")
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/4)...")
         self.setProgress(25)
 
         rows = tools_db.get_rows(
@@ -197,10 +201,10 @@ class GwAssignation(GwTask):
         )
 
         if self.isCanceled():
-            self._emit_report("Task canceled.")
+            self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report("Assign leaks to pipes (3/4)...")
+        self._emit_report(self._tr("Assigning leaks to pipes") + " (3/4)...")
         self.setProgress(50)
 
         leaks = {}
@@ -343,12 +347,15 @@ class GwAssignation(GwTask):
                 arcs[id]["done"] = True
 
             if self.isCanceled():
-                self._emit_report("Task canceled.")
+                self._emit_report(self.msg_task_canceled)
                 return False
         return arcs
 
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
+
+    def _tr(self, msg):
+        return tools_qt.tr(msg, context_name=global_vars.plugin_name)
 
     def _where_clause(self):
         conditions = []
