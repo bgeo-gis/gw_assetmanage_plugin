@@ -217,41 +217,41 @@ CREATE TABLE asset.config_form_tableview (
 );
 
 --
--- VIEWS:
+-- IMPORTING TABLES FROM GISWATER SCHEMA:
 --
 
-CREATE VIEW asset.exploitation AS
+CREATE TABLE asset.exploitation AS
  SELECT exploitation.expl_id,
     exploitation.name,
     exploitation.the_geom
    FROM PARENT_SCHEMA.exploitation;
 
-CREATE VIEW asset.macrosector AS
+CREATE TABLE asset.macrosector AS
  SELECT macrosector.macrosector_id,
     macrosector.name,
     macrosector.the_geom
    FROM PARENT_SCHEMA.macrosector;
 
-CREATE VIEW asset.sector AS
+CREATE TABLE asset.sector AS
  SELECT sector.sector_id,
     sector.name,
     sector.macrosector_id,
     sector.the_geom
    FROM PARENT_SCHEMA.sector;
 
-CREATE VIEW asset.presszone AS
+CREATE TABLE asset.presszone AS
  SELECT presszone.presszone_id,
     presszone.name,
     presszone.the_geom
    FROM PARENT_SCHEMA.presszone;
 
-CREATE VIEW asset.cat_mat_arc AS
+CREATE TABLE asset.cat_mat_arc AS
  SELECT cat_mat_arc.id,
     cat_mat_arc.descript
    FROM PARENT_SCHEMA.cat_mat_arc
   WHERE (cat_mat_arc.active = true);
 
-CREATE VIEW asset.arc_asset AS
+CREATE TABLE asset.arc_asset AS
  SELECT v_edit_arc.arc_id,
     v_edit_arc.sector_id,
     v_edit_arc.macrosector_id,
@@ -265,6 +265,10 @@ CREATE VIEW asset.arc_asset AS
     v_edit_arc.code,
     v_edit_arc.expl_id
    FROM PARENT_SCHEMA.v_edit_arc;
+
+--
+-- VIEWS:
+--
 
 CREATE VIEW asset.v_asset_arc_input AS
  SELECT a.arc_id,
