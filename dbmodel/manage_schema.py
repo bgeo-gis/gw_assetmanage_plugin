@@ -3,15 +3,15 @@ from inspect import getsourcefile
 from pathlib import Path
 
 # Connection parameters
-DBNAME = None
-USER = None
-PASSWORD = None
-HOST = None
-PORT = None
+DBNAME = "postgres"
+USER = "postgres"
+PASSWORD = "postgres"
+HOST = "localhost"
+PORT = "5432"
 
 # Giswater schema parameters
-PARENT_SCHEMA = None
-SCHEMA_SRID = None
+PARENT_SCHEMA = "dev_3_5_031_assetmanage"
+SCHEMA_SRID = "25831"
 LANGUAGE = "es_ES"
 
 if (

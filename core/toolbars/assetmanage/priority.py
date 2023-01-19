@@ -77,8 +77,30 @@ class AmPriority(dialog.GwAction):
 
 
 class CalculatePriority:
-    def __init__(self, type="GLOBAL"):
-        self.type = type
+    def __init__(self, type="GLOBAL", mode="new", result_id=None):
+        if mode != "new":
+            if not result_id:
+                raise ValueError(f"For mode '{mode}', an result_id must be informed.")
+            self.result = tools_db.get_row(
+                f"""
+                SELECT result_id AS id,
+                    result_name AS name,
+                    result_type AS type,
+                    descript,
+                    expl_id,
+                    budget,
+                    target_year,
+                    status,
+                    presszone_id,
+                    material_id,
+                    features,
+                    dnom
+                FROM asset.cat_result
+                WHERE result_id = {result_id}
+                """
+            )
+        self.type = type if mode == "new" else self.result["type"]
+        self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
         self.layers["arc"] = []

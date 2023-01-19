@@ -6,6 +6,7 @@ or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
 from functools import partial
+
 from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
     QMenu,
@@ -15,6 +16,8 @@ from qgis.PyQt.QtWidgets import (
 )
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
+from .priority import CalculatePriority
+from ...ui.ui_manager import PriorityUi, PriorityManagerUi, StatusSelectorUi
 from ....settings import (
     tools_qgis,
     tools_qt,
@@ -26,8 +29,6 @@ from ....settings import (
     gw_global_vars,
 )
 from .... import global_vars
-
-from ...ui.ui_manager import PriorityUi, PriorityManagerUi, StatusSelectorUi
 
 
 class ResultManager(dialog.GwAction):
@@ -122,6 +123,17 @@ class ResultManager(dialog.GwAction):
         self.dlg_status.close()
         self.dlg_priority_manager.tbl_results.model().select()
 
+    def _duplicate_result(self):
+        table = self.dlg_priority_manager.tbl_results
+        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
+
+        if len(selected) != 1:
+            tools_qt.show_info_box("Select only one result to duplicate.")
+            return
+
+        calculate_priority = CalculatePriority(mode="duplicate", result_id=selected[0])
+        calculate_priority.clicked_event()
+
     def _fill_table(
         self,
         dialog,
@@ -207,6 +219,7 @@ class ResultManager(dialog.GwAction):
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager
+        dlg.btn_duplicate.clicked.connect(self._duplicate_result)
         dlg.btn_status.clicked.connect(self._open_status_selector)
         dlg.btn_delete.clicked.connect(self._delete_result)
         dlg.btn_close.clicked.connect(dlg.reject)
