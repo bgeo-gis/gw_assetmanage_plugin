@@ -120,7 +120,7 @@ CREATE TABLE asset.config_engine_def (
     widgetcontrols json,
     placeholder text,
     standardvalue text,
-    CONSTRAINT config_engine_def_pkey PRIMARY KEY (parameter, method)
+    CONSTRAINT config_engine_def_pkey PRIMARY KEY (parameter, method, round)
 );
 
 CREATE TABLE asset.config_engine (
