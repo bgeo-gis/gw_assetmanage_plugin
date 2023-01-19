@@ -99,6 +99,21 @@ class CalculatePriority:
                 WHERE result_id = {result_id}
                 """
             )
+        else:
+            self.result = {
+                "id": None,
+                "name": None,
+                "type": None,
+                "descript": None,
+                "expl_id": None,
+                "budget": None,
+                "target_year": None,
+                "status": None,
+                "presszone_id": None,
+                "material_id": None,
+                "features": None,
+                "dnom": None,
+            }
         self.type = type if mode == "new" else self.result["type"]
         self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
@@ -267,36 +282,62 @@ class CalculatePriority:
             config.read(config_path)
 
             # Get configuration parameters
-            if config.getboolean(dialog_type, "show_budget") is not True:
+            if (
+                config.getboolean(dialog_type, "show_budget") is not True
+                and not self.result["budget"]
+            ):
                 self.dlg_priority.lbl_budget.setVisible(False)
                 self.dlg_priority.txt_budget.setVisible(False)
-            if config.getboolean(dialog_type, "show_target_year") is not True:
+            if (
+                config.getboolean(dialog_type, "show_target_year") is not True
+                and not self.result["target_year"]
+            ):
                 self.dlg_priority.lbl_year.setVisible(False)
                 self.dlg_priority.cmb_year.setVisible(False)
-            if config.getboolean(dialog_type, "show_selection") is not True:
+            if (
+                config.getboolean(dialog_type, "show_selection") is not True
+                and not self.result["features"]
+                and not self.result["dnom"]
+                and not self.result["material_id"]
+                and not self.result["expl_id"]
+                and not self.result["presszone_id"]
+            ):
                 self.dlg_priority.grb_selection.setVisible(False)
             else:
-                if config.getboolean(dialog_type, "show_maptool") is not True:
+                if (
+                    config.getboolean(dialog_type, "show_maptool") is not True
+                    and not self.result["features"]
+                ):
                     self.dlg_priority.btn_snapping.setVisible(False)
-                if config.getboolean(dialog_type, "show_diameter") is not True:
+                if (
+                    config.getboolean(dialog_type, "show_diameter") is not True
+                    and not self.result["dnom"]
+                ):
                     self.dlg_priority.lbl_dnom.setVisible(False)
                     self.dlg_priority.cmb_dnom.setVisible(False)
-                if config.getboolean(dialog_type, "show_material") is not True:
+                if (
+                    config.getboolean(dialog_type, "show_material") is not True
+                    and not self.result["material_id"]
+                ):
                     self.dlg_priority.lbl_material.setVisible(False)
                     self.dlg_priority.cmb_material.setVisible(False)
                 # Hide Explotation filter if there's arcs without expl_id
-                if config.getboolean(
-                    dialog_type, "show_exploitation"
-                ) is not True or tools_db.get_row(
+                null_expl = tools_db.get_row(
                     "SELECT 1 FROM asset.arc_asset WHERE expl_id IS NULL"
+                )
+                if not self.result["expl_id"] and (
+                    config.getboolean(dialog_type, "show_exploitation") is not True
+                    or null_expl
                 ):
                     self.dlg_priority.lbl_expl_selection.setVisible(False)
                     self.dlg_priority.cmb_expl_selection.setVisible(False)
                 # Hide Presszone filter if there's arcs without presszone_id
-                if config.getboolean(
-                    dialog_type, "show_presszone"
-                ) is not True or tools_db.get_row(
+                null_presszone = tools_db.get_row(
                     "SELECT 1 FROM asset.arc_asset WHERE presszone_id IS NULL"
+                )
+                if not self.result["presszone_id"] and (
+                    config.getboolean(dialog_type, "show_presszone") is not True
+                    or null_presszone
                 ):
                     self.dlg_priority.lbl_presszone.setVisible(False)
                     self.dlg_priority.cmb_presszone.setVisible(False)
@@ -467,6 +508,8 @@ class CalculatePriority:
         self._manage_btn_snapping()
 
     def _manage_btn_snapping(self):
+
+        # FIXME: In case of "duplicate" or "edit", load result selection
 
         self.feature_type = "arc"
         layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
@@ -715,12 +758,18 @@ class CalculatePriority:
         tools_qt.fill_combo_values(
             self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True
         )
+        tools_qt.set_combo_value(
+            self.dlg_priority.cmb_dnom, self.result["dnom"], 0, add_new=False
+        )
 
         # Combo material
         sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
             self.dlg_priority.cmb_material, rows, 1, add_empty=True
+        )
+        tools_qt.set_combo_value(
+            self.dlg_priority.cmb_material, self.result["material_id"], 0, add_new=False
         )
 
         # Combo exploitation
@@ -729,12 +778,24 @@ class CalculatePriority:
         tools_qt.fill_combo_values(
             self.dlg_priority.cmb_expl_selection, rows, 1, add_empty=True
         )
+        tools_qt.set_combo_value(
+            self.dlg_priority.cmb_expl_selection,
+            self.result["expl_id"],
+            0,
+            add_new=False,
+        )
 
         # Combo presszone
         sql = "SELECT presszone_id as id, name as idval FROM asset.presszone"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
             self.dlg_priority.cmb_presszone, rows, 1, add_empty=True
+        )
+        tools_qt.set_combo_value(
+            self.dlg_priority.cmb_presszone,
+            self.result["presszone_id"],
+            0,
+            add_new=False,
         )
 
     # endregion
