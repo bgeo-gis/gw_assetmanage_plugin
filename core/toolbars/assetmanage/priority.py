@@ -174,6 +174,7 @@ class CalculatePriority:
         self.layers["arc"] = []
         self.list_ids = {}
         self.config = CalculatePriorityConfig(type)
+        self.total_weight = {}
 
         # Priority variables
         self.dlg_priority = None
@@ -246,6 +247,15 @@ class CalculatePriority:
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority, dlg_name="priority")
 
+    def _add_total(self, lyt):
+        lbl = QLabel()
+        lbl.setText(self._tr("Total"))
+        value = QLabel()
+        position_config = {"layoutname": lyt, "layoutorder": 100}
+        tools_gw.add_widget(self.dlg_priority, position_config, lbl, value)
+        setattr(self.dlg_priority, f"total_{lyt}", value)
+        self._update_total_weight(lyt)
+
     def _calculate_ended(self):
         dlg = self.dlg_priority
         dlg.btn_cancel.clicked.disconnect()
@@ -265,16 +275,9 @@ class CalculatePriority:
     def _fill_engine_options(self):
         dlg = self.dlg_priority
 
-        if self.config.method == "SH":
-            dlg.grb_engine_1.setTitle(self._tr("Shamir-Howard parameters"))
-            dlg.grb_engine_2.setTitle(self._tr("Weights"))
-        elif self.config.method == "WM":
-            dlg.grb_engine_1.setTitle(self._tr("First iteration"))
-            dlg.grb_engine_2.setTitle(self._tr("Second iteration"))
-
         self.config_engine_fields = []
         rows = tools_db.get_rows(
-            """
+            f"""
             select parameter,
                 value,
                 descript,
@@ -282,15 +285,17 @@ class CalculatePriority:
                 layoutorder,
                 label,
                 datatype,
-                widgettype
+                widgettype,
+                round
             from asset.config_engine_def
+            where method = '{self.config.method}'
             """
         )
 
         for row in rows:
             self.config_engine_fields.append(
                 {
-                    "widgetname": row[0],
+                    "widgetname": row["parameter"] + "_" + str(row["round"]),
                     "value": row[1],
                     "tooltip": row[2],
                     "layoutname": row[3],
@@ -305,16 +310,18 @@ class CalculatePriority:
             dlg, [{"fields": self.config_engine_fields}], 0, []
         )
 
-        lbl = QLabel()
-        lbl.setText(self._tr("Total"))
-        lbl_total_weight = QLabel()
-        dlg.lbl_total_weight = lbl_total_weight
-        position_config = {"layoutname": "lyt_engine_2", "layoutorder": 100}
-        tools_gw.add_widget(dlg, position_config, lbl, lbl_total_weight)
-        self._update_total_weight()
+        if self.config.method == "SH":
+            dlg.grb_engine_1.setTitle(self._tr("Shamir-Howard parameters"))
+            dlg.grb_engine_2.setTitle(self._tr("Weights"))
+            self._add_total("lyt_engine_2")
+        elif self.config.method == "WM":
+            dlg.grb_engine_1.setTitle(self._tr("First iteration"))
+            dlg.grb_engine_2.setTitle(self._tr("Second iteration"))
+            self._add_total("lyt_engine_1")
+            self._add_total("lyt_engine_2")
 
-    def _get_weight_widgets(self):
-        is_weight = lambda x: x["layoutname"] == "lyt_engine_2"
+    def _get_weight_widgets(self, lyt):
+        is_weight = lambda x: x["layoutname"] == lyt
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 
@@ -609,8 +616,12 @@ class CalculatePriority:
         dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
 
-        for widget in self._get_weight_widgets():
-            widget.textChanged.connect(self._update_total_weight)
+        if self.config.method == "WM":
+            for widget in self._get_weight_widgets("lyt_engine_1"):
+                widget.textChanged.connect(partial(self._update_total_weight, "lyt_engine_1"))
+       
+        for widget in self._get_weight_widgets("lyt_engine_2"):
+            widget.textChanged.connect(partial(self._update_total_weight, "lyt_engine_2"))
 
     def _tr(self, msg):
         return tools_qt.tr(msg, context_name=global_vars.plugin_name)
@@ -620,16 +631,19 @@ class CalculatePriority:
         text = str(timedelta(seconds=round(elapsed_time)))
         widget.setText(text)
 
-    def _update_total_weight(self):
+    def _update_total_weight(self, lyt):
+        label = getattr(self.dlg_priority, f"total_{lyt}", None)
+        if not label:
+            return
         try:
             total = 0
-            for widget in self._get_weight_widgets():
+            for widget in self._get_weight_widgets(lyt):
                 total += float(widget.text())
-            self.total_weight = total
-            self.dlg_priority.lbl_total_weight.setText(str(round(self.total_weight, 2)))
+            self.total_weight[lyt] = total
+            label.setText(str(round(self.total_weight[lyt], 2)))
         except:
-            self.total_weight = None
-            self.dlg_priority.lbl_total_weight.setText("Error")
+            self.total_weight[lyt] = None
+            label.setText("Error")
 
     def _validate_inputs(self):
         dlg = self.dlg_priority
