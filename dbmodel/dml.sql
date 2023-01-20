@@ -31,25 +31,25 @@ INSERT INTO asset.config_diameter_def VALUES (1110.00, 700.00, 1400.00, 10);
 INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM asset.cat_mat_arc;
 
 -- TODO: translate labels
-INSERT INTO asset.config_engine_def VALUES ('bratemain0', '0.05', 'SH', 1, NULL, true, 'lyt_engine_1', 1, 'Break rate on mains', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('drate', '0.05', 'SH', 1, NULL, true, 'lyt_engine_1', 2, 'Discount rate', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('expected_year', '0.7', 'SH', 1, NULL, true, 'lyt_engine_2', 1, 'Weight expected year', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('compliance', '0.1', 'SH', 1, NULL, true, 'lyt_engine_2', 2, 'Weight compliance', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('strategic', '0.2', 'SH', 1, NULL, true, 'lyt_engine_2', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('rleak', '0.2', 'WM', 1, NULL, true, 'lyt_engine_1', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('rleak', '0.0', 'WM', 2, NULL, true, 'lyt_engine_2', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('mleak', '0.1', 'WM', 1, NULL, true, 'lyt_engine_1', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('mleak', '0.0', 'WM', 2, NULL, true, 'lyt_engine_2', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('longevity', '0.7', 'WM', 1, NULL, true, 'lyt_engine_1', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('longevity', '0.0', 'WM', 2, NULL, true, 'lyt_engine_2', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('flow', '0.0', 'WM', 1, NULL, true, 'lyt_engine_1', 4, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('flow', '0.5', 'WM', 2, NULL, true, 'lyt_engine_2', 4, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('nrw', '0.0', 'WM', 1, NULL, true, 'lyt_engine_1', 5, 'ANC', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('nrw', '0.2', 'WM', 2, NULL, true, 'lyt_engine_2', 5, 'ANC', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('strategic', '0.0', 'WM', 1, NULL, true, 'lyt_engine_1', 6, 'Strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('strategic', '0.0', 'WM', 2, NULL, true, 'lyt_engine_2', 6, 'Strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('compliance', '0.0', 'WM', 1, NULL, true, 'lyt_engine_1', 7, 'Normativo', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('compliance', '0.3', 'WM', 2, NULL, true, 'lyt_engine_2', 7, 'Normativo', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('bratemain0', '0.05', 'SH', NULL, NULL, true, 'lyt_engine_1', 1, 'Break rate on mains', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('drate', '0.05', 'SH', NULL, NULL, true, 'lyt_engine_1', 2, 'Discount rate', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('expected_year', '0.7', 'SH', NULL, NULL, true, 'lyt_engine_2', 1, 'Weight expected year', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('compliance', '0.1', 'SH', NULL, NULL, true, 'lyt_engine_2', 2, 'Weight compliance', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('strategic', '0.2', 'SH', NULL, NULL, true, 'lyt_engine_2', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('rleak_1', '0.2', 'WM', NULL, NULL, true, 'lyt_engine_1', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('rleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('mleak_1', '0.1', 'WM', NULL, NULL, true, 'lyt_engine_1', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('mleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('longevity_1', '0.7', 'WM', NULL, NULL, true, 'lyt_engine_1', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('longevity_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('flow_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 4, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('flow_2', '0.5', 'WM', NULL, NULL, true, 'lyt_engine_2', 4, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('nrw_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 5, 'ANC', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('nrw_2', '0.2', 'WM', NULL, NULL, true, 'lyt_engine_2', 5, 'ANC', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('strategic_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 6, 'Strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('strategic_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 6, 'Strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('compliance_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 7, 'Normativo', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('compliance_2', '0.3', 'WM', NULL, NULL, true, 'lyt_engine_2', 7, 'Normativo', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 --
 -- config_form_tableview

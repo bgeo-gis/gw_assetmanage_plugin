@@ -285,8 +285,7 @@ class CalculatePriority:
                 layoutorder,
                 label,
                 datatype,
-                widgettype,
-                round
+                widgettype
             from asset.config_engine_def
             where method = '{self.config.method}'
             """
@@ -295,7 +294,7 @@ class CalculatePriority:
         for row in rows:
             self.config_engine_fields.append(
                 {
-                    "widgetname": row["parameter"] + "_" + str(row["round"]),
+                    "widgetname": row["parameter"],
                     "value": row[1],
                     "tooltip": row[2],
                     "layoutname": row[3],
