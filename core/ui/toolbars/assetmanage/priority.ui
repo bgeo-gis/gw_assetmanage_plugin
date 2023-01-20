@@ -153,9 +153,9 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_13">
               <item row="0" column="0">
-               <widget class="QGroupBox" name="grb_sh">
+               <widget class="QGroupBox" name="grb_engine_1">
                 <property name="title">
-                 <string>Shamir-Howard parameters</string>
+                 <string>grb_engine_1</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -165,7 +165,7 @@
                   <enum>QLayout::SetDefaultConstraint</enum>
                  </property>
                  <item>
-                  <layout class="QGridLayout" name="lyt_sh_parameters"/>
+                  <layout class="QGridLayout" name="lyt_engine_1"/>
                  </item>
                  <item>
                   <spacer name="verticalSpacer_2">
@@ -184,16 +184,16 @@
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QGroupBox" name="grb_weights">
+               <widget class="QGroupBox" name="grb_engine_2">
                 <property name="title">
-                 <string>Weights</string>
+                 <string>grb_engine_2</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_2">
                  <item>
-                  <layout class="QGridLayout" name="lyt_weights"/>
+                  <layout class="QGridLayout" name="lyt_engine_2"/>
                  </item>
                  <item>
                   <spacer name="verticalSpacer_3">

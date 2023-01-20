@@ -263,6 +263,15 @@ class CalculatePriority:
         )
 
     def _fill_engine_options(self):
+        dlg = self.dlg_priority
+
+        if self.config.method == "SH":
+            dlg.grb_engine_1.setTitle(self._tr("Shamir-Howard parameters"))
+            dlg.grb_engine_2.setTitle(self._tr("Weights"))
+        elif self.config.method == "WM":
+            dlg.grb_engine_1.setTitle(self._tr("First iteration"))
+            dlg.grb_engine_2.setTitle(self._tr("Second iteration"))
+
         self.config_engine_fields = []
         rows = tools_db.get_rows(
             """
@@ -293,15 +302,15 @@ class CalculatePriority:
                 }
             )
         tools_gw.build_dialog_options(
-            self.dlg_priority, [{"fields": self.config_engine_fields}], 0, []
+            dlg, [{"fields": self.config_engine_fields}], 0, []
         )
 
         lbl = QLabel()
         lbl.setText(self._tr("Total"))
         lbl_total_weight = QLabel()
-        self.dlg_priority.lbl_total_weight = lbl_total_weight
+        dlg.lbl_total_weight = lbl_total_weight
         position_config = {"layoutname": "lyt_engine_2", "layoutorder": 100}
-        tools_gw.add_widget(self.dlg_priority, position_config, lbl, lbl_total_weight)
+        tools_gw.add_widget(dlg, position_config, lbl, lbl_total_weight)
         self._update_total_weight()
 
     def _get_weight_widgets(self):
