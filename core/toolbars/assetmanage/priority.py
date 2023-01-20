@@ -728,7 +728,7 @@ class CalculatePriority:
                 k: v for k, v in row.items() if k != "material"
             }
 
-        if round(self.total_weight, 5) != 1:
+        if any(round(total, 5) != 1 for total in self.total_weight.values()):
             msg = (
                 "The sum of weights must equal 1. Please adjust the values accordingly."
             )
