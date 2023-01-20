@@ -2,7 +2,7 @@
 # Mandatory items:
 
 [general]
-name=gw_assetmanage_plugin
+name=gw_assetmanage
 qgisMinimumVersion=3.10.13
 qgisMaximumVersion=3.99
 description=assetmanage tools for giswater plugin
