@@ -266,30 +266,6 @@
 			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
-			<source>tab_infolog</source>
-			<translation>Fugas</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_assignation</source>
-			<translation>Asignación de fugas</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_assignation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Configuración</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_cluster_length</source>
 			<translation>Distancia del cluster:</translation>
 		</message>
@@ -322,6 +298,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_pipes</source>
+			<translation>Tuberías</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Distancia de buffer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_max_distance</source>
 			<translation>Distancia máxima:</translation>
 		</message>
@@ -338,27 +330,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_buffer</source>
-			<translation>Distancia de bufferr:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Tuberías</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_years</source>
 			<translation>Años a calcular:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_years</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Fugas</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_assignation</source>
+			<translation>Asignación de fugas</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_assignation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Configuración</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -367,70 +367,6 @@
 		<message>
 			<source>title</source>
 			<translation>Cálculo de prioridad</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Seleccione las entidades del entorno</translation>
-		</message>
-		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Explotación:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_presszone</source>
-			<translation>Zona de presión:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_presszone</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info Log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_budget</source>
-			<translation>Presupuesto:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Año horizonte:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>tab_diameter</source>
@@ -473,43 +409,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Seleccione las entidades en la vista de mapa</translation>
+		</message>
+		<message>
 			<source>grb_selection</source>
 			<translation>Selección de entidades</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dnom</source>
-			<translation>Diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dnom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_priority</source>
-			<translation>Cálculo de prioridad</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor de cálculo</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_global</source>
-			<translation>Parámetros de cálculo</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_global</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -544,20 +456,100 @@
 			<source>tooltip_lbl_status</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Explotación:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Zona de presión:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info Log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Presupuesto:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Año horizonte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor de cálculo</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Cálculo de prioridad</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Parámetros de cálculo</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
 			<translation>Gestor de resultados</translation>
-		</message>
-		<message>
-			<source>btn_status</source>
-			<translation>Cambiar estado</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_status</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -568,11 +560,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Cerrar</translation>
+			<source>btn_status</source>
+			<translation>Cambiar estado</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_btn_status</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -583,6 +575,14 @@
 			<source>tooltip_dlg_priority_manager</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Cerrar</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>result_selector</name>
@@ -591,11 +591,11 @@
 			<translation>Selector de resulados</translation>
 		</message>
 		<message>
-			<source>tab_result</source>
-			<translation>Resultado</translation>
+			<source>btn_accept</source>
+			<translation>OK</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_result</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -607,6 +607,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_result</source>
+			<translation>Resultado</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_result_selector</source>
 			<translation>Selector de resulados</translation>
 		</message>
@@ -615,27 +623,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<source>lbl_descript_compare</source>
+			<translation>Descripción:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Resultado para comparar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
+			<source>tooltip_lbl_descript_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -647,22 +639,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descripción:</translation>
+			<source>lbl_result_compare</source>
+			<translation>Resultado para comparar:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>status_selector</name>
-		<message>
-			<source>lbl_new_status</source>
-			<translation>Nuevo estado: </translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_status</source>
+			<source>tooltip_lbl_result_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -673,12 +654,15 @@
 			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>status_selector</name>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Está cambiando el estado del siguiente resultado:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -687,6 +671,22 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>Nuevo estado: </translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Está cambiando el estado del siguiente resultado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
 			<translation>None</translation>
 		</message>
 	</context>

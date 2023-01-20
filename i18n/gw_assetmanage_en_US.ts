@@ -266,30 +266,6 @@
 			<translation>Leak Assignation</translation>
 		</message>
 		<message>
-			<source>tab_infolog</source>
-			<translation>Leaks</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_assignation</source>
-			<translation>Leak Assignation</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_assignation</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_config</source>
-			<translation>Config</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_config</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_cluster_length</source>
 			<translation>Cluster length:</translation>
 		</message>
@@ -322,6 +298,22 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_pipes</source>
+			<translation>Pipes</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Buffer distance:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_max_distance</source>
 			<translation>Maximum distance:</translation>
 		</message>
@@ -338,27 +330,35 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_buffer</source>
-			<translation>Buffer distance:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Pipes</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_years</source>
 			<translation>Years to calculate:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_years</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Leaks</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_assignation</source>
+			<translation>Leak Assignation</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_assignation</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_config</source>
+			<translation>Config</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_config</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -367,70 +367,6 @@
 		<message>
 			<source>title</source>
 			<translation>Priority Calculation</translation>
-		</message>
-		<message>
-			<source>btn_snapping</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_snapping</source>
-			<translation>Select features on canvas</translation>
-		</message>
-		<message>
-			<source>lbl_expl_selection</source>
-			<translation>Exploitation:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_expl_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_presszone</source>
-			<translation>Presszone:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_presszone</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info Log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_budget</source>
-			<translation>Budget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_year</source>
-			<translation>Horizon year:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>tab_diameter</source>
@@ -473,43 +409,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>btn_snapping</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_snapping</source>
+			<translation>Select features on canvas</translation>
+		</message>
+		<message>
 			<source>grb_selection</source>
 			<translation>Selection of features</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_selection</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dnom</source>
-			<translation>Diameter:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dnom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_priority</source>
-			<translation>Priority Calculation</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Engine</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_global</source>
-			<translation>Calculation parameters</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_global</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -544,20 +456,100 @@
 			<source>tooltip_lbl_status</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>lbl_expl_selection</source>
+			<translation>Exploitation:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_presszone</source>
+			<translation>Presszone:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_presszone</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info Log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_budget</source>
+			<translation>Budget:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_budget</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Horizon year:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Engine</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Priority Calculation</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diameter:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_global</source>
+			<translation>Calculation parameters</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
 			<translation>Results Manager</translation>
-		</message>
-		<message>
-			<source>btn_status</source>
-			<translation>Change status</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_status</source>
-			<translation>None</translation>
 		</message>
 		<message>
 			<source>btn_delete</source>
@@ -568,11 +560,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_close</source>
-			<translation>Close</translation>
+			<source>btn_status</source>
+			<translation>Change status</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_close</source>
+			<source>tooltip_btn_status</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -583,6 +575,14 @@
 			<source>tooltip_dlg_priority_manager</source>
 			<translation>None</translation>
 		</message>
+		<message>
+			<source>btn_close</source>
+			<translation>Close</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
 	</context>
 	<context>
 		<name>result_selector</name>
@@ -591,11 +591,11 @@
 			<translation>Result Selector</translation>
 		</message>
 		<message>
-			<source>tab_result</source>
-			<translation>Result</translation>
+			<source>btn_accept</source>
+			<translation>OK</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_result</source>
+			<source>tooltip_btn_accept</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -607,6 +607,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>tab_result</source>
+			<translation>Result</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_result</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>dlg_result_selector</source>
 			<translation>Result Selector</translation>
 		</message>
@@ -615,27 +623,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancel</translation>
+			<source>lbl_descript_compare</source>
+			<translation>Description:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>btn_accept</source>
-			<translation>OK</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_accept</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Result to compare:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
+			<source>tooltip_lbl_descript_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -647,22 +639,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Description:</translation>
+			<source>lbl_result_compare</source>
+			<translation>Result to compare:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-	</context>
-	<context>
-		<name>status_selector</name>
-		<message>
-			<source>lbl_new_status</source>
-			<translation>New status:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_new_status</source>
+			<source>tooltip_lbl_result_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -673,12 +654,15 @@
 			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
+	</context>
+	<context>
+		<name>status_selector</name>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>You are changing the status of the following result:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancel</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_btn_cancel</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -687,6 +671,22 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_new_status</source>
+			<translation>New status:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_new_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>You are changing the status of the following result:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
 			<translation>None</translation>
 		</message>
 	</context>
