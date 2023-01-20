@@ -149,6 +149,8 @@ class CalculatePriority:
         # Manage attributes group
         self._manage_attr()
 
+        # FIXME: Tables should load result config if "duplicate" or "edit"
+        # TODO: Change from QTableView to QTableWidget for more flexibility
         # Define tableviews
         self.qtbl_diameter = self.dlg_priority.findChild(QTableView, "tbl_diameter")
         self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -244,12 +246,12 @@ class CalculatePriority:
         lbl.setText(self._tr("Total"))
         lbl_total_weight = QLabel()
         self.dlg_priority.lbl_total_weight = lbl_total_weight
-        position_config = {"layoutname": "lyt_weights", "layoutorder": 100}
+        position_config = {"layoutname": "lyt_engine_2", "layoutorder": 100}
         tools_gw.add_widget(self.dlg_priority, position_config, lbl, lbl_total_weight)
         self._update_total_weight()
 
     def _get_weight_widgets(self):
-        is_weight = lambda x: x["layoutname"] == "lyt_weights"
+        is_weight = lambda x: x["layoutname"] == "lyt_engine_2"
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 
