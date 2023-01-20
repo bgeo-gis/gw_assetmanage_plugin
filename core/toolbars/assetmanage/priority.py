@@ -76,6 +76,59 @@ class AmPriority(dialog.GwAction):
         calculate_priority.clicked_event()
 
 
+class CalculatePriorityConfig:
+    def __init__(self, type):
+        try:
+            if type == "GLOBAL":
+                dialog_type = "dialog_priority_global"
+            elif type == "SELECTION":
+                dialog_type = "dialog_priority_selection"
+            else:
+                raise ValueError(
+                    self._tr(
+                        "Invalid value for type of priority dialog. "
+                        "Please pass either 'GLOBAL' or 'SELECTION'. "
+                        "Value passed:"
+                    )
+                    + f" '{self.type}'."
+                )
+
+            # Read the config file
+            config = configparser.ConfigParser()
+            config_path = os.path.join(
+                global_vars.plugin_dir, f"config{os.sep}config.config"
+            )
+            if not os.path.exists(config_path):
+                print(f"Config file not found: {config_path}")
+                return
+
+            config.read(config_path)
+
+            self.method = config.get("general", "engine_method")
+            self.show_budget = config.getboolean(dialog_type, "show_budget")
+            self.show_target_year = config.getboolean(dialog_type, "show_target_year")
+            self.show_selection = config.getboolean(dialog_type, "show_selection")
+            self.show_maptool = config.getboolean(dialog_type, "show_maptool")
+            self.show_diameter = config.getboolean(dialog_type, "show_diameter")
+            self.show_material = config.getboolean(dialog_type, "show_material")
+            self.show_exploitation = config.getboolean(dialog_type, "show_exploitation")
+            self.show_presszone = config.getboolean(dialog_type, "show_presszone")
+            self.show_ivi_button = config.getboolean(dialog_type, "show_ivi_button")
+            self.show_config = config.getboolean(dialog_type, "show_config")
+            self.show_config_diameter = config.getboolean(
+                dialog_type, "show_config_diameter"
+            )
+            self.show_config_material = config.getboolean(
+                dialog_type, "show_config_material"
+            )
+            self.show_config_engine = config.getboolean(
+                dialog_type, "show_config_engine"
+            )
+
+        except Exception as e:
+            print("read_config_file error %s" % e)
+
+
 class CalculatePriority:
     def __init__(self, type="GLOBAL", mode="new", result_id=None):
         if mode != "new":
@@ -120,6 +173,7 @@ class CalculatePriority:
         self.layers = {}
         self.layers["arc"] = []
         self.list_ids = {}
+        self.config = CalculatePriorityConfig(type)
 
         # Priority variables
         self.dlg_priority = None
@@ -256,113 +310,61 @@ class CalculatePriority:
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 
     def _manage_hidden_form(self):
-        status = True
-        try:
-            if self.type == "GLOBAL":
-                dialog_type = "dialog_priority_global"
-            elif self.type == "SELECTION":
-                dialog_type = "dialog_priority_selection"
-            else:
-                raise ValueError(
-                    self._tr(
-                        "Invalid value for type of priority dialog. "
-                        "Please pass either 'GLOBAL' or 'SELECTION'. "
-                        "Value passed:"
-                    )
-                    + f" '{self.type}'."
-                )
 
-            # Read the config file
-            config = configparser.ConfigParser()
-            config_path = os.path.join(
-                global_vars.plugin_dir, f"config{os.sep}config.config"
+        if self.config.show_budget is not True and not self.result["budget"]:
+            self.dlg_priority.lbl_budget.setVisible(False)
+            self.dlg_priority.txt_budget.setVisible(False)
+        if self.config.show_target_year is not True and not self.result["target_year"]:
+            self.dlg_priority.lbl_year.setVisible(False)
+            self.dlg_priority.cmb_year.setVisible(False)
+        if (
+            self.config.show_selection is not True
+            and not self.result["features"]
+            and not self.result["dnom"]
+            and not self.result["material_id"]
+            and not self.result["expl_id"]
+            and not self.result["presszone_id"]
+        ):
+            self.dlg_priority.grb_selection.setVisible(False)
+        else:
+            if self.config.show_maptool is not True and not self.result["features"]:
+                self.dlg_priority.btn_snapping.setVisible(False)
+            if self.config.show_diameter is not True and not self.result["dnom"]:
+                self.dlg_priority.lbl_dnom.setVisible(False)
+                self.dlg_priority.cmb_dnom.setVisible(False)
+            if self.config.show_material is not True and not self.result["material_id"]:
+                self.dlg_priority.lbl_material.setVisible(False)
+                self.dlg_priority.cmb_material.setVisible(False)
+            # Hide Explotation filter if there's arcs without expl_id
+            null_expl = tools_db.get_row(
+                "SELECT 1 FROM asset.arc_asset WHERE expl_id IS NULL"
             )
-            if not os.path.exists(config_path):
-                print(f"Config file not found: {config_path}")
-                return
-
-            config.read(config_path)
-
-            # Get configuration parameters
-            if (
-                config.getboolean(dialog_type, "show_budget") is not True
-                and not self.result["budget"]
+            if not self.result["expl_id"] and (
+                self.config.show_exploitation is not True or null_expl
             ):
-                self.dlg_priority.lbl_budget.setVisible(False)
-                self.dlg_priority.txt_budget.setVisible(False)
-            if (
-                config.getboolean(dialog_type, "show_target_year") is not True
-                and not self.result["target_year"]
+                self.dlg_priority.lbl_expl_selection.setVisible(False)
+                self.dlg_priority.cmb_expl_selection.setVisible(False)
+            # Hide Presszone filter if there's arcs without presszone_id
+            null_presszone = tools_db.get_row(
+                "SELECT 1 FROM asset.arc_asset WHERE presszone_id IS NULL"
+            )
+            if not self.result["presszone_id"] and (
+                self.config.show_presszone is not True or null_presszone
             ):
-                self.dlg_priority.lbl_year.setVisible(False)
-                self.dlg_priority.cmb_year.setVisible(False)
-            if (
-                config.getboolean(dialog_type, "show_selection") is not True
-                and not self.result["features"]
-                and not self.result["dnom"]
-                and not self.result["material_id"]
-                and not self.result["expl_id"]
-                and not self.result["presszone_id"]
-            ):
-                self.dlg_priority.grb_selection.setVisible(False)
-            else:
-                if (
-                    config.getboolean(dialog_type, "show_maptool") is not True
-                    and not self.result["features"]
-                ):
-                    self.dlg_priority.btn_snapping.setVisible(False)
-                if (
-                    config.getboolean(dialog_type, "show_diameter") is not True
-                    and not self.result["dnom"]
-                ):
-                    self.dlg_priority.lbl_dnom.setVisible(False)
-                    self.dlg_priority.cmb_dnom.setVisible(False)
-                if (
-                    config.getboolean(dialog_type, "show_material") is not True
-                    and not self.result["material_id"]
-                ):
-                    self.dlg_priority.lbl_material.setVisible(False)
-                    self.dlg_priority.cmb_material.setVisible(False)
-                # Hide Explotation filter if there's arcs without expl_id
-                null_expl = tools_db.get_row(
-                    "SELECT 1 FROM asset.arc_asset WHERE expl_id IS NULL"
-                )
-                if not self.result["expl_id"] and (
-                    config.getboolean(dialog_type, "show_exploitation") is not True
-                    or null_expl
-                ):
-                    self.dlg_priority.lbl_expl_selection.setVisible(False)
-                    self.dlg_priority.cmb_expl_selection.setVisible(False)
-                # Hide Presszone filter if there's arcs without presszone_id
-                null_presszone = tools_db.get_row(
-                    "SELECT 1 FROM asset.arc_asset WHERE presszone_id IS NULL"
-                )
-                if not self.result["presszone_id"] and (
-                    config.getboolean(dialog_type, "show_presszone") is not True
-                    or null_presszone
-                ):
-                    self.dlg_priority.lbl_presszone.setVisible(False)
-                    self.dlg_priority.cmb_presszone.setVisible(False)
-            if config.getboolean(dialog_type, "show_ivi_button") is not True:
-                # TODO: next approach
-                pass
-            if config.getboolean(dialog_type, "show_config") is not True:
-                self.dlg_priority.grb_global.setVisible(False)
-            else:
-                if config.getboolean(dialog_type, "show_config_diameter") is not True:
-                    self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if config.getboolean(dialog_type, "show_config_arc") is not True:
-                    self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
-                if config.getboolean(dialog_type, "show_config_material") is not True:
-                    self.dlg_priority.tab_widget.tab_material.setVisible(False)
-                if config.getboolean(dialog_type, "show_config_engine") is not True:
-                    self.dlg_priority.tab_widget.tab_engine.setVisible(False)
-
-        except Exception as e:
-            print("read_config_file error %s" % e)
-            status = False
-
-        return status
+                self.dlg_priority.lbl_presszone.setVisible(False)
+                self.dlg_priority.cmb_presszone.setVisible(False)
+        if self.config.show_ivi_button is not True:
+            # TODO: next approach
+            pass
+        if self.config.show_config is not True:
+            self.dlg_priority.grb_global.setVisible(False)
+        else:
+            if self.config.show_config_diameter is not True:
+                self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
+            if self.config.show_config_material is not True:
+                self.dlg_priority.tab_widget.tab_material.setVisible(False)
+            if self.config.show_config_engine is not True:
+                self.dlg_priority.tab_widget.tab_engine.setVisible(False)
 
     def _manage_calculate(self):
         dlg = self.dlg_priority
