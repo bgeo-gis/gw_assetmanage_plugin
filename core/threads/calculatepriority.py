@@ -119,27 +119,7 @@ class GwCalculatePriority(GwTask):
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
-    def _run_sh(self):
-        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
-        self.setProgress(0)
-
-        discount_rate = float(self.config_engine["drate"])
-        break_growth_rate = float(self.config_engine["bratemain0"])
-
-        last_leak_year = tools_db.get_rows(
-            """
-            select max(year) from (select 
-                date_part('year', "date") as year
-                FROM asset.leaks) years
-            """
-        )[0][0]
-
-        if self.isCanceled():
-            self._emit_report(self.msg_task_canceled)
-            return False
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
-        self.setProgress(20)
-
+    def _get_arcs(self):
         sql = """
             select a.arc_id,
                 a.matcat_id,
@@ -165,7 +145,30 @@ class GwCalculatePriority(GwTask):
             filters.append(f"a.matcat_id = '{self.material}'")
         if filters:
             sql += f"where {' and '.join(filters)}"
-        arcs = tools_db.get_rows(sql)
+        return tools_db.get_rows(sql)
+
+    def _run_sh(self):
+        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
+        self.setProgress(0)
+
+        discount_rate = float(self.config_engine["drate"])
+        break_growth_rate = float(self.config_engine["bratemain0"])
+
+        last_leak_year = tools_db.get_rows(
+            """
+            select max(year) from (select 
+                date_part('year', "date") as year
+                FROM asset.leaks) years
+            """
+        )[0][0]
+
+        if self.isCanceled():
+            self._emit_report(self.msg_task_canceled)
+            return False
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
+        self.setProgress(20)
+
+        arcs = self._get_arcs()
         if not arcs:
             self._emit_report(
                 self._tr("Task canceled:"),
@@ -581,6 +584,28 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+        # For each arc in the filter:
+        #   - Define its mleak by config_material (pleak)
+        #   - Define longevity by combine builtdate, pressure
+        #     and data from config_material (use default builtdate for missing data)
+        #   - Define nrw (in m3/km.day)
+        #   - Define cost of construction
+        # Normalize (0 for min, 10 for max):
+        #   - rleak
+        #   - mleak
+        #   - longevity
+        #   - flow (how to take in account ficticious flows?)
+        #   - nrw (0 for 2 m3/km.day and 10 for 20 m3/km.day)
+        #   - strategic
+        #   - compliance
+        # Weight sum of the parameters (first iteration)
+        # Order by total val, with cumulative sum of cost
+        # Discard pipes after budget
+        # ??? Normalize parameters again ???
+        # Weight sum of the parameters (second iteration)
+        # Order by total val, with cumulative sum of cost
+        # ??? How to calculate IVI ???
+        # Save results to DB
         pass
 
     def _tr(self, msg):
