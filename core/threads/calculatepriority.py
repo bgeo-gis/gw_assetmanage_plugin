@@ -1,4 +1,5 @@
 import configparser
+import traceback
 from math import log, log1p, exp
 from pathlib import Path
 
@@ -113,7 +114,7 @@ class GwCalculatePriority(GwTask):
                 )
 
         except Exception as e:
-            self._emit_report(f"Error: {e}")
+            self._emit_report(traceback.format_exc())
             return False
 
     def _emit_report(self, *args):
