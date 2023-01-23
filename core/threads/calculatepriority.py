@@ -135,7 +135,9 @@ class GwCalculatePriority(GwTask):
         elif self.method == "WM":
             columns = """
                 a.arc_id,
-                a.matcat_id
+                a.matcat_id,
+                a.dnom,
+                st_length(a.the_geom) length
             """
 
         filter_list = []
@@ -610,7 +612,23 @@ class GwCalculatePriority(GwTask):
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
+            if (
+                arc["dnom"] is None
+                or int(arc["dnom"]) <= 0
+                or int(arc["dnom"]) > max(self.config_diameter.keys())
+            ):
+                continue
+            if arc["length"] is None:
+                continue
+
             arc["mleak"] = self.config_material[arc["matcat_id"]]["pleak"]
+
+            reference_dnom = get_min_greater_than(
+                self.config_diameter.keys(), int(arc["dnom"])
+            )
+            cost_by_meter = self.config_diameter[reference_dnom]["cost_constr"]
+            arc["cost_constr"] = cost_by_meter * float(arc["length"])
+
             arcs.append(arc)
 
         # For each arc in the filter:
