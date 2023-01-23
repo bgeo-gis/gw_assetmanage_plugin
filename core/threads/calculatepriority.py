@@ -144,7 +144,7 @@ class GwCalculatePriority(GwTask):
         if self.presszone:
             filter_list.append(f"a.presszone_id = '{self.presszone}'")
         if self.diameter:
-            filter_list.append(f"a.dnom = {self.diameter}")
+            filter_list.append(f"a.dnom = '{self.diameter}'")
         if self.material:
             filter_list.append(f"a.matcat_id = '{self.material}'")
         filters = f"where {' and '.join(filter_list)}" if filter_list else ""
@@ -155,7 +155,6 @@ class GwCalculatePriority(GwTask):
             left join asset.arc_input ai using (arc_id)
             {filters}
         """
-        print(sql)
         return tools_db.get_rows(sql)
 
     def _run_sh(self):

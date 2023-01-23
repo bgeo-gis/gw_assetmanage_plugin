@@ -677,7 +677,7 @@ class CalculatePriority:
 
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection") or None
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone") or None
-        diameter = tools_qt.get_combo_value(dlg, "cmb_dnom") or None
+        diameter = f'{tools_qt.get_combo_value(dlg, "cmb_dnom"):g}' or None
         material = tools_qt.get_combo_value(dlg, "cmb_material") or None
 
         config_diameter = {}
