@@ -120,8 +120,9 @@ class GwCalculatePriority(GwTask):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
     def _get_arcs(self):
-        sql = """
-            select a.arc_id,
+        if self.method == "SH":
+            columns = """
+                a.arc_id,
                 a.matcat_id,
                 a.dnom,
                 st_length(a.the_geom) length,
@@ -129,22 +130,32 @@ class GwCalculatePriority(GwTask):
                 a.expl_id,
                 a.presszone_id,
                 ai.strategic
+            """
+        elif self.method == "WM":
+            columns = """
+                a.arc_id
+            """
+
+        filter_list = []
+        if self.features:
+            filter_list.append(f"""a.arc_id in ('{"','".join(self.features)}')""")
+        if self.exploitation:
+            filter_list.append(f"a.expl_id = {self.exploitation}")
+        if self.presszone:
+            filter_list.append(f"a.presszone_id = '{self.presszone}'")
+        if self.diameter:
+            filter_list.append(f"a.dnom = {self.diameter}")
+        if self.material:
+            filter_list.append(f"a.matcat_id = '{self.material}'")
+        filters = f"where {' and '.join(filter_list)}" if filter_list else ""
+
+        sql = f"""
+            select {columns}
             from asset.arc_asset a 
             left join asset.arc_input ai using (arc_id)
+            {filters}
         """
-        filters = []
-        if self.features:
-            filters.append(f"""a.arc_id in ('{"','".join(self.features)}')""")
-        if self.exploitation:
-            filters.append(f"a.expl_id = {self.exploitation}")
-        if self.presszone:
-            filters.append(f"a.presszone_id = '{self.presszone}'")
-        if self.diameter:
-            filters.append(f"a.dnom = {self.diameter}")
-        if self.material:
-            filters.append(f"a.matcat_id = '{self.material}'")
-        if filters:
-            sql += f"where {' and '.join(filters)}"
+        print(sql)
         return tools_db.get_rows(sql)
 
     def _run_sh(self):
