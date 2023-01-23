@@ -134,7 +134,8 @@ class GwCalculatePriority(GwTask):
             """
         elif self.method == "WM":
             columns = """
-                a.arc_id
+                a.arc_id,
+                a.matcat_id
             """
 
         filter_list = []
@@ -595,8 +596,24 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+        self._emit_report(self._tr("Getting pipe data from DB") + " (1/n)...")
+        self.setProgress(10)
+
+        rows = self._get_arcs()
+        if not rows:
+            self._emit_report(
+                self._tr("Task canceled:"),
+                self._tr("No pipes found matching your selected filters."),
+            )
+            return False
+        arcs = []
+        for row in rows:
+            # Convert arc from psycopg2.extras.DictRow to OrderedDict
+            arc = row.copy()
+            arc["mleak"] = self.config_material[arc["matcat_id"]]["pleak"]
+            arcs.append(arc)
+
         # For each arc in the filter:
-        #   - Define its mleak by config_material (pleak)
         #   - Define longevity by combine builtdate, pressure
         #     and data from config_material (use default builtdate for missing data)
         #   - Define nrw (in m3/km.day)
