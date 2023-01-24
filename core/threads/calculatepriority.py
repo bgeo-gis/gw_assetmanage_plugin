@@ -140,8 +140,8 @@ class GwCalculatePriority(GwTask):
                 a.dnom,
                 st_length(a.the_geom) length,
                 a.builtdate,
-                coalesce(a.staticpress1, 0) staticpress1,
-                coalesce(a.staticpress2, 0) staticpress2
+                press1,
+                press2
             """
 
         filter_list = []
@@ -638,7 +638,13 @@ class GwCalculatePriority(GwTask):
             builtdate = arc["builtdate"] or date(
                 config_material["builtdate_vdef"], 1, 1
             )
-            pression = (arc["staticpress1"] + arc["staticpress2"]) / 2
+            pression = (
+                arc["press1"]
+                if arc["press2"] is None
+                else arc["press2"]
+                if arc["press1"] is None
+                else (arc["press1"] + arc["press2"]) / 2
+            )
             age = (
                 "age_max"
                 if pression < 50

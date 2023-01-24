@@ -252,22 +252,24 @@ CREATE TABLE asset.cat_mat_arc AS
   WHERE (cat_mat_arc.active = true);
 
 CREATE TABLE asset.arc_asset AS
- SELECT vu_arc.arc_id,
-    vu_arc.sector_id,
-    vu_arc.macrosector_id,
-    vu_arc.presszone_id,
-    vu_arc.builtdate,
-    vu_arc.cat_dnom AS dnom,
-    vu_arc.cat_matcat_id AS matcat_id,
-    vu_arc.pavcat_id,
-    vu_arc.function_type,
-    vu_arc.the_geom,
-    vu_arc.code,
-    vu_arc.expl_id,
-    vu_arc.dma_id,
-    vu_arc.staticpress1,
-    vu_arc.staticpress2
-   FROM PARENT_SCHEMA.vu_arc;
+ SELECT a.arc_id,
+    a.sector_id,
+    a.macrosector_id,
+    a.presszone_id,
+    a.builtdate,
+    a.cat_dnom AS dnom,
+    a.cat_matcat_id AS matcat_id,
+    a.pavcat_id,
+    a.function_type,
+    a.the_geom,
+    a.code,
+    a.expl_id,
+    a.dma_id,
+    n1.press_avg AS press1,
+    n2.press_avg AS press2
+   FROM PARENT_SCHEMA.vu_arc AS a
+   JOIN PARENT_SCHEMA.vu_node AS n1 ON (a.node_1 = n1.node_id)
+   JOIN PARENT_SCHEMA.vu_node AS n2 ON (a.node_2 = n2.node_id);
 
 --
 -- VIEWS:
