@@ -714,11 +714,14 @@ class GwCalculatePriority(GwTask):
                 else self._fit_to_scale(arc["nrw"], 2, 20)
             )
             arc["val_strategic"] = 10 if arc["strategic"] else 0
+            arc["val_compliance"] = 10 - min(
+                config_material["compliance"],
+                self.config_diameter[reference_dnom]["compliance"],
+            )
 
         pprint(arcs[0])
         # Normalize (0 for min, 10 for max):
         #   - flow (how to take in account ficticious flows?)
-        #   - compliance
         # Weight sum of the parameters (first iteration)
         # Order by total val, with cumulative sum of cost
         # Discard pipes after budget
