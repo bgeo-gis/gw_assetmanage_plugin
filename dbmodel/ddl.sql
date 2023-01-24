@@ -280,7 +280,8 @@ CREATE TABLE asset.arc_asset AS
     a.expl_id,
     a.dma_id,
     n1.press_avg AS press1,
-    n2.press_avg AS press2
+    n2.press_avg AS press2,
+    a.flow_avg
    FROM PARENT_SCHEMA.vu_arc AS a
    JOIN PARENT_SCHEMA.vu_node AS n1 ON (a.node_1 = n1.node_id)
    JOIN PARENT_SCHEMA.vu_node AS n2 ON (a.node_2 = n2.node_id);

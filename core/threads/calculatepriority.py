@@ -1,4 +1,5 @@
 import configparser
+from pprint import pprint
 import traceback
 from datetime import date, timedelta
 from math import log, log1p, exp
@@ -121,6 +122,12 @@ class GwCalculatePriority(GwTask):
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
+    def _fit_to_scale(self, value, min, max):
+        """Fit a value to a 0 to 10 scale, where min is the zero and max is ten."""
+        if min == max:
+            return 10
+        return (value - min) * 10 / (max - min)
+
     def _get_arcs(self):
         if self.method == "SH":
             columns = """
@@ -139,10 +146,13 @@ class GwCalculatePriority(GwTask):
                 a.matcat_id,
                 a.dnom,
                 st_length(a.the_geom) length,
+                coalesce(ai.rleak, 0) rleak,
                 a.builtdate,
                 a.press1,
                 a.press2,
-                a.dma_id
+                coalesce(a.flow_avg, 0) flow_avg,
+                a.dma_id,
+                ai.strategic
             """
 
         filter_list = []
@@ -677,14 +687,37 @@ class GwCalculatePriority(GwTask):
 
             arcs.append(arc)
 
-        print(arcs[0])
+        min_rleak = min(arc["rleak"] for arc in arcs)
+        max_rleak = max(arc["rleak"] for arc in arcs)
+
+        min_mleak = min(arc["mleak"] for arc in arcs)
+        max_mleak = max(arc["mleak"] for arc in arcs)
+
+        min_longevity = min(arc["longevity"] for arc in arcs)
+        max_longevity = max(arc["longevity"] for arc in arcs)
+
+        min_flow = min(arc["flow_avg"] for arc in arcs)
+        max_flow = max(arc["flow_avg"] for arc in arcs)
+
+        for arc in arcs:
+            arc["val_rleak"] = self._fit_to_scale(arc["rleak"], min_rleak, max_rleak)
+            arc["val_mleak"] = self._fit_to_scale(arc["mleak"], min_mleak, max_mleak)
+            arc["val_longevity"] = self._fit_to_scale(
+                arc["longevity"], min_longevity, max_longevity
+            )
+            arc["val_flow"] = self._fit_to_scale(arc["flow_avg"], min_flow, max_flow)
+            arc["val_nrw"] = (
+                0
+                if arc["nrw"] < 2
+                else 10
+                if arc["nrw"] > 20
+                else self._fit_to_scale(arc["nrw"], 2, 20)
+            )
+            arc["val_strategic"] = 10 if arc["strategic"] else 0
+
+        pprint(arcs[0])
         # Normalize (0 for min, 10 for max):
-        #   - rleak
-        #   - mleak
-        #   - longevity
         #   - flow (how to take in account ficticious flows?)
-        #   - nrw (0 for 2 m3/km.day and 10 for 20 m3/km.day)
-        #   - strategic
         #   - compliance
         # Weight sum of the parameters (first iteration)
         # Order by total val, with cumulative sum of cost
