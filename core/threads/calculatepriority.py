@@ -126,7 +126,7 @@ class GwCalculatePriority(GwTask):
         """Fit a value to a 0 to 10 scale, where min is the zero and max is ten."""
         if min == max:
             return 10
-        return (value - min) * 10 / (max - min)
+        return float((value - min) * 10 / (max - min))
 
     def _get_arcs(self):
         if self.method == "SH":
@@ -717,6 +717,25 @@ class GwCalculatePriority(GwTask):
             arc["val_compliance"] = 10 - min(
                 config_material["compliance"],
                 self.config_diameter[reference_dnom]["compliance"],
+            )
+
+            arc["val_1"] = (
+                arc["val_rleak"] * self.config_engine["rleak_1"]
+                + arc["val_mleak"] * self.config_engine["mleak_1"]
+                + arc["val_longevity"] * self.config_engine["longevity_1"]
+                + arc["val_flow"] * self.config_engine["flow_1"]
+                + arc["val_nrw"] * self.config_engine["nrw_1"]
+                + arc["val_strategic"] * self.config_engine["strategic_1"]
+                + arc["val_compliance"] * self.config_engine["compliance_1"]
+            )
+            arc["val_2"] = (
+                arc["val_rleak"] * self.config_engine["rleak_2"]
+                + arc["val_mleak"] * self.config_engine["mleak_2"]
+                + arc["val_longevity"] * self.config_engine["longevity_2"]
+                + arc["val_flow"] * self.config_engine["flow_2"]
+                + arc["val_nrw"] * self.config_engine["nrw_2"]
+                + arc["val_strategic"] * self.config_engine["strategic_2"]
+                + arc["val_compliance"] * self.config_engine["compliance_2"]
             )
 
         pprint(arcs[0])
