@@ -245,7 +245,7 @@ class CalculatePriority:
         self.dlg_priority.executing = False
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority, dlg_name="priority")
+        tools_gw.open_dialog(self.dlg_priority, dlg_name="priority", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _add_total(self, lyt):
         lbl = QLabel()

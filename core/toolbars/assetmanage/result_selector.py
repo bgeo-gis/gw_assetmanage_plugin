@@ -31,7 +31,7 @@ class ResultSelector(dialog.GwAction):
             return
         self._update_descriptions()
         self._set_signals()
-        tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection")
+        tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _fill_combos(self):
         # TODO: Check for connection

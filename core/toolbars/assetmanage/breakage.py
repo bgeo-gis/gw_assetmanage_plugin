@@ -135,7 +135,7 @@ class AmBreakage(dialog.GwAction):
         self._set_assignation_signals()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_assignation, dlg_name="assignation")
+        tools_gw.open_dialog(self.dlg_assignation, dlg_name="assignation", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _manage_hidden_form_leaks(self):
 

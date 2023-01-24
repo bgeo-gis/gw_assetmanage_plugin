@@ -71,7 +71,7 @@ class ResultManager(dialog.GwAction):
         self.dlg_priority_manager.btn_duplicate.hide()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager")
+        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _delete_result(self):
         table = self.dlg_priority_manager.tbl_results
@@ -217,7 +217,7 @@ class ResultManager(dialog.GwAction):
         )
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
-        tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector")
+        tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager
