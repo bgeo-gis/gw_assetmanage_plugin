@@ -217,6 +217,22 @@
 			<translation>Por favor introduzca un número entero válido para el número de años.</translation>
 		</message>
 		<message>
+			<source>First iteration</source>
+			<translation>Primera iteración</translation>
+		</message>
+		<message>
+			<source>Second iteration</source>
+			<translation>Segunda iteración</translation>
+		</message>
+		<message>
+			<source>Weights</source>
+			<translation>Pesos</translation>
+		</message>
+		<message>
+			<source>Shamir-Howard parameters</source>
+			<translation>Parámetros de Shamir-Howard</translation>
+		</message>
+		<message>
 			<source>No pipes found matching your selected filters.</source>
 			<translation>No se han encontrado tuberías que coincidan con los filtros seleccionados.</translation>
 		</message>
@@ -266,6 +282,22 @@
 			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
+			<source>lbl_buffer</source>
+			<translation>Distancia de buffer:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_max_distance</source>
+			<translation>Distancia máxima:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_cluster_length</source>
 			<translation>Distancia del cluster:</translation>
 		</message>
@@ -303,22 +335,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Distancia de buffer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distancia máxima:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -374,22 +390,6 @@
 		</message>
 		<message>
 			<source>tooltip_tab_diameter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_sh</source>
-			<translation>Parámetros de Shamir-Howard</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_sh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_weights</source>
-			<translation>Pesos</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_weights</source>
 			<translation>None</translation>
 		</message>
 		<message>
