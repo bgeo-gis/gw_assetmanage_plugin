@@ -140,8 +140,9 @@ class GwCalculatePriority(GwTask):
                 a.dnom,
                 st_length(a.the_geom) length,
                 a.builtdate,
-                press1,
-                press2
+                a.press1,
+                a.press2,
+                a.dma_id
             """
 
         filter_list = []
@@ -602,6 +603,21 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+        rows = tools_db.get_rows(
+            """
+            with lengths AS (
+                select a.dma_id, sum(st_length(a.the_geom)) as length 
+                from asset.arc_asset a
+                group by dma_id
+            )
+            select d.dma_id, (d.nrw / d.days / l.length * 1000) as nrw_m3kmd
+            from asset.dma_nrw as d
+            join lengths as l using (dma_id)
+            """
+        )
+
+        nrw = {row["dma_id"]: row["nrw_m3kmd"] for row in rows}
+
         self._emit_report(self._tr("Getting pipe data from DB") + " (1/n)...")
         self.setProgress(10)
 
@@ -657,11 +673,11 @@ class GwCalculatePriority(GwTask):
             remaining_years = builtdate + duration - date.today()
             arc["longevity"] = remaining_years / one_year
 
+            arc["nrw"] = nrw.get(arc["dma_id"], 0)
+
             arcs.append(arc)
 
         print(arcs[0])
-        # For each arc in the filter:
-        #   - Define nrw (in m3/km.day)
         # Normalize (0 for min, 10 for max):
         #   - rleak
         #   - mleak

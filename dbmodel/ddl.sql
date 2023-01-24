@@ -15,6 +15,13 @@ CREATE TABLE asset.leaks (
     CONSTRAINT leaks_pkey PRIMARY KEY (id)
 );
 
+CREATE TABLE asset.dma_nrw (
+    dma_id integer,
+    nrw numeric(12,3),
+    "days" integer,
+    CONSTRAINT dma_nrw_pkey PRIMARY KEY (dma_id)
+);
+
 CREATE TABLE asset.arc_input (
     arc_id character varying(60) NOT NULL,
     longevity numeric(12,3),
@@ -238,6 +245,13 @@ CREATE TABLE asset.sector AS
     sector.macrosector_id,
     sector.the_geom
    FROM PARENT_SCHEMA.sector;
+
+CREATE TABLE asset.dma AS
+ SELECT dma.dma_id,
+    dma.name,
+    dma.macrodma_id,
+    dma.the_geom
+   FROM PARENT_SCHEMA.dma;
 
 CREATE TABLE asset.presszone AS
  SELECT presszone.presszone_id,
