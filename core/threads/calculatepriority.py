@@ -1,5 +1,6 @@
 import configparser
 import traceback
+from datetime import date, timedelta
 from math import log, log1p, exp
 from pathlib import Path
 
@@ -137,7 +138,10 @@ class GwCalculatePriority(GwTask):
                 a.arc_id,
                 a.matcat_id,
                 a.dnom,
-                st_length(a.the_geom) length
+                st_length(a.the_geom) length,
+                a.builtdate,
+                coalesce(a.staticpress1, 0) staticpress1,
+                coalesce(a.staticpress2, 0) staticpress2
             """
 
         filter_list = []
@@ -621,7 +625,9 @@ class GwCalculatePriority(GwTask):
             if arc["length"] is None:
                 continue
 
-            arc["mleak"] = self.config_material[arc["matcat_id"]]["pleak"]
+            config_material = self.config_material[arc["matcat_id"]]
+
+            arc["mleak"] = config_material["pleak"]
 
             reference_dnom = get_min_greater_than(
                 self.config_diameter.keys(), int(arc["dnom"])
@@ -629,13 +635,27 @@ class GwCalculatePriority(GwTask):
             cost_by_meter = self.config_diameter[reference_dnom]["cost_constr"]
             arc["cost_constr"] = cost_by_meter * float(arc["length"])
 
+            builtdate = arc["builtdate"] or date(
+                config_material["builtdate_vdef"], 1, 1
+            )
+            pression = (arc["staticpress1"] + arc["staticpress2"]) / 2
+            age = (
+                "age_max"
+                if pression < 50
+                else "age_min"
+                if pression > 75
+                else "age_med"
+            )
+            one_year = timedelta(days=365)
+            duration = config_material[age] * one_year
+            remaining_years = builtdate + duration - date.today()
+            arc["longevity"] = remaining_years / one_year
+
             arcs.append(arc)
 
+        print(arcs[0])
         # For each arc in the filter:
-        #   - Define longevity by combine builtdate, pressure
-        #     and data from config_material (use default builtdate for missing data)
         #   - Define nrw (in m3/km.day)
-        #   - Define cost of construction
         # Normalize (0 for min, 10 for max):
         #   - rleak
         #   - mleak
