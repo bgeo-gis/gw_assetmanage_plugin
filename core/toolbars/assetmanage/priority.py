@@ -397,6 +397,7 @@ class CalculatePriority:
             presszone,
             diameter,
             material,
+            budget,
             config_diameter,
             config_material,
             config_engine,
@@ -485,7 +486,7 @@ class CalculatePriority:
             presszone,
             diameter,
             material,
-            budget=None,
+            budget,
             target_year=None,
             config_diameter=config_diameter,
             config_material=config_material,
@@ -681,6 +682,16 @@ class CalculatePriority:
         diameter = f'{diameter:g}' if diameter else None
         material = tools_qt.get_combo_value(dlg, "cmb_material") or None
 
+        try:
+            budget = float(dlg.txt_budget.text())
+        except ValueError:
+            if self.method == "SH":
+                budget = None
+            else:
+                message = "Please enter a valid number for the budget."
+                tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
+                return
+
         config_diameter = {}
         for row in table2data(self.qtbl_diameter):
             if not row["dnom"]:
@@ -761,6 +772,7 @@ class CalculatePriority:
             presszone,
             diameter,
             material,
+            budget,
             config_diameter,
             config_material,
             config_engine,

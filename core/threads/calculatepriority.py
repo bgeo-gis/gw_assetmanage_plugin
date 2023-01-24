@@ -738,15 +738,29 @@ class GwCalculatePriority(GwTask):
                 + arc["val_compliance"] * self.config_engine["compliance_2"]
             )
 
+        # First iteration
+        arcs.sort(key=lambda x: x["val_1"], reverse=True)
+        cum_cost_constr = 0
+        second_iteration = []
+        for arc in arcs:
+            cum_cost_constr += arc["cost_constr"]
+            if cum_cost_constr > self.result_budget:
+                break
+            second_iteration.append(arc)
+
+        # Second iteration
+        second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
+        cum_cost_constr = 0
+        for arc in second_iteration:
+            cum_cost_constr += arc["cost_constr"]
+            arc["cum_cost_constr"] = cum_cost_constr
+
         pprint(arcs[0])
         # Normalize (0 for min, 10 for max):
         #   - flow (how to take in account ficticious flows?)
-        # Weight sum of the parameters (first iteration)
-        # Order by total val, with cumulative sum of cost
-        # Discard pipes after budget
+        # (first iteration)
         # ??? Normalize parameters again ???
-        # Weight sum of the parameters (second iteration)
-        # Order by total val, with cumulative sum of cost
+        # (second iteration)
         # ??? How to calculate IVI ???
         # Save results to DB
         pass
