@@ -685,7 +685,7 @@ class CalculatePriority:
         try:
             budget = float(dlg.txt_budget.text())
         except ValueError:
-            if self.method == "SH":
+            if self.config.method == "SH":
                 budget = None
             else:
                 message = "Please enter a valid number for the budget."
