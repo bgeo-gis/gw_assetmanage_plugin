@@ -152,7 +152,8 @@ class GwCalculatePriority(GwTask):
                 a.press2,
                 coalesce(a.flow_avg, 0) flow_avg,
                 a.dma_id,
-                ai.strategic
+                ai.strategic,
+                coalesce(ai.mandatory, false) mandatory
             """
 
         filter_list = []
@@ -662,6 +663,7 @@ class GwCalculatePriority(GwTask):
 
         # First iteration
         arcs.sort(key=lambda x: x["val_1"], reverse=True)
+        arcs.sort(key=lambda x: x["mandatory"], reverse=True)
         cum_cost_constr = 0
         second_iteration = []
         for arc in arcs:
@@ -672,6 +674,7 @@ class GwCalculatePriority(GwTask):
 
         # Second iteration
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
+        second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
         cum_cost_constr = 0
         for arc in second_iteration:
             cum_cost_constr += arc["cost_constr"]
