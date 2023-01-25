@@ -536,6 +536,9 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/n)...")
+        self.setProgress(10)
+
         rows = tools_db.get_rows(
             """
             with lengths AS (
@@ -551,8 +554,12 @@ class GwCalculatePriority(GwTask):
 
         nrw = {row["dma_id"]: row["nrw_m3kmd"] for row in rows}
 
-        self._emit_report(self._tr("Getting pipe data from DB") + " (1/n)...")
-        self.setProgress(10)
+        if self.isCanceled():
+            self._emit_report(self.msg_task_canceled)
+            return False
+
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/n)...")
+        self.setProgress(20)
 
         rows = self._get_arcs()
         if not rows:
@@ -561,6 +568,14 @@ class GwCalculatePriority(GwTask):
                 self._tr("No pipes found matching your selected filters."),
             )
             return False
+
+        if self.isCanceled():
+            self._emit_report(self.msg_task_canceled)
+            return False
+
+        self._emit_report(self._tr("Calculating values") + " (3/n)...")
+        self.setProgress(30)
+
         arcs = []
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
@@ -689,7 +704,13 @@ class GwCalculatePriority(GwTask):
         # ??? Normalize parameters again ???
         # (second iteration)
         # ??? How to calculate IVI ???
-        # Save results to DB
+
+        if self.isCanceled():
+            self._emit_report(self.msg_task_canceled)
+            return False
+
+        self._emit_report(self._tr("Updating tables") + " (4/n)...")
+        self.setProgress(40)
 
         self.result_id = self._save_result_info()
         if not self.result_id:
@@ -750,7 +771,7 @@ class GwCalculatePriority(GwTask):
             save_arcs_sql = save_arcs_sql.strip()[:-1]
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
-            progress = (76 - 72) / len(second_iteration) * 1000 * loop + 72
+            progress = (70 - 40) / len(second_iteration) * 1000 * loop + 40
             self.setProgress(progress)
 
         # Saving to asset.arc_output
@@ -795,9 +816,12 @@ class GwCalculatePriority(GwTask):
             save_arcs_sql = save_arcs_sql.strip()[:-1]
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
-            progress = (76 - 72) / len(second_iteration) * 1000 * loop + 72
+            progress = (100 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
 
+        # TODO: Reports (invalid materials and diameters, etc.)
+        
+        self._emit_report(self._tr("Task finished!"))
         return True
 
     def _save_config_diameter(self):
