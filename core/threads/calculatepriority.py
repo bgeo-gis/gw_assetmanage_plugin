@@ -319,103 +319,25 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/5)...")
         self.setProgress(60)
 
-        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql)
-        print(f"RESULT_ID 11 -> {result_id}")
-        if result_id is not None:
-            self._emit_report(
-                self._tr("Result name already in use, please choose a different name.")
-            )
+        self.result_id = self._save_result_info()
+
+        if not self.result_id:
             return False
 
-        str_features = (
-            f"""ARRAY['{"','".join(self.features)}']""" if self.features else "NULL"
-        )
-        str_presszone_id = f"'{self.presszone}'" if self.presszone else "NULL"
-        str_material_id = f"'{self.material}'" if self.material else "NULL"
-        tools_db.execute_sql(
-            f"""
-            insert into asset.cat_result (result_name, 
-                result_type, 
-                descript,
-                status,
-                features,
-                expl_id,
-                presszone_id,
-                dnom,
-                material_id,
-                budget,
-                target_year,
-                cur_user,
-                tstamp)
-            values ('{self.result_name}',
-                '{self.result_type}',
-                '{self.result_description}',
-                '{self.status}',
-                {str_features},
-                {self.exploitation or 'NULL'},
-                {str_presszone_id},
-                {self.diameter or 'NULL'},
-                {str_material_id},
-                NULL,
-                NULL,
-                current_user,
-                now())
-            """
-        )
-
-        self.setProgress(63)
-
-        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql)[0]
-
-        config_diameter_fields = list(self.config_diameter.values())[0].keys()
-        save_config_diameter_sql = f"""
-            delete from asset.config_diameter where result_id = {result_id};
-            insert into asset.config_diameter 
-                (result_id, dnom, {','.join(config_diameter_fields)})
-            values
-        """
-        for dnom, fields in self.config_diameter.items():
-            save_config_diameter_sql += f"""
-                ({result_id},{dnom},{','.join([str(fields[x]) for x in config_diameter_fields])}),
-            """
-        save_config_diameter_sql = save_config_diameter_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_diameter_sql)
+        self._save_config_diameter()
 
         self.setProgress(66)
 
-        config_material_fields = list(self.config_material.values())[0].keys()
-        save_config_material_sql = f"""
-            delete from asset.config_material where result_id = {result_id};
-            insert into asset.config_material 
-                (result_id, material, {','.join(config_material_fields)})
-            values
-        """
-        for material, fields in self.config_material.items():
-            save_config_material_sql += f"""
-                ({result_id},'{material}',{','.join([str(fields[x]) for x in config_material_fields])}),
-            """
-        save_config_material_sql = save_config_material_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_material_sql)
+        self._save_config_material()
 
         self.setProgress(69)
 
-        save_config_engine_sql = f"""
-            delete from asset.config_engine where result_id = {result_id};
-            insert into asset.config_engine
-                (result_id, parameter, value)
-            values
-        """
-        for k, v in self.config_engine.items():
-            save_config_engine_sql += f"({result_id}, '{k}', {v}),"
-        save_config_engine_sql = save_config_engine_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_engine_sql)
+        self._save_config_engine()
 
         self.setProgress(72)
 
         tools_db.execute_sql(
-            f"delete from asset.arc_engine_sh where result_id = {result_id};"
+            f"delete from asset.arc_engine_sh where result_id = {self.result_id};"
         )
         index = 0
         loop = 0
@@ -450,7 +372,7 @@ class GwCalculatePriority(GwTask):
                     ) = output_arcs[index]
                     save_arcs_sql += f"""
                         ({arc_id},
-                        {result_id},
+                        {self.result_id},
                         {cost_repmain},
                         {cost_constr},
                         {break_growth_rate},
@@ -473,7 +395,7 @@ class GwCalculatePriority(GwTask):
         tools_db.execute_sql(
             f"""
             delete from asset.arc_output
-                where result_id = {result_id};
+                where result_id = {self.result_id};
             insert into asset.arc_output (arc_id,
                     result_id,
                     val,
@@ -501,7 +423,7 @@ class GwCalculatePriority(GwTask):
                 from asset.arc_engine_sh sh
                 left join asset.arc_input i using (arc_id)
                 left join asset.arc_asset a using (arc_id)
-                where sh.result_id = {result_id}
+                where sh.result_id = {self.result_id}
                 order by total;
             """
         )
@@ -521,7 +443,7 @@ class GwCalculatePriority(GwTask):
                 or dnom::numeric > (
                     select max(dnom)
                     from asset.config_diameter
-                    where result_id = {result_id}
+                    where result_id = {self.result_id}
                 )
             """
         )[0]
@@ -539,7 +461,7 @@ class GwCalculatePriority(GwTask):
                         or dnom::numeric > (
                             select max(dnom)
                             from asset.config_diameter
-                            where result_id = {result_id}
+                            where result_id = {self.result_id}
                         )
                     """
                 )
@@ -554,7 +476,7 @@ class GwCalculatePriority(GwTask):
                 from asset.config_material
                 where 
                     material = a.matcat_id
-                    and result_id = {result_id}
+                    and result_id = {self.result_id}
             )
             """
         )[0]
@@ -572,7 +494,7 @@ class GwCalculatePriority(GwTask):
                         from asset.config_material
                         where 
                             material = a.matcat_id
-                            and result_id = {result_id}
+                            and result_id = {self.result_id}
                     )
                     """
                 )
@@ -755,7 +677,6 @@ class GwCalculatePriority(GwTask):
             cum_cost_constr += arc["cost_constr"]
             arc["cum_cost_constr"] = cum_cost_constr
 
-        pprint(arcs[0])
         # Normalize (0 for min, 10 for max):
         #   - flow (how to take in account ficticious flows?)
         # (first iteration)
@@ -763,7 +684,110 @@ class GwCalculatePriority(GwTask):
         # (second iteration)
         # ??? How to calculate IVI ???
         # Save results to DB
-        pass
+
+        self.result_id = self._save_result_info()
+        if not self.result_id:
+            return False
+
+        self._save_config_diameter()
+        self._save_config_material()
+        self._save_config_engine()
+
+    def _save_config_diameter(self):
+        config_diameter_fields = list(self.config_diameter.values())[0].keys()
+        save_config_diameter_sql = f"""
+            delete from asset.config_diameter where result_id = {self.result_id};
+            insert into asset.config_diameter 
+                (result_id, dnom, {','.join(config_diameter_fields)})
+            values
+        """
+        for dnom, fields in self.config_diameter.items():
+            save_config_diameter_sql += f"""
+                ({self.result_id},
+                {dnom},
+                {','.join([str(fields[x]) for x in config_diameter_fields])}),
+            """
+        save_config_diameter_sql = save_config_diameter_sql.strip()[:-1]
+        tools_db.execute_sql(save_config_diameter_sql)
+
+    def _save_config_engine(self):
+        save_config_engine_sql = f"""
+            delete from asset.config_engine where result_id = {self.result_id};
+            insert into asset.config_engine
+                (result_id, parameter, value)
+            values
+        """
+        for k, v in self.config_engine.items():
+            save_config_engine_sql += f"({self.result_id}, '{k}', {v}),"
+        save_config_engine_sql = save_config_engine_sql.strip()[:-1]
+        tools_db.execute_sql(save_config_engine_sql)
+
+    def _save_config_material(self):
+        config_material_fields = list(self.config_material.values())[0].keys()
+        save_config_material_sql = f"""
+            delete from asset.config_material where result_id = {self.result_id};
+            insert into asset.config_material 
+                (result_id, material, {','.join(config_material_fields)})
+            values
+        """
+        for material, fields in self.config_material.items():
+            save_config_material_sql += f"""
+                ({self.result_id},
+                '{material}',
+                {','.join([str(fields[x]) for x in config_material_fields])}),
+            """
+        save_config_material_sql = save_config_material_sql.strip()[:-1]
+        tools_db.execute_sql(save_config_material_sql)
+
+    def _save_result_info(self):
+        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
+        result_id = tools_db.get_row(sql)
+        print(f"RESULT_ID 11 -> {result_id}")
+        if result_id is not None:
+            self._emit_report(
+                self._tr("Result name already in use, please choose a different name.")
+            )
+            return None
+
+        str_features = (
+            f"""ARRAY['{"','".join(self.features)}']""" if self.features else "NULL"
+        )
+        str_presszone_id = f"'{self.presszone}'" if self.presszone else "NULL"
+        str_material_id = f"'{self.material}'" if self.material else "NULL"
+        tools_db.execute_sql(
+            f"""
+            insert into asset.cat_result (result_name, 
+                result_type, 
+                descript,
+                status,
+                features,
+                expl_id,
+                presszone_id,
+                dnom,
+                material_id,
+                budget,
+                target_year,
+                cur_user,
+                tstamp)
+            values ('{self.result_name}',
+                '{self.result_type}',
+                '{self.result_description}',
+                '{self.status}',
+                {str_features},
+                {self.exploitation or 'NULL'},
+                {str_presszone_id},
+                {self.diameter or 'NULL'},
+                {str_material_id},
+                {self.result_budget or 'NULL'},
+                NULL,
+                current_user,
+                now())
+            """
+        )
+
+        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
+        result_id = tools_db.get_row(sql)[0]
+        return result_id
 
     def _tr(self, msg):
         return tools_qt.tr(msg, context_name=global_vars.plugin_name)
