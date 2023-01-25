@@ -676,9 +676,12 @@ class GwCalculatePriority(GwTask):
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
         cum_cost_constr = 0
+        cum_length = 0
         for arc in second_iteration:
             cum_cost_constr += arc["cost_constr"]
+            cum_length += arc["length"]
             arc["cum_cost_constr"] = cum_cost_constr
+            arc["cum_length"] = cum_length
 
         # Normalize (0 for min, 10 for max):
         #   - flow (how to take in account ficticious flows?)
@@ -695,6 +698,107 @@ class GwCalculatePriority(GwTask):
         self._save_config_diameter()
         self._save_config_material()
         self._save_config_engine()
+
+        tools_db.execute_sql(
+            f"""
+            delete from asset.arc_engine_wm where result_id = {self.result_id};
+            delete from asset.arc_output where result_id = {self.result_id};
+            """
+        )
+
+        # Saving to asset.arc_engine_wm
+        index = 0
+        loop = 0
+        ended = False
+        while not ended:
+            save_arcs_sql = f"""
+                insert into asset.arc_engine_wm (
+                    arc_id,
+                    result_id,
+                    rleak,
+                    longevity,
+                    pressure,
+                    flow,
+                    nrw,
+                    strategic,
+                    compliance,
+                    val_first,
+                    val
+                ) values 
+            """
+            for i in range(1000):
+                try:
+                    arc = second_iteration[index]
+                    save_arcs_sql += f"""
+                        ({arc["arc_id"]},
+                        {self.result_id},
+                        {arc["val_rleak"]},
+                        {arc["val_longevity"]},
+                        NULL,
+                        {arc["val_flow"]},
+                        {arc["val_nrw"]},
+                        {arc["val_strategic"]},
+                        {arc["val_compliance"]},
+                        {arc["val_1"]},
+                        {arc["val_2"]}
+                        ),
+                    """
+                    index += 1
+                except IndexError:
+                    ended = True
+                    break
+            save_arcs_sql = save_arcs_sql.strip()[:-1]
+            tools_db.execute_sql(save_arcs_sql)
+            loop += 1
+            progress = (76 - 72) / len(second_iteration) * 1000 * loop + 72
+            self.setProgress(progress)
+
+        # Saving to asset.arc_output
+        index = 0
+        loop = 0
+        ended = False
+        while not ended:
+            save_arcs_sql = f"""
+                insert into asset.arc_output (
+                    arc_id,
+                    result_id,
+                    val,
+                    mandatory,
+                    orderby,
+                    expected_year,
+                    budget,
+                    total,
+                    length,
+                    cum_length
+                ) values 
+            """
+            for i in range(1000):
+                try:
+                    arc = second_iteration[index]
+                    save_arcs_sql += f"""
+                        ({arc["arc_id"]},
+                        {self.result_id},
+                        {arc["val_2"]},
+                        {arc["mandatory"]},
+                        {index + 1},
+                        {date.today().year + arc["longevity"]},
+                        {arc["cost_constr"]},
+                        {arc["cum_cost_constr"]},
+                        {arc["length"]},
+                        {arc["cum_length"]}
+                        ),
+                    """
+                    index += 1
+                except IndexError:
+                    ended = True
+                    break
+            save_arcs_sql = save_arcs_sql.strip()[:-1]
+            tools_db.execute_sql(save_arcs_sql)
+            loop += 1
+            progress = (76 - 72) / len(second_iteration) * 1000 * loop + 72
+            self.setProgress(progress)
+
+        return True
 
     def _save_config_diameter(self):
         config_diameter_fields = list(self.config_diameter.values())[0].keys()
