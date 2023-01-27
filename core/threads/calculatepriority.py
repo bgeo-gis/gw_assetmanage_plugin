@@ -697,6 +697,14 @@ class GwCalculatePriority(GwTask):
                 break
             second_iteration.append(arc)
 
+        if not len(second_iteration):
+            self._emit_report(
+                self._tr("Task canceled:"),
+                # message (yet to translate)
+                self._tr("No pipes found matching your budget."),
+            )
+            return False
+
         # Second iteration
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
@@ -725,7 +733,7 @@ class GwCalculatePriority(GwTask):
         self.result_id = self._save_result_info()
         if not self.result_id:
             return False
-
+            
         self._save_config_diameter()
         self._save_config_material()
         self._save_config_engine()
