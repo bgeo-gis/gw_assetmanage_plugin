@@ -35,7 +35,7 @@ class GwAssignation(GwTask):
         config_path = Path(global_vars.plugin_dir) / "config" / "config.config"
         config = configparser.ConfigParser()
         config.read(config_path)
-        self.unknown_material = config.get("dialog_leaks", "unknown_material")
+        self.unknown_material = config.get("general", "unknown_material")
 
         self.msg_task_canceled = self._tr("Task canceled.")
 

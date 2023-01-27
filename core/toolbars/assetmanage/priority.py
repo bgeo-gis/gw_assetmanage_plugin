@@ -105,6 +105,7 @@ class CalculatePriorityConfig:
             config.read(config_path)
 
             self.method = config.get("general", "engine_method")
+            self.unknown_material = config.get("general", "unknown_material")
             self.show_budget = config.getboolean(dialog_type, "show_budget")
             self.show_target_year = config.getboolean(dialog_type, "show_target_year")
             self.show_selection = config.getboolean(dialog_type, "show_selection")
@@ -428,6 +429,7 @@ class CalculatePriority:
                 select count(*), coalesce(matcat_id, 'NULL')
                 from asset.arc_asset a
                 where matcat_id not in ('{"','".join(config_material.keys())}')
+                    or matcat_id = '{self.config.unknown_material}'
                     or matcat_id is null
                 group by matcat_id
                 order by matcat_id),
@@ -461,19 +463,19 @@ class CalculatePriority:
                 if not tools_qt.show_question(msg, force_action=True):
                     return
             elif row["check"] == "invalid_materials":
-                msg = (
+                message = (
                     self._tr("Pipes with invalid materials:")
                     + f" {row['qtd']}.\n"
                     + self._tr("Invalid materials:")
                     + f" {row['list']}.\n\n"
                     + self._tr(
                         "A material is considered invalid if it is not listed in the material configuration table. "
-                        "As a result, these pipes will be set as compliant by default, which may affect the priority value."
+                        "As a result, the material of these pipes will be treated as:"
                     )
-                    + "\n\n"
+                    + f" {self.config.unknown_material}\n\n"
                     + self._tr("Do you want to proceed?")
                 )
-                if not tools_qt.show_question(msg, force_action=True):
+                if not tools_qt.show_question(message, force_action=True):
                     return
 
         self.thread = GwCalculatePriority(

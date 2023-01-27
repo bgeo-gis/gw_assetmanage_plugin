@@ -98,6 +98,7 @@ class GwCalculatePriority(GwTask):
         config = configparser.ConfigParser()
         config.read(config_path)
         self.method = config.get("general", "engine_method")
+        self.unknown_material = config.get("general", "unknown_material")
 
         self.msg_task_canceled = self._tr("Task canceled.")
 
@@ -224,6 +225,8 @@ class GwCalculatePriority(GwTask):
                 presszone_id,
                 strategic,
             ) = arc
+            if arc_material not in self.config_material:
+                arc_material = self.unknown_material
             if (
                 arc_diameter is None
                 or int(arc_diameter) <= 0
@@ -589,7 +592,12 @@ class GwCalculatePriority(GwTask):
             if arc["length"] is None:
                 continue
 
-            config_material = self.config_material[arc["matcat_id"]]
+            arc_material = (
+                arc["matcat_id"]
+                if arc["matcat_id"] in self.config_material
+                else self.unknown_material
+            )
+            config_material = self.config_material[arc_material]
 
             arc["mleak"] = config_material["pleak"]
 
@@ -821,7 +829,7 @@ class GwCalculatePriority(GwTask):
             self.setProgress(progress)
 
         # TODO: Reports (invalid materials and diameters, etc.)
-        
+
         self._emit_report(self._tr("Task finished!"))
         return True
 
