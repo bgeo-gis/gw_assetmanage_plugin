@@ -410,6 +410,7 @@ class CalculatePriority:
         ) = inputs
 
         # FIXME: Take into account the unknown material from config.config
+        # FIXME: Add filters to checks
         data_checks = tools_db.get_rows(
             f"""
             with list_invalid_diameters as (
@@ -435,10 +436,18 @@ class CalculatePriority:
                 order by matcat_id),
             invalid_materials as (
                 select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
-                from list_invalid_materials)
+                from list_invalid_materials),
+            list_null_pressures as (
+                select count(*)
+                from asset.arc_asset
+                where press1 is null and press2 is null),
+            null_pressures as (
+                select 'null_pressures', count, null from list_null_pressures)
             select * from invalid_diameters
             union all
             select * from invalid_materials
+            union all
+            select * from null_pressures
             """
         )
 
@@ -473,6 +482,20 @@ class CalculatePriority:
                         "As a result, the material of these pipes will be treated as:"
                     )
                     + f" {self.config.unknown_material}\n\n"
+                    + self._tr("Do you want to proceed?")
+                )
+                if not tools_qt.show_question(message, force_action=True):
+                    return
+            elif row["check"] == "null_pressures":
+                message = (
+                    self._tr("Pipes with invalid pressures:")
+                    + f" {row['qtd']}.\n"
+                    + self._tr(
+                        "These pipes have no pressure information for their nodes. "
+                        "This will result in them receiving the maximum longevity value for their material, "
+                        "which may affect the final priority value."
+                    )
+                    + "\n\n"
                     + self._tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(message, force_action=True):

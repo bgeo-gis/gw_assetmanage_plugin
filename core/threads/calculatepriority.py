@@ -611,13 +611,14 @@ class GwCalculatePriority(GwTask):
                 config_material["builtdate_vdef"], 1, 1
             )
             pression = (
-                arc["press1"]
+                0
+                if arc["press1"] is None and arc["press2"] is None
+                else arc["press1"]
                 if arc["press2"] is None
                 else arc["press2"]
                 if arc["press1"] is None
                 else (arc["press1"] + arc["press2"]) / 2
             )
-            # FIXME: Handle pression is None
             age = (
                 "age_max"
                 if pression < 50
