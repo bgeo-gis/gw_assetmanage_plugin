@@ -245,7 +245,12 @@ class CalculatePriority:
         self.dlg_priority.executing = False
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority, dlg_name="priority", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
+        tools_gw.open_dialog(
+            self.dlg_priority,
+            dlg_name="priority",
+            plugin_dir=global_vars.plugin_dir,
+            plugin_name=global_vars.plugin_name,
+        )
 
     def _add_total(self, lyt):
         lbl = QLabel()
@@ -403,77 +408,73 @@ class CalculatePriority:
             config_engine,
         ) = inputs
 
-        invalid_diameters_count = tools_db.get_row(
-            f"""
-            select count(*)
-            from asset.arc_asset
-            where dnom is null 
-                or dnom::numeric <= 0
-                or dnom::numeric > ({max(config_diameter.keys())})
-            """
-        )[0]
-        if invalid_diameters_count:
-            invalid_diameters = [
-                x[0]
-                for x in tools_db.get_rows(
-                    f"""
-                    select distinct dnom
-                    from asset.arc_asset
-                    where dnom is null 
-                        or dnom::numeric <= 0
-                        or dnom::numeric > ({max(config_diameter.keys())})
-                    """
-                )
-            ]
-            msg = (
-                self._tr("Pipes with invalid diameters:")
-                + f" {invalid_diameters_count}.\n"
-                + self._tr("Invalid diameters:")
-                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.\n\n"
-                + self._tr(
-                    "A diameter value is considered invalid if it is zero, negative, "
-                    "NULL or greater than the maximum diameter in the configuration table. "
-                    "As a result, these pipes will NOT be assigned a priority value."
-                )
-                + "\n\n"
-                + self._tr("Do you want to proceed?")
-            )
-            if not tools_qt.show_question(msg, force_action=True):
-                return
-
         # FIXME: Take into account the unknown material from config.config
-        invalid_materials_count = tools_db.get_row(
+        data_checks = tools_db.get_rows(
             f"""
-            select count(*)
-            from asset.arc_asset a
-            where matcat_id not in ('{"','".join(config_material.keys())}')
+            with list_invalid_diameters as (
+                select count(*), coalesce(dnom, 'NULL')
+                from asset.arc_asset
+                where dnom is null 
+                    or dnom::numeric <= 0
+                    or dnom::numeric > ({max(config_diameter.keys())})
+                group by dnom
+                order by dnom),
+            invalid_diameters as (
+                select 'invalid_diameters' as check,
+                    sum(count) as qtd,
+                    string_agg(coalesce, ', ') as list
+                from list_invalid_diameters),
+            list_invalid_materials AS (
+                select count(*), coalesce(matcat_id, 'NULL')
+                from asset.arc_asset a
+                where matcat_id not in ('{"','".join(config_material.keys())}')
+                    or matcat_id is null
+                group by matcat_id
+                order by matcat_id),
+            invalid_materials as (
+                select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
+                from list_invalid_materials)
+            select * from invalid_diameters
+            union all
+            select * from invalid_materials
             """
-        )[0]
-        if invalid_materials_count:
-            invalid_materials = [
-                x[0]
-                for x in tools_db.get_rows(
-                    f"""
-                    select distinct matcat_id
-                    from asset.arc_asset a
-                    where matcat_id not in ('{"','".join(config_material.keys())}')
-                    """
+        )
+
+        print(data_checks)
+        for row in data_checks:
+            if not row["qtd"]:
+                continue
+            if row["check"] == "invalid_diameters":
+                msg = (
+                    self._tr("Pipes with invalid diameters:")
+                    + f" {row['qtd']}.\n"
+                    + self._tr("Invalid diameters:")
+                    + f" {row['list']}.\n\n"
+                    + self._tr(
+                        "A diameter value is considered invalid if it is zero, negative, "
+                        "NULL or greater than the maximum diameter in the configuration table. "
+                        "As a result, these pipes will NOT be assigned a priority value."
+                    )
+                    + "\n\n"
+                    + self._tr("Do you want to proceed?")
                 )
-            ]
-            msg = (
-                self._tr("Pipes with invalid materials:")
-                + f" {invalid_materials_count}.\n"
-                + self._tr("Invalid materials:")
-                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.\n\n"
-                + self._tr(
-                    "A material is considered invalid if it is not listed in the material configuration table. "
-                    "As a result, these pipes will be set as compliant by default, which may affect the priority value."
+                if not tools_qt.show_question(msg, force_action=True):
+                    return
+            elif row["check"] == "invalid_materials":
+                msg = (
+                    self._tr("Pipes with invalid materials:")
+                    + f" {row['qtd']}.\n"
+                    + self._tr("Invalid materials:")
+                    + f" {row['list']}.\n\n"
+                    + self._tr(
+                        "A material is considered invalid if it is not listed in the material configuration table. "
+                        "As a result, these pipes will be set as compliant by default, which may affect the priority value."
+                    )
+                    + "\n\n"
+                    + self._tr("Do you want to proceed?")
                 )
-                + "\n\n"
-                + self._tr("Do you want to proceed?")
-            )
-            if not tools_qt.show_question(msg, force_action=True):
-                return
+                if not tools_qt.show_question(msg, force_action=True):
+                    return
 
         self.thread = GwCalculatePriority(
             self._tr("Calculate Priority"),
@@ -618,10 +619,14 @@ class CalculatePriority:
 
         if self.config.method == "WM":
             for widget in self._get_weight_widgets("lyt_engine_1"):
-                widget.textChanged.connect(partial(self._update_total_weight, "lyt_engine_1"))
-       
+                widget.textChanged.connect(
+                    partial(self._update_total_weight, "lyt_engine_1")
+                )
+
         for widget in self._get_weight_widgets("lyt_engine_2"):
-            widget.textChanged.connect(partial(self._update_total_weight, "lyt_engine_2"))
+            widget.textChanged.connect(
+                partial(self._update_total_weight, "lyt_engine_2")
+            )
 
     def _tr(self, msg):
         return tools_qt.tr(msg, context_name=global_vars.plugin_name)
@@ -679,7 +684,7 @@ class CalculatePriority:
         exploitation = tools_qt.get_combo_value(dlg, "cmb_expl_selection") or None
         presszone = tools_qt.get_combo_value(dlg, "cmb_presszone") or None
         diameter = tools_qt.get_combo_value(dlg, "cmb_dnom") or None
-        diameter = f'{diameter:g}' if diameter else None
+        diameter = f"{diameter:g}" if diameter else None
         material = tools_qt.get_combo_value(dlg, "cmb_material") or None
 
         try:

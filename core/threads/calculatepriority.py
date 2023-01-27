@@ -609,6 +609,7 @@ class GwCalculatePriority(GwTask):
                 if arc["press1"] is None
                 else (arc["press1"] + arc["press2"]) / 2
             )
+            # FIXME: Handle pression is None
             age = (
                 "age_max"
                 if pression < 50

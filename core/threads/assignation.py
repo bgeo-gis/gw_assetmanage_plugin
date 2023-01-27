@@ -287,6 +287,7 @@ class GwAssignation(GwTask):
         return arcs
 
     def _calculate_rleak(self, arcs):
+        # TODO: Add progress messages
         arc_list = sorted(arcs.values(), key=lambda a: a["length"], reverse=True)
         where_clause = self._where_clause()
         for arc in arc_list:
