@@ -112,7 +112,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_budget">
             <property name="text">
-             <string>Budget:</string>
+             <string>Yearly budget:</string>
             </property>
            </widget>
           </item>
