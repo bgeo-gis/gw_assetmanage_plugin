@@ -5,7 +5,7 @@ General Public License as published by the Free Software Foundation, either vers
 or (at your option) any later version.
 """
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 from functools import partial
 from time import time
 import configparser
@@ -404,6 +404,7 @@ class CalculatePriority:
             diameter,
             material,
             budget,
+            target_year,
             config_diameter,
             config_material,
             config_engine,
@@ -513,10 +514,10 @@ class CalculatePriority:
             diameter,
             material,
             budget,
-            target_year=None,
-            config_diameter=config_diameter,
-            config_material=config_material,
-            config_engine=config_engine,
+            target_year,
+            config_diameter,
+            config_material,
+            config_engine,
         )
         t = self.thread
         t.taskCompleted.connect(self._calculate_ended)
@@ -722,6 +723,12 @@ class CalculatePriority:
                 tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
                 return
 
+        target_year = tools_qt.get_combo_value(dlg, "cmb_year") or None
+        if self.config.method == "WM" and not target_year:
+            message = "Please select a target year."
+            tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
+            return
+
         config_diameter = {}
         for row in table2data(self.qtbl_diameter):
             if not row["dnom"]:
@@ -803,6 +810,7 @@ class CalculatePriority:
             diameter,
             material,
             budget,
+            target_year,
             config_diameter,
             config_material,
             config_engine,
@@ -866,6 +874,12 @@ class CalculatePriority:
             0,
             add_new=False,
         )
+
+        # Combo horizon year
+        next_years = [
+            [str(x + date.today().year), x + date.today().year] for x in range(1, 101)
+        ]
+        tools_qt.fill_combo_values(self.dlg_priority.cmb_year, next_years, add_empty=True)
 
     # endregion
 
