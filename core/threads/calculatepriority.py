@@ -89,7 +89,7 @@ class GwCalculatePriority(GwTask):
         self.diameter = diameter
         self.material = material
         self.result_budget = budget
-        self.result_target_year = target_year
+        self.target_year = target_year
         self.config_diameter = config_diameter
         self.config_material = config_material
         self.config_engine = config_engine
@@ -693,7 +693,9 @@ class GwCalculatePriority(GwTask):
         second_iteration = []
         for arc in arcs:
             cum_cost_constr += arc["cost_constr"]
-            if cum_cost_constr > self.result_budget:
+            if cum_cost_constr > self.result_budget * (
+                self.target_year - date.today().year
+            ):
                 break
             second_iteration.append(arc)
 
@@ -708,11 +710,17 @@ class GwCalculatePriority(GwTask):
         # Second iteration
         second_iteration.sort(key=lambda x: x["val_2"], reverse=True)
         second_iteration.sort(key=lambda x: x["mandatory"], reverse=True)
+        replacement_year = date.today().year + 1
         cum_cost_constr = 0
         cum_length = 0
         for arc in second_iteration:
             cum_cost_constr += arc["cost_constr"]
+            if cum_cost_constr > self.result_budget:
+                cum_cost_constr = arc["cost_constr"]
+                cum_length = 0
+                replacement_year += 1
             cum_length += arc["length"]
+            arc["replacement_year"] = replacement_year
             arc["cum_cost_constr"] = cum_cost_constr
             arc["cum_length"] = cum_length
 
@@ -733,7 +741,7 @@ class GwCalculatePriority(GwTask):
         self.result_id = self._save_result_info()
         if not self.result_id:
             return False
-            
+
         self._save_config_diameter()
         self._save_config_material()
         self._save_config_engine()
@@ -814,6 +822,8 @@ class GwCalculatePriority(GwTask):
             for i in range(1000):
                 try:
                     arc = second_iteration[index]
+                    if arc["replacement_year"] > self.target_year:
+                        break
                     save_arcs_sql += f"""
                         ({arc["arc_id"]},
                         {self.result_id},
@@ -832,6 +842,8 @@ class GwCalculatePriority(GwTask):
                     ended = True
                     break
             save_arcs_sql = save_arcs_sql.strip()[:-1]
+            if save_arcs_sql.endswith("value"):
+                break
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
             progress = (100 - 70) / len(second_iteration) * 1000 * loop + 70
@@ -928,7 +940,7 @@ class GwCalculatePriority(GwTask):
                 {self.diameter or 'NULL'},
                 {str_material_id},
                 {self.result_budget or 'NULL'},
-                NULL,
+                {self.target_year or 'NULL'},
                 current_user,
                 now())
             """
