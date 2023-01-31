@@ -120,6 +120,34 @@ class GwCalculatePriority(GwTask):
             self._emit_report(traceback.format_exc())
             return False
 
+    def _calculate_ivi(self, arcs, year, replacements=False):
+        current_value = 0
+        replacement_cost = 0
+        for arc in arcs:
+            replacement_cost += arc["cost_constr"]
+
+            if (
+                replacements
+                and "replacement_year" in arc
+                and arc["replacement_year"] <= year
+            ):
+                builtdate = arc["replacement_year"]
+            else:
+                arc_material = (
+                    arc["matcat_id"]
+                    if arc["matcat_id"] in self.config_material
+                    else self.unknown_material
+                )
+                config_material = self.config_material[arc_material]
+                builtdate = arc["builtdate"].year or config_material["builtdate_vdef"]
+            residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
+            current_value += (
+                arc["cost_constr"]
+                * residual_useful_life
+                / arc["total_expected_useful_life"]
+            )
+        return current_value / replacement_cost
+
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
@@ -626,6 +654,7 @@ class GwCalculatePriority(GwTask):
                 if pression > 75
                 else "age_med"
             )
+            arc["total_expected_useful_life"] = config_material[age]
             one_year = timedelta(days=365)
             duration = config_material[age] * one_year
             remaining_years = builtdate + duration - date.today()
@@ -653,6 +682,7 @@ class GwCalculatePriority(GwTask):
             arc["val_longevity"] = self._fit_to_scale(
                 arc["longevity"], min_longevity, max_longevity
             )
+            #   - flow (how to take in account ficticious flows?)
             arc["val_flow"] = self._fit_to_scale(arc["flow_avg"], min_flow, max_flow)
             arc["val_nrw"] = (
                 0
@@ -724,12 +754,12 @@ class GwCalculatePriority(GwTask):
             arc["cum_cost_constr"] = cum_cost_constr
             arc["cum_length"] = cum_length
 
-        # Normalize (0 for min, 10 for max):
-        #   - flow (how to take in account ficticious flows?)
-        # (first iteration)
-        # ??? Normalize parameters again ???
-        # (second iteration)
-        # ??? How to calculate IVI ???
+        # IVI calculation
+        ivi = {}
+        for year in range(date.today().year, self.target_year + 1):
+            ivi_without_replacements = self._calculate_ivi(arcs, year)
+            ivi_with_replacements = self._calculate_ivi(arcs, year, replacements=True)
+            ivi[year] = (ivi_without_replacements, ivi_with_replacements)
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
