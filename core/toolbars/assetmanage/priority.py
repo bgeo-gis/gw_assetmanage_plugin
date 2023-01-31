@@ -452,7 +452,6 @@ class CalculatePriority:
             """
         )
 
-        print(data_checks)
         for row in data_checks:
             if not row["qtd"]:
                 continue
@@ -877,9 +876,11 @@ class CalculatePriority:
 
         # Combo horizon year
         next_years = [
-            [str(x + date.today().year), x + date.today().year] for x in range(1, 101)
+            [x + date.today().year, str(x + date.today().year)] for x in range(1, 101)
         ]
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_year, next_years, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority.cmb_year, next_years, 1, add_empty=True
+        )
 
     # endregion
 
