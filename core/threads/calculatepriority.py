@@ -206,6 +206,35 @@ class GwCalculatePriority(GwTask):
         """
         return tools_db.get_rows(sql)
 
+    def _ivi_report(self, ivi):
+        # message
+        title = self._tr("IVI")
+        # message
+        year_header = self._tr("Year")
+        # message
+        without_replacements_header = self._tr("Without replacements")
+        # message
+        with_replacements_header = self._tr("With replacements")
+        columns = [
+            [year_header],
+            [without_replacements_header],
+            [with_replacements_header],
+        ]
+        for year, (value_without, value_with) in ivi.items():
+            columns[0].append(str(year))
+            columns[1].append(f"{value_without:.3f}")
+            columns[2].append(f"{value_with:.3f}")
+        for column in columns:
+            length = max(len(x) for x in column)
+            for index, string in enumerate(column):
+                column[index] = string.ljust(length)
+
+        txt = f"{title}:\n"
+        for line in zip(*columns):
+            txt += "  ".join(line)
+            txt += "\n"
+        return txt
+
     def _run_sh(self):
         self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
         self.setProgress(0)
@@ -880,6 +909,8 @@ class GwCalculatePriority(GwTask):
             self.setProgress(progress)
 
         # TODO: Reports (invalid materials and diameters, etc.)
+
+        self._emit_report(self._ivi_report(ivi))
 
         self._emit_report(self._tr("Task finished!"))
         return True
