@@ -68,21 +68,21 @@ CREATE TABLE asset.value_status (
     idval character varying(50)
 );
 
-CREATE TABLE asset.config_diameter_def (
+CREATE TABLE asset.config_cost_def (
     dnom numeric(12,2) NOT NULL,
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
-    CONSTRAINT config_diameter_def_pkey PRIMARY KEY (dnom)
+    CONSTRAINT config_cost_def_pkey PRIMARY KEY (dnom)
 );
 
-CREATE TABLE asset.config_diameter (
+CREATE TABLE asset.config_cost (
     dnom numeric(12,2) NOT NULL,
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
     result_id integer NOT NULL,
-    CONSTRAINT config_diameter_pkey PRIMARY KEY (dnom, result_id)
+    CONSTRAINT config_cost_pkey PRIMARY KEY (dnom, result_id)
 );
 
 CREATE TABLE asset.config_material_def (
