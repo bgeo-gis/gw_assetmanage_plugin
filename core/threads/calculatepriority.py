@@ -797,6 +797,8 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/n)...")
         self.setProgress(40)
 
+        self.statistics_report = self._ivi_report(ivi) 
+
         self.result_id = self._save_result_info()
         if not self.result_id:
             return False
@@ -872,6 +874,7 @@ class GwCalculatePriority(GwTask):
                     mandatory,
                     orderby,
                     expected_year,
+                    replacement_year,
                     budget,
                     total,
                     length,
@@ -890,6 +893,7 @@ class GwCalculatePriority(GwTask):
                         {arc["mandatory"]},
                         {index + 1},
                         {date.today().year + arc["longevity"]},
+                        {arc["replacement_year"]},
                         {arc["cost_constr"]},
                         {arc["cum_cost_constr"]},
                         {arc["length"]},
@@ -910,7 +914,7 @@ class GwCalculatePriority(GwTask):
 
         # TODO: Reports (invalid materials and diameters, etc.)
 
-        self._emit_report(self._ivi_report(ivi))
+        self._emit_report(self.statistics_report)
 
         self._emit_report(self._tr("Task finished!"))
         return True
@@ -989,6 +993,7 @@ class GwCalculatePriority(GwTask):
                 material_id,
                 budget,
                 target_year,
+                report,
                 cur_user,
                 tstamp)
             values ('{self.result_name}',
@@ -1002,6 +1007,7 @@ class GwCalculatePriority(GwTask):
                 {str_material_id},
                 {self.result_budget or 'NULL'},
                 {self.target_year or 'NULL'},
+                '{self.statistics_report}',
                 current_user,
                 now())
             """
