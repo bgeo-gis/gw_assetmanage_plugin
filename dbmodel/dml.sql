@@ -2,31 +2,7 @@
 -- Default values
 --
 
-INSERT INTO asset.config_cost_def VALUES (12.00, 60.00, 250.00, 10);
-INSERT INTO asset.config_cost_def VALUES (19.00, 65.00, 275.00, 10);
-INSERT INTO asset.config_cost_def VALUES (25.00, 70.00, 300.00, 10);
-INSERT INTO asset.config_cost_def VALUES (32.00, 80.00, 325.00, 10);
-INSERT INTO asset.config_cost_def VALUES (40.00, 90.00, 375.00, 10);
-INSERT INTO asset.config_cost_def VALUES (50.00, 100.00, 400.00, 10);
-INSERT INTO asset.config_cost_def VALUES (63.00, 110.00, 425.00, 10);
-INSERT INTO asset.config_cost_def VALUES (75.00, 120.00, 500.00, 10);
-INSERT INTO asset.config_cost_def VALUES (100.00, 150.00, 550.00, 10);
-INSERT INTO asset.config_cost_def VALUES (125.00, 175.00, 600.00, 10);
-INSERT INTO asset.config_cost_def VALUES (150.00, 200.00, 650.00, 10);
-INSERT INTO asset.config_cost_def VALUES (200.00, 220.00, 750.00, 10);
-INSERT INTO asset.config_cost_def VALUES (250.00, 240.00, 800.00, 10);
-INSERT INTO asset.config_cost_def VALUES (300.00, 260.00, 850.00, 10);
-INSERT INTO asset.config_cost_def VALUES (350.00, 280.00, 900.00, 10);
-INSERT INTO asset.config_cost_def VALUES (400.00, 300.00, 950.00, 10);
-INSERT INTO asset.config_cost_def VALUES (450.00, 320.00, 1000.00, 10);
-INSERT INTO asset.config_cost_def VALUES (500.00, 350.00, 1050.00, 10);
-INSERT INTO asset.config_cost_def VALUES (550.00, 400.00, 1100.00, 10);
-INSERT INTO asset.config_cost_def VALUES (600.00, 450.00, 1150.00, 10);
-INSERT INTO asset.config_cost_def VALUES (700.00, 500.00, 1200.00, 10);
-INSERT INTO asset.config_cost_def VALUES (800.00, 550.00, 1250.00, 10);
-INSERT INTO asset.config_cost_def VALUES (900.00, 600.00, 1300.00, 10);
-INSERT INTO asset.config_cost_def VALUES (1100.00, 650.00, 1350.00, 10);
-INSERT INTO asset.config_cost_def VALUES (1110.00, 700.00, 1400.00, 10);
+INSERT INTO asset.config_cost_def SELECT id AS arccat_id, dnom::NUMERIC, round(dnom::NUMERIC * 3 / 5 + 70) AS cost_constr, round(dnom::NUMERIC * 9 / 5 + 310) AS cost_repmain, 10 AS compliance FROM PARENT_SCHEMA.cat_arc WHERE dnom IS NOT NULL;
 
 INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM asset.cat_mat_arc;
 
