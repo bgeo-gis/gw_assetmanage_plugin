@@ -61,7 +61,7 @@ def table2data(table_view):
 class ConfigCost:
     def __init__(self, data):
         # order the dict by dnom
-        self.data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
+        self._data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
 
     def fill_table_widget(self, table_widget):
         # message
@@ -74,7 +74,7 @@ class ConfigCost:
         ]
         table_widget.setColumnCount(len(headers))
         table_widget.setHorizontalHeaderLabels(headers)
-        for r, row in enumerate(self.data.values()):
+        for r, row in enumerate(self._data.values()):
             table_widget.insertRow(r)
             table_widget.setItem(r, 0, QTableWidgetItem(row["arccat_id"]))
             table_widget.setItem(r, 1, QTableWidgetItem(str(row["dnom"])))
@@ -87,14 +87,25 @@ def configcost_from_sql(sql):
     rows = tools_db.get_rows(sql)
     data = {}
     for row in rows:
-        if row["arccat_id"] in data:
-            continue
         data[row["arccat_id"]] = {
             "arccat_id": row["arccat_id"],
             "dnom": row["dnom"],
             "cost_constr": row["cost_constr"],
             "cost_repmain": row["cost_repmain"],
             "compliance": row["compliance"],
+        }
+    return ConfigCost(data)
+
+
+def configcost_from_tablewidget(table_widget):
+    data = {}
+    for r in range(table_widget.rowCount()):
+        data[table_widget.item(r, 0).text()] = {
+            "arccat_id": table_widget.item(r, 0).text(),
+            "dnom": float(table_widget.item(r, 1).text()),
+            "cost_constr": float(table_widget.item(r, 2).text()),
+            "cost_repmain": float(table_widget.item(r, 3).text()),
+            "compliance": int(table_widget.item(r, 4).text()),
         }
     return ConfigCost(data)
 
@@ -251,6 +262,7 @@ class CalculatePriority:
         # Define tableviews
         self.qtbl_cost = self.dlg_priority.findChild(QTableWidget, "tbl_cost")
         self.qtbl_cost.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_cost.setSortingEnabled(True)
         configcost = configcost_from_sql("select * from asset.config_cost_def")
         configcost.fill_table_widget(self.qtbl_cost)
 
@@ -436,29 +448,17 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_diameter,
+            config_cost,
             config_material,
             config_engine,
         ) = inputs
 
         # FIXME: Take into account the unknown material from config.config
         # FIXME: Add filters to checks
+        # TODO: Check invalid arccat_ids
         data_checks = tools_db.get_rows(
             f"""
-            with list_invalid_diameters as (
-                select count(*), coalesce(dnom, 'NULL')
-                from asset.arc_asset
-                where dnom is null 
-                    or dnom::numeric <= 0
-                    or dnom::numeric > ({max(config_diameter.keys())})
-                group by dnom
-                order by dnom),
-            invalid_diameters as (
-                select 'invalid_diameters' as check,
-                    sum(count) as qtd,
-                    string_agg(coalesce, ', ') as list
-                from list_invalid_diameters),
-            list_invalid_materials AS (
+            with list_invalid_materials AS (
                 select count(*), coalesce(matcat_id, 'NULL')
                 from asset.arc_asset a
                 where matcat_id not in ('{"','".join(config_material.keys())}')
@@ -467,7 +467,9 @@ class CalculatePriority:
                 group by matcat_id
                 order by matcat_id),
             invalid_materials as (
-                select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
+                select 'invalid_materials' as check,
+                    sum(count) as qtd,
+                    string_agg(coalesce, ', ') as list
                 from list_invalid_materials),
             list_null_pressures as (
                 select count(*)
@@ -475,8 +477,6 @@ class CalculatePriority:
                 where press1 is null and press2 is null),
             null_pressures as (
                 select 'null_pressures', count, null from list_null_pressures)
-            select * from invalid_diameters
-            union all
             select * from invalid_materials
             union all
             select * from null_pressures
@@ -545,7 +545,7 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_diameter,
+            config_cost,
             config_material,
             config_engine,
         )
@@ -759,36 +759,11 @@ class CalculatePriority:
             tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
             return
 
-        config_diameter = {}
-        for row in table2data(self.qtbl_cost):
-            if not row["dnom"]:
-                msg = "Empty value detected in 'Diameter' tab. Please enter a value for diameter."
-                tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
-                return
-            if not row["cost_constr"]:
-                msg = "Please provide the replacing cost for diameter"
-                tools_qt.show_info_box(
-                    msg, context_name=global_vars.plugin_name, parameter=row["dnom"]
-                )
-                return
-            if not row["cost_repmain"]:
-                msg = "Please provide the repairing cost for diameter"
-                tools_qt.show_info_box(
-                    msg, context_name=global_vars.plugin_name, parameter=row["dnom"]
-                )
-                return
-            if not (0 <= row["compliance"] <= 10):
-                msg = "Invalid compliance value for diameter"
-                info = "Compliance value must be between 0 and 10 inclusive."
-                tools_qt.show_info_box(
-                    msg,
-                    inf_text=info,
-                    context_name=global_vars.plugin_name,
-                    parameter=row["dnom"],
-                )
-            config_diameter[int(row["dnom"])] = {
-                k: v for k, v in row.items() if k != "dnom"
-            }
+        try:
+            config_cost = configcost_from_tablewidget(self.qtbl_cost)
+        except ValueError as e:
+            tools_qt.show_info_box(e)
+            return
 
         config_material = {}
         for row in table2data(self.qtbl_material):
@@ -841,7 +816,7 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_diameter,
+            config_cost,
             config_material,
             config_engine,
         )
