@@ -127,13 +127,14 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="tab_diameter">
+            <widget class="QWidget" name="tab_cost">
              <attribute name="title">
-              <string>Diameter</string>
+              <string>Costs</string>
              </attribute>
              <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_diameter"/>
+               <widget class="QTableWidget" name="tbl_cost">
+               </widget>
               </item>
              </layout>
             </widget>
@@ -396,7 +397,6 @@
   <tabstop>cmb_material</tabstop>
   <tabstop>txt_budget</tabstop>
   <tabstop>cmb_year</tabstop>
-  <tabstop>tbl_diameter</tabstop>
   <tabstop>tbl_material</tabstop>
   <tabstop>btn_calc</tabstop>
   <tabstop>btn_cancel</tabstop>

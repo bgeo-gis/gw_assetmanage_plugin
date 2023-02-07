@@ -21,6 +21,8 @@ from qgis.PyQt.QtWidgets import (
     QAction,
     QActionGroup,
     QTableView,
+    QTableWidget,
+    QTableWidgetItem,
 )
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtSql import QSqlTableModel
@@ -54,6 +56,47 @@ def table2data(table_view):
             }
         )
     return data
+
+
+class ConfigCost:
+    def __init__(self, data):
+        # order the dict by dnom
+        self.data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
+
+    def fill_table_widget(self, table_widget):
+        # message
+        headers = [
+            "Arccat_id",
+            "Diameter",
+            "Replacement cost",
+            "Repair cost",
+            "Compliance",
+        ]
+        table_widget.setColumnCount(len(headers))
+        table_widget.setHorizontalHeaderLabels(headers)
+        for r, row in enumerate(self.data.values()):
+            table_widget.insertRow(r)
+            table_widget.setItem(r, 0, QTableWidgetItem(row["arccat_id"]))
+            table_widget.setItem(r, 1, QTableWidgetItem(str(row["dnom"])))
+            table_widget.setItem(r, 2, QTableWidgetItem(str(row["cost_constr"])))
+            table_widget.setItem(r, 3, QTableWidgetItem(str(row["cost_repmain"])))
+            table_widget.setItem(r, 4, QTableWidgetItem(str(row["compliance"])))
+
+
+def configcost_from_sql(sql):
+    rows = tools_db.get_rows(sql)
+    data = {}
+    for row in rows:
+        if row["arccat_id"] in data:
+            continue
+        data[row["arccat_id"]] = {
+            "arccat_id": row["arccat_id"],
+            "dnom": row["dnom"],
+            "cost_constr": row["cost_constr"],
+            "cost_repmain": row["cost_repmain"],
+            "compliance": row["compliance"],
+        }
+    return ConfigCost(data)
 
 
 class AmPriority(dialog.GwAction):
@@ -116,9 +159,7 @@ class CalculatePriorityConfig:
             self.show_presszone = config.getboolean(dialog_type, "show_presszone")
             self.show_ivi_button = config.getboolean(dialog_type, "show_ivi_button")
             self.show_config = config.getboolean(dialog_type, "show_config")
-            self.show_config_diameter = config.getboolean(
-                dialog_type, "show_config_diameter"
-            )
+            self.show_config_cost = config.getboolean(dialog_type, "show_config_cost")
             self.show_config_material = config.getboolean(
                 dialog_type, "show_config_material"
             )
@@ -208,25 +249,15 @@ class CalculatePriority:
         # FIXME: Tables should load result config if "duplicate" or "edit"
         # TODO: Change from QTableView to QTableWidget for more flexibility
         # Define tableviews
-        self.qtbl_diameter = self.dlg_priority.findChild(QTableView, "tbl_diameter")
-        self.qtbl_diameter.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_cost = self.dlg_priority.findChild(QTableWidget, "tbl_cost")
+        self.qtbl_cost.setSelectionBehavior(QAbstractItemView.SelectRows)
+        configcost = configcost_from_sql("select * from asset.config_cost_def")
+        configcost.fill_table_widget(self.qtbl_cost)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableView, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         # Triggers
-        self._fill_table(
-            self.dlg_priority,
-            self.qtbl_diameter,
-            "asset.config_diameter_def",
-            set_edit_triggers=QTableView.DoubleClicked,
-        )
-        tools_gw.set_tablemodel_config(
-            self.dlg_priority,
-            self.qtbl_diameter,
-            "config_diameter_def",
-            schema_name="asset",
-        )
         self._fill_table(
             self.dlg_priority,
             self.qtbl_material,
@@ -380,7 +411,7 @@ class CalculatePriority:
         if self.config.show_config is not True:
             self.dlg_priority.grb_global.setVisible(False)
         else:
-            if self.config.show_config_diameter is not True:
+            if self.config.show_config_cost is not True:
                 self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
             if self.config.show_config_material is not True:
                 self.dlg_priority.tab_widget.tab_material.setVisible(False)
@@ -729,7 +760,7 @@ class CalculatePriority:
             return
 
         config_diameter = {}
-        for row in table2data(self.qtbl_diameter):
+        for row in table2data(self.qtbl_cost):
             if not row["dnom"]:
                 msg = "Empty value detected in 'Diameter' tab. Please enter a value for diameter."
                 tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
