@@ -276,6 +276,7 @@ CREATE TABLE asset.arc_asset AS
     a.macrosector_id,
     a.presszone_id,
     a.builtdate,
+    a.arccat_id,
     a.cat_dnom AS dnom,
     a.cat_matcat_id AS matcat_id,
     a.pavcat_id,
@@ -289,7 +290,8 @@ CREATE TABLE asset.arc_asset AS
     a.flow_avg
    FROM PARENT_SCHEMA.vu_arc AS a
    JOIN PARENT_SCHEMA.vu_node AS n1 ON (a.node_1 = n1.node_id)
-   JOIN PARENT_SCHEMA.vu_node AS n2 ON (a.node_2 = n2.node_id);
+   JOIN PARENT_SCHEMA.vu_node AS n2 ON (a.node_2 = n2.node_id)
+   WHERE a.state = 1;
 
 --
 -- VIEWS:
