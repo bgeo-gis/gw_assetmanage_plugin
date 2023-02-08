@@ -82,6 +82,37 @@ class ConfigCost:
             table_widget.setItem(r, 3, QTableWidgetItem(str(row["cost_repmain"])))
             table_widget.setItem(r, 4, QTableWidgetItem(str(row["compliance"])))
 
+    def get_compliance(self, arccat_id):
+        return self._data[arccat_id]["compliance"]
+
+    def get_cost_constr(self, arccat_id):
+        return self._data[arccat_id]["cost_constr"]
+
+    def has_arccat_id(self, arccat_id):
+        return arccat_id in self._data
+
+    def max_diameter(self):
+        return max(x["dnom"] for x in self._data.values())
+
+    def save(self, result_id):
+        sql = f"""
+            delete from asset.config_cost where result_id = {result_id};
+            insert into asset.config_cost
+                (result_id, arccat_id, dnom, cost_constr, cost_repmain, compliance)
+            values
+        """
+        for value in self._data.values():
+            sql += f"""
+                ({result_id},
+                '{value["arccat_id"]}',
+                {value["dnom"]},
+                {value["cost_constr"]},
+                {value["cost_repmain"]},
+                {value["compliance"]}),
+            """
+        sql = sql.strip()[:-1]
+        tools_db.execute_sql(sql)
+
 
 def configcost_from_sql(sql):
     rows = tools_db.get_rows(sql)

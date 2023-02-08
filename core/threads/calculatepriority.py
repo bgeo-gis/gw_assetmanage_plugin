@@ -74,7 +74,7 @@ class GwCalculatePriority(GwTask):
         material,
         budget,
         target_year,
-        config_diameter,
+        config_cost,
         config_material,
         config_engine,
     ):
@@ -90,7 +90,7 @@ class GwCalculatePriority(GwTask):
         self.material = material
         self.result_budget = budget
         self.target_year = target_year
-        self.config_diameter = config_diameter
+        self.config_cost = config_cost
         self.config_material = config_material
         self.config_engine = config_engine
 
@@ -172,6 +172,7 @@ class GwCalculatePriority(GwTask):
         elif self.method == "WM":
             columns = """
                 a.arc_id,
+                a.arccat_id,
                 a.matcat_id,
                 a.dnom,
                 st_length(a.the_geom) length,
@@ -640,11 +641,7 @@ class GwCalculatePriority(GwTask):
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
-            if (
-                arc["dnom"] is None
-                or int(arc["dnom"]) <= 0
-                or int(arc["dnom"]) > max(self.config_diameter.keys())
-            ):
+            if not self.config_cost.has_arccat_id(arc["arccat_id"]):
                 continue
             if arc["length"] is None:
                 continue
@@ -658,10 +655,7 @@ class GwCalculatePriority(GwTask):
 
             arc["mleak"] = config_material["pleak"]
 
-            reference_dnom = get_min_greater_than(
-                self.config_diameter.keys(), int(arc["dnom"])
-            )
-            cost_by_meter = self.config_diameter[reference_dnom]["cost_constr"]
+            cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
             arc["cost_constr"] = cost_by_meter * float(arc["length"])
 
             builtdate = arc["builtdate"] or date(
@@ -723,7 +717,7 @@ class GwCalculatePriority(GwTask):
             arc["val_strategic"] = 10 if arc["strategic"] else 0
             arc["val_compliance"] = 10 - min(
                 config_material["compliance"],
-                self.config_diameter[reference_dnom]["compliance"],
+                self.config_cost.get_compliance(arc["arccat_id"]),
             )
 
             arc["val_1"] = (
@@ -803,7 +797,7 @@ class GwCalculatePriority(GwTask):
         if not self.result_id:
             return False
 
-        self._save_config_diameter()
+        self.config_cost.save(self.result_id)
         self._save_config_material()
         self._save_config_engine()
 
