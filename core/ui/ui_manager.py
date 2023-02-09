@@ -8,11 +8,13 @@ or (at your option) any later version.
 import configparser
 import os
 import webbrowser
+from pathlib import Path
 
 from qgis.PyQt import uic, QtCore
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QAction, QMainWindow, QDialog, QDockWidget, QWhatsThis, QLineEdit
 
+from ... import global_vars
 
 class GwDialog(QDialog):
 
@@ -23,6 +25,9 @@ class GwDialog(QDialog):
         # Enable event filter
         self.installEventFilter(self)
 
+        # Set window icon
+        icon_path = Path(global_vars.plugin_dir) / "icons/dialogs/20x20/giswater.png"
+        self.setWindowIcon(QIcon(str(icon_path)))
 
     def eventFilter(self, object, event):
 
