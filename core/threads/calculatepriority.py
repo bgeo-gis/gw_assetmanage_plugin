@@ -133,13 +133,10 @@ class GwCalculatePriority(GwTask):
             ):
                 builtdate = arc["replacement_year"]
             else:
-                arc_material = (
-                    arc["matcat_id"]
-                    if arc["matcat_id"] in self.config_material
-                    else self.unknown_material
+                builtdate = (
+                    getattr(arc["builtdate"], "year", None)
+                    or self.config_material.get_default_builtdate()
                 )
-                config_material = self.config_material[arc_material]
-                builtdate = arc["builtdate"].year or config_material["builtdate_vdef"]
             residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
             current_value += (
                 arc["cost_constr"]
@@ -646,20 +643,14 @@ class GwCalculatePriority(GwTask):
             if arc["length"] is None:
                 continue
 
-            arc_material = (
-                arc["matcat_id"]
-                if arc["matcat_id"] in self.config_material
-                else self.unknown_material
-            )
-            config_material = self.config_material[arc_material]
-
-            arc["mleak"] = config_material["pleak"]
+            arc_material = arc.get("material", None)
+            arc["mleak"] = self.config_material.get_pleak(arc_material)
 
             cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
             arc["cost_constr"] = cost_by_meter * float(arc["length"])
 
             builtdate = arc["builtdate"] or date(
-                config_material["builtdate_vdef"], 1, 1
+                self.config_material.get_default_builtdate(arc_material), 1, 1
             )
             pression = (
                 0
@@ -670,16 +661,11 @@ class GwCalculatePriority(GwTask):
                 if arc["press1"] is None
                 else (arc["press1"] + arc["press2"]) / 2
             )
-            age = (
-                "age_max"
-                if pression < 50
-                else "age_min"
-                if pression > 75
-                else "age_med"
+            arc["total_expected_useful_life"] = self.config_material.get_age(
+                arc_material, pression
             )
-            arc["total_expected_useful_life"] = config_material[age]
             one_year = timedelta(days=365)
-            duration = config_material[age] * one_year
+            duration = arc["total_expected_useful_life"] * one_year
             remaining_years = builtdate + duration - date.today()
             arc["longevity"] = remaining_years / one_year
 
@@ -716,7 +702,7 @@ class GwCalculatePriority(GwTask):
             )
             arc["val_strategic"] = 10 if arc["strategic"] else 0
             arc["val_compliance"] = 10 - min(
-                config_material["compliance"],
+                self.config_material.get_compliance(arc_material),
                 self.config_cost.get_compliance(arc["arccat_id"]),
             )
 
@@ -791,14 +777,14 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/n)...")
         self.setProgress(40)
 
-        self.statistics_report = self._ivi_report(ivi) 
+        self.statistics_report = self._ivi_report(ivi)
 
         self.result_id = self._save_result_info()
         if not self.result_id:
             return False
 
         self.config_cost.save(self.result_id)
-        self._save_config_material()
+        self.config_material.save(self.result_id)
         self._save_config_engine()
 
         tools_db.execute_sql(

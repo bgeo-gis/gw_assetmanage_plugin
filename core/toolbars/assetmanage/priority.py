@@ -142,9 +142,10 @@ def configcost_from_tablewidget(table_widget):
 
 
 class ConfigMaterial:
-    def __init__(self, data):
+    def __init__(self, data, unknown_material):
         # order the dict by material
         self._data = {k: data[k] for k in sorted(data.keys())}
+        self._unknown_material = unknown_material
 
     def fill_table_widget(self, table_widget):
         # message
@@ -173,8 +174,53 @@ class ConfigMaterial:
             for c, column in enumerate(columns):
                 table_widget.setItem(r, c, QTableWidgetItem(str(row[column])))
 
+    def get_age(self, material, pression):
+        if pression < 50:
+            return self._get_attr(material, "age_max")
+        elif pression < 75:
+            return self._get_attr(material, "age_med")
+        else:
+            return self._get_attr(material, "age_min")
 
-def configmaterial_from_sql(sql):
+    def get_compliance(self, material):
+        return self._get_attr(material, "compliance")
+
+    def get_default_builtdate(self, material):
+        return self._get_attr(material, "builtdate_vdef")
+
+    def get_pleak(self, material):
+        return self._get_attr(material, "pleak")
+
+    def save(self, result_id):
+        sql = f"""
+            delete from asset.config_material where result_id = {result_id};
+            insert into asset.config_material
+                (result_id, material, pleak,
+                age_max, age_med, age_min,
+                builtdate_vdef, compliance)
+            values
+        """
+        for value in self._data.values():
+            sql += f"""
+                ({result_id},
+                '{value["material"]}',
+                {value["pleak"]},
+                {value["age_max"]},
+                {value["age_med"]},
+                {value["age_min"]},
+                {value["builtdate_vdef"]},
+                {value["compliance"]}),
+            """
+        sql = sql.strip()[:-1]
+        tools_db.execute_sql(sql)
+
+    def _get_attr(self, material, attribute):
+        if material in self._data.keys():
+            return self._data[material][attribute]
+        return self._data[self._unknown_material][attribute]
+
+
+def configmaterial_from_sql(sql, unknown_material):
     rows = tools_db.get_rows(sql)
     data = {}
     for row in rows:
@@ -187,10 +233,10 @@ def configmaterial_from_sql(sql):
             "builtdate_vdef": row["builtdate_vdef"],
             "compliance": row["compliance"],
         }
-    return ConfigMaterial(data)
+    return ConfigMaterial(data, unknown_material)
 
 
-def configmaterial_from_tablewidget(table_widget):
+def configmaterial_from_tablewidget(table_widget, unknown_material):
     data = {}
     for r in range(table_widget.rowCount()):
         data[table_widget.item(r, 0).text()] = {
@@ -202,7 +248,7 @@ def configmaterial_from_tablewidget(table_widget):
             "builtdate_vdef": int(table_widget.item(r, 5).text()),
             "compliance": int(table_widget.item(r, 6).text()),
         }
-    return ConfigMaterial(data)
+    return ConfigMaterial(data, unknown_material)
 
 
 class AmPriority(dialog.GwAction):
@@ -364,7 +410,7 @@ class CalculatePriority:
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
         configmaterial = configmaterial_from_sql(
-            "select * from asset.config_material_def"
+            "select * from asset.config_material_def", self.config.unknown_material
         )
         configmaterial.fill_table_widget(self.qtbl_material)
 
@@ -840,7 +886,9 @@ class CalculatePriority:
             return
 
         try:
-            config_material = configmaterial_from_tablewidget(self.qtbl_material)
+            config_material = configmaterial_from_tablewidget(
+                self.qtbl_material, self.config.unknown_material
+            )
         except ValueError as e:
             tools_qt.show_info_box(e)
             return
