@@ -141,6 +141,70 @@ def configcost_from_tablewidget(table_widget):
     return ConfigCost(data)
 
 
+class ConfigMaterial:
+    def __init__(self, data):
+        # order the dict by material
+        self._data = {k: data[k] for k in sorted(data.keys())}
+
+    def fill_table_widget(self, table_widget):
+        # message
+        headers = [
+            "Material",
+            "Prob. of Failure",
+            "Max. Longevity",
+            "Med. Longevity",
+            "Min. Longevity",
+            "Default Built Date",
+            "Compliance",
+        ]
+        columns = [
+            "material",
+            "pleak",
+            "age_max",
+            "age_med",
+            "age_min",
+            "builtdate_vdef",
+            "compliance",
+        ]
+        table_widget.setColumnCount(len(headers))
+        table_widget.setHorizontalHeaderLabels(headers)
+        for r, row in enumerate(self._data.values()):
+            table_widget.insertRow(r)
+            for c, column in enumerate(columns):
+                table_widget.setItem(r, c, QTableWidgetItem(str(row[column])))
+
+
+def configmaterial_from_sql(sql):
+    rows = tools_db.get_rows(sql)
+    data = {}
+    for row in rows:
+        data[row["material"]] = {
+            "material": row["material"],
+            "pleak": row["pleak"],
+            "age_max": row["age_max"],
+            "age_med": row["age_med"],
+            "age_min": row["age_min"],
+            "builtdate_vdef": row["builtdate_vdef"],
+            "compliance": row["compliance"],
+        }
+    return ConfigMaterial(data)
+
+
+def configmaterial_from_tablewidget(table_widget):
+    data = {}
+    for r in range(table_widget.rowCount()):
+        data[table_widget.item(r, 0).text()] = {
+            "material": table_widget.item(r, 0).text(),
+            "pleak": float(table_widget.item(r, 1).text()),
+            "age_max": int(table_widget.item(r, 2).text()),
+            "age_med": int(table_widget.item(r, 3).text()),
+            "age_min": int(table_widget.item(r, 4).text()),
+            "builtdate_vdef": int(table_widget.item(r, 5).text()),
+            "compliance": int(table_widget.item(r, 6).text()),
+        }
+    return ConfigMaterial(data)
+
+
 class AmPriority(dialog.GwAction):
     """Button 2: Selection & priority calculation button
     Select features and calculate priorities"""
@@ -297,22 +361,12 @@ class CalculatePriority:
         configcost = configcost_from_sql("select * from asset.config_cost_def")
         configcost.fill_table_widget(self.qtbl_cost)
 
-        self.qtbl_material = self.dlg_priority.findChild(QTableView, "tbl_material")
+        self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
-
-        # Triggers
-        self._fill_table(
-            self.dlg_priority,
-            self.qtbl_material,
-            "asset.config_material_def",
-            set_edit_triggers=QTableView.DoubleClicked,
+        configmaterial = configmaterial_from_sql(
+            "select * from asset.config_material_def"
         )
-        tools_gw.set_tablemodel_config(
-            self.dlg_priority,
-            self.qtbl_material,
-            "config_material_def",
-            schema_name="asset",
-        )
+        configmaterial.fill_table_widget(self.qtbl_material)
 
         self._fill_engine_options()
         self._set_signals()
@@ -487,29 +541,18 @@ class CalculatePriority:
         # FIXME: Take into account the unknown material from config.config
         # FIXME: Add filters to checks
         # TODO: Check invalid arccat_ids
+        # TODO: Check for invalid materials
         data_checks = tools_db.get_rows(
             f"""
-            with list_invalid_materials AS (
-                select count(*), coalesce(matcat_id, 'NULL')
-                from asset.arc_asset a
-                where matcat_id not in ('{"','".join(config_material.keys())}')
-                    or matcat_id = '{self.config.unknown_material}'
-                    or matcat_id is null
-                group by matcat_id
-                order by matcat_id),
-            invalid_materials as (
-                select 'invalid_materials' as check,
-                    sum(count) as qtd,
-                    string_agg(coalesce, ', ') as list
-                from list_invalid_materials),
-            list_null_pressures as (
+            with list_null_pressures as (
                 select count(*)
                 from asset.arc_asset
                 where press1 is null and press2 is null),
             null_pressures as (
-                select 'null_pressures', count, null from list_null_pressures)
-            select * from invalid_materials
-            union all
+                select 'null_pressures' as check,
+                    count as qtd,
+                    null as list
+                from list_null_pressures)
             select * from null_pressures
             """
         )
@@ -796,21 +839,11 @@ class CalculatePriority:
             tools_qt.show_info_box(e)
             return
 
-        config_material = {}
-        for row in table2data(self.qtbl_material):
-            if not (0 <= row["compliance"] <= 10):
-                msg = "Invalid compliance value for material"
-                info = "Compliance value must be between 0 and 10 inclusive."
-                tools_qt.show_info_box(
-                    msg,
-                    inf_text=info,
-                    context_name=global_vars.plugin_name,
-                    parameter=row["material"],
-                )
-                return
-            config_material[row["material"]] = {
-                k: v for k, v in row.items() if k != "material"
-            }
+        try:
+            config_material = configmaterial_from_tablewidget(self.qtbl_material)
+        except ValueError as e:
+            tools_qt.show_info_box(e)
+            return
 
         if any(round(total, 5) != 1 for total in self.total_weight.values()):
             msg = (

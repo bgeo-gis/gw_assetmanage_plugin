@@ -133,8 +133,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_2">
               <item row="0" column="0">
-               <widget class="QTableWidget" name="tbl_cost">
-               </widget>
+               <widget class="QTableWidget" name="tbl_cost"/>
               </item>
              </layout>
             </widget>
@@ -144,7 +143,7 @@
              </attribute>
              <layout class="QGridLayout" name="gridLayout_3">
               <item row="0" column="0">
-               <widget class="QTableView" name="tbl_material"/>
+               <widget class="QTableWidget" name="tbl_material"/>
               </item>
              </layout>
             </widget>
@@ -397,7 +396,6 @@
   <tabstop>cmb_material</tabstop>
   <tabstop>txt_budget</tabstop>
   <tabstop>cmb_year</tabstop>
-  <tabstop>tbl_material</tabstop>
   <tabstop>btn_calc</tabstop>
   <tabstop>btn_cancel</tabstop>
   <tabstop>mainTab</tabstop>
