@@ -989,9 +989,10 @@ class CalculatePriority:
         tools_qt.fill_combo_values(
             dlg.cmb_dnom, rows, 1, sort_by=0, add_empty=True
         )
-        tools_qt.set_combo_value(
-            dlg.cmb_dnom, f'{round(self.result["dnom"], 1)}', 0, add_new=False
-        )
+        if self.result["dnom"]:
+            tools_qt.set_combo_value(
+                dlg.cmb_dnom, f'{round(self.result["dnom"], 1)}', 0, add_new=False
+            )
 
         # Combo material
         sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
