@@ -325,7 +325,22 @@ class CalculatePriorityConfig:
 
 class CalculatePriority:
     def __init__(self, type="GLOBAL", mode="new", result_id=None):
-        if mode != "new":
+        if mode == "new":
+            self.result = {
+                "id": None,
+                "name": None,
+                "type": type,
+                "descript": None,
+                "expl_id": None,
+                "budget": None,
+                "target_year": None,
+                "status": None,
+                "presszone_id": None,
+                "material_id": None,
+                "features": None,
+                "dnom": None,
+            }
+        else:
             if not result_id:
                 raise ValueError(f"For mode '{mode}', an result_id must be informed.")
             self.result = tools_db.get_row(
@@ -346,21 +361,6 @@ class CalculatePriority:
                 WHERE result_id = {result_id}
                 """
             )
-        else:
-            self.result = {
-                "id": None,
-                "name": None,
-                "type": None,
-                "descript": None,
-                "expl_id": None,
-                "budget": None,
-                "target_year": None,
-                "status": None,
-                "presszone_id": None,
-                "material_id": None,
-                "features": None,
-                "dnom": None,
-            }
         self.type = type if mode == "new" else self.result["type"]
         self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
