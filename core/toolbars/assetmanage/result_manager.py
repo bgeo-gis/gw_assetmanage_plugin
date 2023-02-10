@@ -13,7 +13,9 @@ from qgis.PyQt.QtWidgets import (
     QAction,
     QActionGroup,
     QTableView,
+    QCompleter,
 )
+from qgis.PyQt.QtCore import QStringListModel
 from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
 
 from .priority import CalculatePriority
@@ -29,6 +31,7 @@ from ....settings import (
     gw_global_vars,
 )
 from .... import global_vars
+from .priority import CalculatePriority
 
 
 class ResultManager(dialog.GwAction):
@@ -52,6 +55,16 @@ class ResultManager(dialog.GwAction):
 
         self.dlg_priority_manager = PriorityManagerUi()
 
+        # Fill filters
+        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_result_type")
+        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_type, rows, 1, add_empty=True)
+
+        rows = tools_db.get_rows("SELECT expl_id, name FROM asset.exploitation")
+        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_expl, rows, 1, add_empty=True)
+
+        rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
+        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_status, rows, 1, add_empty=True)
+
         # Fill results table
         # TODO: use a join to translate type and status of a result
         self._fill_table(
@@ -67,13 +80,87 @@ class ResultManager(dialog.GwAction):
         )
 
         self._set_signals()
+
         # TODO: finish "Duplicate" implementation
-        self.dlg_priority_manager.btn_duplicate.hide()
+        # self.dlg_priority_manager.btn_duplicate.hide()
 
         # Open the dialog
         tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
+
+    def _manage_txt_report(self):
+
+        dlg = self.dlg_priority_manager
+
+        selected_list = dlg.tbl_results.selectionModel().selectedRows()
+
+        if len(selected_list) == 0 or len(selected_list) > 1:
+            dlg.txt_info.setText("")
+            return
+
+        row = selected_list[0].row()
+        report = dlg.tbl_results.model().record(row).value("report")
+
+        dlg.txt_info.setText(report)
+
+    def _manage_btn_action(self):
+
+        dlg = self.dlg_priority_manager
+
+        selected_list = dlg.tbl_results.selectionModel().selectedRows()
+
+        if len(selected_list) == 0 or len(selected_list) > 1:
+            dlg.btn_delete.setEnabled(False)
+            dlg.btn_status.setEnabled(False)
+            dlg.btn_duplicate.setEnabled(False)
+            dlg.btn_open.setEnabled(False)
+            return
+
+        row = selected_list[0].row()
+        status = dlg.tbl_results.model().record(row).value("status")
+
+        if status == 'FINISHED':
+            dlg.btn_delete.setEnabled(False)
+            dlg.btn_status.setEnabled(False)
+            dlg.btn_duplicate.setEnabled(True)
+        else:
+            dlg.btn_delete.setEnabled(True)
+            dlg.btn_status.setEnabled(True)
+            dlg.btn_duplicate.setEnabled(False)
+        if status == 'ON PLANNING':
+            dlg.btn_open.setEnabled(True)
+            dlg.btn_delete.setEnabled(False)
+        else:
+            dlg.btn_open.setEnabled(False)
+            dlg.btn_delete.setEnabled(True)
+
+
+    def _filter_table(self):
+
+        dlg = self.dlg_priority_manager
+
+        tbl_result = dlg.tbl_results
+
+        expr = ""
+        id_ = tools_qt.get_text(dlg, dlg.txt_filter, False, False)
+        result_type = tools_qt.get_combo_value(dlg, dlg.cmb_type, 0)
+        expl_id = tools_qt.get_combo_value(dlg, dlg.cmb_expl, 0)
+        status = tools_qt.get_combo_value(dlg, dlg.cmb_status, 0)
+
+        expr += f" result_name ILIKE '%{id_}%'"
+        expr += f" AND (result_type ILIKE '%{result_type}%')"
+        if expl_id:
+            expr += f" AND (expl_id = {expl_id})"
+        expr += f" AND (status::text ILIKE '%{status}%')"
+
+        # Refresh model with selected filter
+        tbl_result.model().setFilter(expr)
+        tbl_result.model().select()
+
+
+
     def _delete_result(self):
+
         table = self.dlg_priority_manager.tbl_results
         selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
         for result_id in selected:
@@ -114,6 +201,7 @@ class ResultManager(dialog.GwAction):
         table.model().select()
 
     def _dlg_status_accept(self, result_id):
+
         new_status = tools_qt.get_combo_value(self.dlg_status, "cmb_status")
         tools_db.execute_sql(
             f"""
@@ -125,7 +213,22 @@ class ResultManager(dialog.GwAction):
         self.dlg_status.close()
         self.dlg_priority_manager.tbl_results.model().select()
 
+
+    def _open_result(self):
+
+        # Get parameters
+
+        dlg = self.dlg_priority_manager
+        selected_list = dlg.tbl_results.selectionModel().selectedRows()
+        row = selected_list[0].row()
+        result_id = dlg.tbl_results.model().record(row).value("result_id")
+
+        calculate_priority = CalculatePriority(type="SELECTION", mode="exist", result_id=result_id)
+        calculate_priority.clicked_event(is_edit=True)
+
+
     def _duplicate_result(self):
+
         table = self.dlg_priority_manager.tbl_results
         selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
 
@@ -183,6 +286,7 @@ class ResultManager(dialog.GwAction):
             print(f"EXCEPTION -> {e}")
 
     def _open_status_selector(self):
+
         table = self.dlg_priority_manager.tbl_results
         selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
 
@@ -221,7 +325,19 @@ class ResultManager(dialog.GwAction):
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager
+        dlg.btn_open.clicked.connect(self._open_result)
         dlg.btn_duplicate.clicked.connect(self._duplicate_result)
         dlg.btn_status.clicked.connect(self._open_status_selector)
         dlg.btn_delete.clicked.connect(self._delete_result)
         dlg.btn_close.clicked.connect(dlg.reject)
+
+        dlg.txt_filter.textChanged.connect(partial(self._filter_table))
+        dlg.cmb_type.currentIndexChanged.connect(partial(self._filter_table))
+        dlg.cmb_expl.currentIndexChanged.connect(partial(self._filter_table))
+        dlg.cmb_status.currentIndexChanged.connect(partial(self._filter_table))
+
+        selection_model = dlg.tbl_results.selectionModel()
+        selection_model.selectionChanged.connect(partial(self._manage_btn_action))
+        selection_model.selectionChanged.connect(partial(self._manage_txt_report))
+
+

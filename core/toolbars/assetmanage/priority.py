@@ -373,7 +373,7 @@ class CalculatePriority:
         # Priority variables
         self.dlg_priority = None
 
-    def clicked_event(self):
+    def clicked_event(self, is_edit=False):
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
         dlg.setWindowTitle(dlg.windowTitle() + f" ({self._tr(self.type)})")
@@ -387,10 +387,19 @@ class CalculatePriority:
         if os.path.exists(icon_path):
             self.dlg_priority.btn_snapping.setIcon(QIcon(icon_path))
 
+        icon_path = os.path.join(icons_folder, "111b.png")
+        if os.path.exists(icon_path):
+            self.dlg_priority.btn_add_cost.setIcon(QIcon(icon_path))
+            self.dlg_priority.btn_add_material.setIcon(QIcon(icon_path))
+        icon_path = os.path.join(icons_folder, "112b.png")
+        if os.path.exists(icon_path):
+            self.dlg_priority.btn_remove_cost.setIcon(QIcon(icon_path))
+            self.dlg_priority.btn_remove_material.setIcon(QIcon(icon_path))
+
         # Manage form
 
         # Hidden widgets
-        self._manage_hidden_form()
+        self._manage_hidden_form(is_edit)
 
         # Manage selection group
         self._manage_selection()
@@ -504,7 +513,7 @@ class CalculatePriority:
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 
-    def _manage_hidden_form(self):
+    def _manage_hidden_form(self, is_edit=False):
 
         if self.config.show_budget is not True and not self.result["budget"]:
             self.dlg_priority.lbl_budget.setVisible(False)
@@ -560,6 +569,10 @@ class CalculatePriority:
                 self.dlg_priority.tab_widget.tab_material.setVisible(False)
             if self.config.show_config_engine is not True:
                 self.dlg_priority.tab_widget.tab_engine.setVisible(False)
+
+        # Manage form when is edit
+        if is_edit:
+            self.dlg_priority.txt_result_id.setEnabled(False)
 
     def _manage_calculate(self):
         dlg = self.dlg_priority
@@ -792,6 +805,10 @@ class CalculatePriority:
         dlg.btn_calc.clicked.connect(self._manage_calculate)
         dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
+        dlg.btn_add_cost.clicked.connect(partial(self._manage_qtw_row, dlg, dlg.tbl_cost, "add"))
+        dlg.btn_remove_cost.clicked.connect(partial(self._manage_qtw_row, dlg, dlg.tbl_cost, "remove"))
+        dlg.btn_add_material.clicked.connect(partial(self._manage_qtw_row, dlg, dlg.tbl_material, "add"))
+        dlg.btn_remove_material.clicked.connect(partial(self._manage_qtw_row, dlg, dlg.tbl_material, "remove"))
 
         if self.config.method == "WM":
             for widget in self._get_weight_widgets("lyt_engine_1"):
@@ -803,6 +820,18 @@ class CalculatePriority:
             widget.textChanged.connect(
                 partial(self._update_total_weight, "lyt_engine_2")
             )
+
+    def _manage_qtw_row(self, dialog, widget, action):
+
+        if action == 'add':
+            row_count = widget.rowCount()
+            widget.insertRow(row_count)
+        elif action == 'remove':
+            selected_row = widget.currentRow()
+            print(f"aa -> {selected_row}")
+            if selected_row != -1:
+                widget.removeRow(selected_row)
+
 
     def _tr(self, msg):
         return tools_qt.tr(msg, context_name=global_vars.plugin_name)
@@ -936,45 +965,54 @@ class CalculatePriority:
     # region Attribute
 
     def _manage_attr(self):
+
+        dlg = self.dlg_priority
+
         # Combo status
         rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
-        tools_qt.fill_combo_values(self.dlg_priority.cmb_status, rows, 1)
+        tools_qt.fill_combo_values(dlg.cmb_status, rows, 1)
         tools_qt.set_combo_value(
-            self.dlg_priority.cmb_status, "ON PLANNING", 0, add_new=False
+            dlg.cmb_status, "ON PLANNING", 0, add_new=False
         )
         tools_qt.set_combo_item_select_unselectable(
-            self.dlg_priority.cmb_status, list_id=["FINISHED"]
+            dlg.cmb_status, list_id=["FINISHED"]
         )
+
+        # Text result_id
+        tools_qt.set_widget_text(dlg, dlg.txt_result_id, self.result["name"])
+
+        # Text descript
+        tools_qt.set_widget_text(dlg, dlg.txt_descript, self.result["descript"])
 
         # Combo dnom
         sql = "SELECT distinct(dnom::float) as id, dnom as idval FROM cat_arc WHERE dnom is not null ORDER BY id;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
-            self.dlg_priority.cmb_dnom, rows, 1, sort_by=0, add_empty=True
+            dlg.cmb_dnom, rows, 1, sort_by=0, add_empty=True
         )
         tools_qt.set_combo_value(
-            self.dlg_priority.cmb_dnom, self.result["dnom"], 0, add_new=False
+            dlg.cmb_dnom, f'{round(self.result["dnom"], 1)}', 0, add_new=False
         )
 
         # Combo material
         sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
-            self.dlg_priority.cmb_material, rows, 1, add_empty=True
+            dlg.cmb_material, rows, 1, add_empty=True
         )
         tools_qt.set_combo_value(
-            self.dlg_priority.cmb_material, self.result["material_id"], 0, add_new=False
+            dlg.cmb_material, self.result["material_id"], 0, add_new=False
         )
 
         # Combo exploitation
         sql = "SELECT expl_id as id, name as idval FROM asset.exploitation;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
-            self.dlg_priority.cmb_expl_selection, rows, 1, add_empty=True
+            dlg.cmb_expl_selection, rows, 1, add_empty=True
         )
         tools_qt.set_combo_value(
-            self.dlg_priority.cmb_expl_selection,
-            self.result["expl_id"],
+            dlg.cmb_expl_selection,
+            f'{self.result["expl_id"]}',
             0,
             add_new=False,
         )
@@ -983,21 +1021,25 @@ class CalculatePriority:
         sql = "SELECT presszone_id as id, name as idval FROM asset.presszone"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(
-            self.dlg_priority.cmb_presszone, rows, 1, add_empty=True
+            dlg.cmb_presszone, rows, 1, add_empty=True
         )
         tools_qt.set_combo_value(
-            self.dlg_priority.cmb_presszone,
+            dlg.cmb_presszone,
             self.result["presszone_id"],
             0,
             add_new=False,
         )
+
+        # Text budget
+        tools_qt.set_widget_text(dlg, dlg.txt_budget, self.result["budget"])
+
 
         # Combo horizon year
         next_years = [
             [x + date.today().year, str(x + date.today().year)] for x in range(1, 101)
         ]
         tools_qt.fill_combo_values(
-            self.dlg_priority.cmb_year, next_years, 1, add_empty=True
+            dlg.cmb_year, next_years, 1, add_empty=True
         )
 
     # endregion

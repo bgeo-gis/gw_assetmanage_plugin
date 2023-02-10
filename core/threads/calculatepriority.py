@@ -594,6 +594,7 @@ class GwCalculatePriority(GwTask):
         return True
 
     def _run_wm(self):
+
         self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/n)...")
         self.setProgress(10)
 
@@ -948,7 +949,7 @@ class GwCalculatePriority(GwTask):
     def _save_result_info(self):
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
         result_id = tools_db.get_row(sql)
-        print(f"RESULT_ID 11 -> {result_id}")
+
         if result_id is not None:
             self._emit_report(
                 self._tr("Result name already in use, please choose a different name.")
