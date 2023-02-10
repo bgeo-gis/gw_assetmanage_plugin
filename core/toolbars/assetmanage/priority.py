@@ -828,7 +828,6 @@ class CalculatePriority:
             widget.insertRow(row_count)
         elif action == 'remove':
             selected_row = widget.currentRow()
-            print(f"aa -> {selected_row}")
             if selected_row != -1:
                 widget.removeRow(selected_row)
 
