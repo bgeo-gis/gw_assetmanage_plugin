@@ -214,6 +214,21 @@ class GwCalculatePriority(GwTask):
         )
         return message.format(qtd=obj["qtd"], list=", ".join(obj["set"]))
 
+    def _invalid_material_report(self, obj):
+        if not obj["qtd"]:
+            return
+        message = self._tr(
+            "Pipes with invalid material: {qtd}.\n"
+            "Invalid materials: {list}.\n"
+            "These pipes have been identified as the configured unknown material, "
+            "{unknown_material}."
+        )
+        return message.format(
+            qtd=obj["qtd"],
+            list=", ".join(obj["set"]),
+            unknown_material=self.unknown_material,
+        )
+
     def _ivi_report(self, ivi):
         # message
         title = self._tr("IVI")
@@ -647,6 +662,7 @@ class GwCalculatePriority(GwTask):
 
         arcs = []
         invalid_arccat_id = {"qtd": 0, "set": set()}
+        invalid_material = {"qtd": 0, "set": set()}
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
@@ -658,6 +674,14 @@ class GwCalculatePriority(GwTask):
                 continue
 
             arc_material = arc.get("material", None)
+            if (
+                not arc_material
+                or arc_material == self.unknown_material
+                or not self.config_material.has_material(arc_material)
+            ):
+                invalid_material["qtd"] += 1
+                invalid_material["set"].add(arc_material or "NULL")
+
             arc["mleak"] = self.config_material.get_pleak(arc_material)
 
             cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
@@ -797,6 +821,7 @@ class GwCalculatePriority(GwTask):
                 [
                     self._ivi_report(ivi),
                     self._invalid_arccat_id_report(invalid_arccat_id),
+                    self._invalid_material_report(invalid_material),
                 ],
             )
         )
