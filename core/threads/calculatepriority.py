@@ -204,6 +204,16 @@ class GwCalculatePriority(GwTask):
         """
         return tools_db.get_rows(sql)
 
+    def _invalid_arccat_id_report(self, obj):
+        if not obj["qtd"]:
+            return
+        message = self._tr(
+            "Pipes with invalid arccat_id: {qtd}.\n"
+            "Invalid arccat_ids: {list}.\n"
+            "These pipes have NOT been assigned a priority value."
+        )
+        return message.format(qtd=obj["qtd"], list=", ".join(obj["set"]))
+
     def _ivi_report(self, ivi):
         # message
         title = self._tr("IVI")
@@ -231,7 +241,7 @@ class GwCalculatePriority(GwTask):
         for line in zip(*columns):
             txt += "  ".join(line)
             txt += "\n"
-        return txt
+        return txt.strip()
 
     def _run_sh(self):
         self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
@@ -636,10 +646,13 @@ class GwCalculatePriority(GwTask):
         self.setProgress(30)
 
         arcs = []
+        invalid_arccat_id = {"qtd": 0, "set": set()}
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
             if not self.config_cost.has_arccat_id(arc["arccat_id"]):
+                invalid_arccat_id["qtd"] += 1
+                invalid_arccat_id["set"].add(arc["arccat_id"])
                 continue
             if arc["length"] is None:
                 continue
@@ -778,7 +791,15 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/n)...")
         self.setProgress(40)
 
-        self.statistics_report = self._ivi_report(ivi)
+        self.statistics_report = "\n\n".join(
+            filter(
+                lambda x: x,
+                [
+                    self._ivi_report(ivi),
+                    self._invalid_arccat_id_report(invalid_arccat_id),
+                ],
+            )
+        )
 
         self.result_id = self._save_result_info()
         if not self.result_id:
