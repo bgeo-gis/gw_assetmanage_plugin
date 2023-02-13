@@ -269,7 +269,6 @@ CREATE TABLE asset.cat_mat_arc AS
    FROM PARENT_SCHEMA.cat_mat_arc
   WHERE (cat_mat_arc.active = true);
 
--- FIXME: Take into account state of the arc (active, inactive, etc.)
 CREATE TABLE asset.arc_asset AS
  SELECT a.arc_id,
     a.sector_id,

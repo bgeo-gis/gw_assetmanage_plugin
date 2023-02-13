@@ -392,7 +392,6 @@ class CalculatePriority:
         # Manage attributes group
         self._manage_attr()
 
-        # FIXME: Tables should load result config if "duplicate" or "edit"
         # Define tableviews
         self.qtbl_cost = self.dlg_priority.findChild(QTableWidget, "tbl_cost")
         self.qtbl_cost.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -567,9 +566,6 @@ class CalculatePriority:
             ):
                 self.dlg_priority.lbl_presszone.setVisible(False)
                 self.dlg_priority.cmb_presszone.setVisible(False)
-        if self.config.show_ivi_button is not True:
-            # TODO: next approach
-            pass
         if self.config.show_config is not True:
             self.dlg_priority.grb_global.setVisible(False)
         else:
