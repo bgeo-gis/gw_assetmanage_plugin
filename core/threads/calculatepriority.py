@@ -217,12 +217,21 @@ class GwCalculatePriority(GwTask):
     def _invalid_material_report(self, obj):
         if not obj["qtd"]:
             return
-        message = self._tr(
-            "Pipes with invalid material: {qtd}.\n"
-            "Invalid materials: {list}.\n"
-            "These pipes have been identified as the configured unknown material, "
-            "{unknown_material}."
-        )
+        if self.config_material.has_material(self.unknown_material):
+            message = self._tr(
+                "Pipes with invalid material: {qtd}.\n"
+                "Invalid materials: {list}.\n"
+                "These pipes have been identified as the configured unknown material, "
+                "{unknown_material}."
+            )
+        else:
+            message = self._tr(
+                "Pipes with invalid material: {qtd}.\n"
+                "Invalid materials: {list}.\n"
+                "These pipes have NOT been assigned a priority value "
+                "as the configured unknown material, {unknown_material}, "
+                "is not listed in the configuration tab for materials."
+            )
         return message.format(
             qtd=obj["qtd"],
             list=", ".join(obj["set"]),
@@ -673,7 +682,7 @@ class GwCalculatePriority(GwTask):
             if arc["length"] is None:
                 continue
 
-            arc_material = arc.get("material", None)
+            arc_material = arc.get("matcat_id", None)
             if (
                 not arc_material
                 or arc_material == self.unknown_material
@@ -681,7 +690,9 @@ class GwCalculatePriority(GwTask):
             ):
                 invalid_material["qtd"] += 1
                 invalid_material["set"].add(arc_material or "NULL")
-
+                if not self.config_material.has_material(self.unknown_material):
+                    continue
+            
             arc["mleak"] = self.config_material.get_pleak(arc_material)
 
             cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
@@ -740,7 +751,7 @@ class GwCalculatePriority(GwTask):
             )
             arc["val_strategic"] = 10 if arc["strategic"] else 0
             arc["val_compliance"] = 10 - min(
-                self.config_material.get_compliance(arc_material),
+                self.config_material.get_compliance(arc["matcat_id"]),
                 self.config_cost.get_compliance(arc["arccat_id"]),
             )
 

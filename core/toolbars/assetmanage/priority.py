@@ -176,6 +176,9 @@ class ConfigMaterial:
     def get_pleak(self, material):
         return self._get_attr(material, "pleak")
 
+    def has_material(self, material):
+        return material in self._data
+
     def save(self, result_id):
         sql = f"""
             delete from asset.config_material where result_id = {result_id};
@@ -200,7 +203,7 @@ class ConfigMaterial:
         tools_db.execute_sql(sql)
 
     def _get_attr(self, material, attribute):
-        if material in self._data.keys():
+        if material in self._data:
             return self._data[material][attribute]
         return self._data[self._unknown_material][attribute]
 
