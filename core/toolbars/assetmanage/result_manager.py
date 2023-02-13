@@ -223,8 +223,8 @@ class ResultManager(dialog.GwAction):
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
 
-        calculate_priority = CalculatePriority(type="SELECTION", mode="exist", result_id=result_id)
-        calculate_priority.clicked_event(is_edit=True)
+        calculate_priority = CalculatePriority(type="SELECTION", mode="edit", result_id=result_id)
+        calculate_priority.clicked_event()
 
 
     def _duplicate_result(self):

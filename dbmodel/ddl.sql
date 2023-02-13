@@ -37,7 +37,7 @@ CREATE TABLE asset.arc_input (
 
 CREATE TABLE asset.cat_result (
     result_id serial,
-    result_name text,
+    result_name text UNIQUE,
     result_type character varying(50),
     descript text,
     report text,

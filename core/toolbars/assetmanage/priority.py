@@ -43,21 +43,6 @@ from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
 
 
-def table2data(table_view):
-    model = table_view.model()
-    data = []
-    for row in range(model.rowCount()):
-        record = model.record(row)
-        data.append(
-            {
-                record.fieldName(i): record.value(i)
-                for i in range(len(record))
-                if not table_view.isColumnHidden(i)
-            }
-        )
-    return data
-
-
 class ConfigCost:
     def __init__(self, data):
         # order the dict by dnom
@@ -365,7 +350,7 @@ class CalculatePriority:
         self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
-        self.layers["arc"] = []
+        self.layers["arc"] = self.result["features"] or []
         self.list_ids = {}
         self.config = CalculatePriorityConfig(type)
         self.total_weight = {}
@@ -373,7 +358,7 @@ class CalculatePriority:
         # Priority variables
         self.dlg_priority = None
 
-    def clicked_event(self, is_edit=False):
+    def clicked_event(self):
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
         dlg.setWindowTitle(dlg.windowTitle() + f" ({self._tr(self.type)})")
@@ -399,7 +384,7 @@ class CalculatePriority:
         # Manage form
 
         # Hidden widgets
-        self._manage_hidden_form(is_edit)
+        self._manage_hidden_form()
 
         # Manage selection group
         self._manage_selection()
@@ -408,19 +393,26 @@ class CalculatePriority:
         self._manage_attr()
 
         # FIXME: Tables should load result config if "duplicate" or "edit"
-        # TODO: Change from QTableView to QTableWidget for more flexibility
         # Define tableviews
         self.qtbl_cost = self.dlg_priority.findChild(QTableWidget, "tbl_cost")
         self.qtbl_cost.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.qtbl_cost.setSortingEnabled(True)
-        configcost = configcost_from_sql("select * from asset.config_cost_def")
+        if self.mode == "new":
+            sql = "select * from asset.config_cost_def"
+        else:
+            sql = (
+                f"select * from asset.config_cost where result_id = {self.result['id']}"
+            )
+        configcost = configcost_from_sql(sql)
         configcost.fill_table_widget(self.qtbl_cost)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
-        configmaterial = configmaterial_from_sql(
-            "select * from asset.config_material_def", self.config.unknown_material
-        )
+        if self.mode == "new":
+            sql = "select * from asset.config_material_def"
+        else:
+            sql = f"select * from asset.config_material where result_id = {self.result['id']}"
+        configmaterial = configmaterial_from_sql(sql, self.config.unknown_material)
         configmaterial.fill_table_widget(self.qtbl_material)
 
         self._fill_engine_options()
@@ -465,20 +457,38 @@ class CalculatePriority:
         dlg = self.dlg_priority
 
         self.config_engine_fields = []
-        rows = tools_db.get_rows(
-            f"""
-            select parameter,
-                value,
-                descript,
-                layoutname,
-                layoutorder,
-                label,
-                datatype,
-                widgettype
-            from asset.config_engine_def
-            where method = '{self.config.method}'
-            """
-        )
+        if self.mode == "new":
+            rows = tools_db.get_rows(
+                f"""
+                select parameter,
+                    value,
+                    descript,
+                    layoutname,
+                    layoutorder,
+                    label,
+                    datatype,
+                    widgettype
+                from asset.config_engine_def
+                where method = '{self.config.method}'
+                """
+            )
+        else:
+            rows = tools_db.get_rows(
+                f"""
+                select c.parameter,
+                    c.value,
+                    d.descript,
+                    d.layoutname,
+                    d.layoutorder,
+                    d.label,
+                    d.datatype,
+                    d.widgettype
+                from asset.config_engine as c
+                join asset.config_engine_def as d using (parameter)
+                where c.result_id = {self.result["id"]}
+                    and d.method = '{self.config.method}'
+                """
+            )
 
         for row in rows:
             self.config_engine_fields.append(
@@ -513,7 +523,7 @@ class CalculatePriority:
         fields = filter(is_weight, self.config_engine_fields)
         return [tools_qt.get_widget(self.dlg_priority, x["widgetname"]) for x in fields]
 
-    def _manage_hidden_form(self, is_edit=False):
+    def _manage_hidden_form(self):
 
         if self.config.show_budget is not True and not self.result["budget"]:
             self.dlg_priority.lbl_budget.setVisible(False)
@@ -571,7 +581,7 @@ class CalculatePriority:
                 self.dlg_priority.tab_widget.tab_engine.setVisible(False)
 
         # Manage form when is edit
-        if is_edit:
+        if self.mode == "edit":
             self.dlg_priority.txt_result_id.setEnabled(False)
 
     def _manage_calculate(self):
@@ -869,7 +879,7 @@ class CalculatePriority:
             msg = "Please provide a result name."
             tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
-        if tools_db.get_row(
+        if self.mode != "edit" and tools_db.get_row(
             f"""
             select * from asset.cat_result
             where result_name = '{result_name}'
@@ -1035,6 +1045,12 @@ class CalculatePriority:
             [x + date.today().year, str(x + date.today().year)] for x in range(1, 101)
         ]
         tools_qt.fill_combo_values(dlg.cmb_year, next_years, 1, add_empty=True)
+        tools_qt.set_combo_value(
+            dlg.cmb_year,
+            self.result["target_year"],
+            0,
+            add_new=True,
+        )
 
     # endregion
 

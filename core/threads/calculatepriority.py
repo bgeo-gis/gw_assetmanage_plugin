@@ -947,15 +947,6 @@ class GwCalculatePriority(GwTask):
         tools_db.execute_sql(save_config_material_sql)
 
     def _save_result_info(self):
-        sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql)
-
-        if result_id is not None:
-            self._emit_report(
-                self._tr("Result name already in use, please choose a different name.")
-            )
-            return None
-
         str_features = (
             f"""ARRAY['{"','".join(self.features)}']""" if self.features else "NULL"
         )
@@ -991,6 +982,20 @@ class GwCalculatePriority(GwTask):
                 '{self.statistics_report}',
                 current_user,
                 now())
+            on conflict (result_name) do update
+            set result_type = EXCLUDED.result_type, 
+                descript = EXCLUDED.descript,
+                status = EXCLUDED.status,
+                features = EXCLUDED.features,
+                expl_id = EXCLUDED.expl_id,
+                presszone_id = EXCLUDED.presszone_id,
+                dnom = EXCLUDED.dnom,
+                material_id = EXCLUDED.material_id,
+                budget = EXCLUDED.budget,
+                target_year = EXCLUDED.target_year,
+                report = EXCLUDED.report,
+                cur_user = EXCLUDED.cur_user,
+                tstamp = EXCLUDED.tstamp
             """
         )
 
