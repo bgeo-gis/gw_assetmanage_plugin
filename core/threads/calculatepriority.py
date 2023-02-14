@@ -629,7 +629,7 @@ class GwCalculatePriority(GwTask):
 
     def _run_wm(self):
 
-        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/n)...")
+        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/4)...")
         self.setProgress(10)
 
         rows = tools_db.get_rows(
@@ -651,7 +651,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/n)...")
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/4)...")
         self.setProgress(20)
 
         rows = self._get_arcs()
@@ -666,7 +666,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Calculating values") + " (3/n)...")
+        self._emit_report(self._tr("Calculating values") + " (3/4)...")
         self.setProgress(30)
 
         arcs = []
@@ -692,7 +692,7 @@ class GwCalculatePriority(GwTask):
                 invalid_material["set"].add(arc_material or "NULL")
                 if not self.config_material.has_material(self.unknown_material):
                     continue
-            
+
             arc["mleak"] = self.config_material.get_pleak(arc_material)
 
             cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
@@ -823,7 +823,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Updating tables") + " (4/n)...")
+        self._emit_report(self._tr("Updating tables") + " (4/4)...")
         self.setProgress(40)
 
         self.statistics_report = "\n\n".join(
@@ -949,8 +949,6 @@ class GwCalculatePriority(GwTask):
             loop += 1
             progress = (100 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
-
-        # TODO: Reports (invalid materials and diameters, etc.)
 
         self._emit_report(self.statistics_report)
 
