@@ -57,13 +57,19 @@ class ResultManager(dialog.GwAction):
 
         # Fill filters
         rows = tools_db.get_rows("SELECT id, idval FROM asset.value_result_type")
-        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_type, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority_manager.cmb_type, rows, 1, add_empty=True
+        )
 
         rows = tools_db.get_rows("SELECT expl_id, name FROM asset.exploitation")
-        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_expl, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority_manager.cmb_expl, rows, 1, add_empty=True
+        )
 
         rows = tools_db.get_rows("SELECT id, idval FROM asset.value_status")
-        tools_qt.fill_combo_values(self.dlg_priority_manager.cmb_status, rows, 1, add_empty=True)
+        tools_qt.fill_combo_values(
+            self.dlg_priority_manager.cmb_status, rows, 1, add_empty=True
+        )
 
         # Fill results table
         # TODO: use a join to translate type and status of a result
@@ -85,8 +91,12 @@ class ResultManager(dialog.GwAction):
         # self.dlg_priority_manager.btn_duplicate.hide()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_priority_manager, dlg_name="priority_manager", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
-
+        tools_gw.open_dialog(
+            self.dlg_priority_manager,
+            dlg_name="priority_manager",
+            plugin_dir=global_vars.plugin_dir,
+            plugin_name=global_vars.plugin_name,
+        )
 
     def _manage_txt_report(self):
 
@@ -119,12 +129,12 @@ class ResultManager(dialog.GwAction):
         row = selected_list[0].row()
         status = dlg.tbl_results.model().record(row).value("status")
 
-        if status == 'FINISHED':
+        if status == "FINISHED":
             dlg.btn_open.setEnabled(False)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(False)
             dlg.btn_delete.setEnabled(False)
-        elif status == 'ON PLANNING':
+        elif status == "ON PLANNING":
             dlg.btn_open.setEnabled(True)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(True)
@@ -134,7 +144,6 @@ class ResultManager(dialog.GwAction):
             dlg.btn_duplicate.setEnabled(False)
             dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(True)
-
 
     def _filter_table(self):
 
@@ -157,8 +166,6 @@ class ResultManager(dialog.GwAction):
         # Refresh model with selected filter
         tbl_result.model().setFilter(expr)
         tbl_result.model().select()
-
-
 
     def _delete_result(self):
 
@@ -214,7 +221,6 @@ class ResultManager(dialog.GwAction):
         self.dlg_status.close()
         self.dlg_priority_manager.tbl_results.model().select()
 
-
     def _open_result(self):
 
         # Get parameters
@@ -225,9 +231,10 @@ class ResultManager(dialog.GwAction):
         result_id = dlg.tbl_results.model().record(row).value("result_id")
         result_type = dlg.tbl_results.model().record(row).value("result_type")
 
-        calculate_priority = CalculatePriority(type=result_type, mode="edit", result_id=result_id)
+        calculate_priority = CalculatePriority(
+            type=result_type, mode="edit", result_id=result_id
+        )
         calculate_priority.clicked_event()
-
 
     def _duplicate_result(self):
 
@@ -237,7 +244,9 @@ class ResultManager(dialog.GwAction):
         result_id = dlg.tbl_results.model().record(row).value("result_id")
         result_type = dlg.tbl_results.model().record(row).value("result_type")
 
-        calculate_priority = CalculatePriority(type=result_type, mode="duplicate", result_id=result_id)
+        calculate_priority = CalculatePriority(
+            type=result_type, mode="duplicate", result_id=result_id
+        )
         calculate_priority.clicked_event()
 
     def _fill_table(
@@ -322,7 +331,12 @@ class ResultManager(dialog.GwAction):
         )
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
-        tools_gw.open_dialog(self.dlg_status, dlg_name="status_selector", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
+        tools_gw.open_dialog(
+            self.dlg_status,
+            dlg_name="status_selector",
+            plugin_dir=global_vars.plugin_dir,
+            plugin_name=global_vars.plugin_name,
+        )
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager
@@ -340,5 +354,3 @@ class ResultManager(dialog.GwAction):
         selection_model = dlg.tbl_results.selectionModel()
         selection_model.selectionChanged.connect(partial(self._manage_btn_action))
         selection_model.selectionChanged.connect(partial(self._manage_txt_report))
-
-
