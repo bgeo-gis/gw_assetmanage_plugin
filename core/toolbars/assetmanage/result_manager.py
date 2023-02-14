@@ -223,21 +223,21 @@ class ResultManager(dialog.GwAction):
         selected_list = dlg.tbl_results.selectionModel().selectedRows()
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
+        result_type = dlg.tbl_results.model().record(row).value("result_type")
 
-        calculate_priority = CalculatePriority(type="SELECTION", mode="edit", result_id=result_id)
+        calculate_priority = CalculatePriority(type=result_type, mode="edit", result_id=result_id)
         calculate_priority.clicked_event()
 
 
     def _duplicate_result(self):
 
-        table = self.dlg_priority_manager.tbl_results
-        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
+        dlg = self.dlg_priority_manager
+        selected_list = dlg.tbl_results.selectionModel().selectedRows()
+        row = selected_list[0].row()
+        result_id = dlg.tbl_results.model().record(row).value("result_id")
+        result_type = dlg.tbl_results.model().record(row).value("result_type")
 
-        if len(selected) != 1:
-            tools_qt.show_info_box("Select only one result to duplicate.")
-            return
-
-        calculate_priority = CalculatePriority(mode="duplicate", result_id=selected[0])
+        calculate_priority = CalculatePriority(type=result_type, mode="duplicate", result_id=result_id)
         calculate_priority.clicked_event()
 
     def _fill_table(
