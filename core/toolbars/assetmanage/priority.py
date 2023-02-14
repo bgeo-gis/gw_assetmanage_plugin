@@ -641,12 +641,6 @@ class CalculatePriority:
                     sum(count) as qtd,
                     string_agg(coalesce, ', ') as list
                 from list_invalid_arccat_ids),
-            null_pressures as (
-                select 'null_pressures' as check,
-                    count(*) as qtd,
-                    null as list
-                from assets
-                where press1 is null and press2 is null),
             list_invalid_materials as (
                 select count(*), coalesce(matcat_id, 'NULL')
                 from assets
@@ -657,12 +651,18 @@ class CalculatePriority:
                 order by matcat_id),
             invalid_materials as (
                 select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
-                from list_invalid_materials)
+                from list_invalid_materials),
+            null_pressures as (
+                select 'null_pressures' as check,
+                    count(*) as qtd,
+                    null as list
+                from assets
+                where press1 is null and press2 is null)
             select * from invalid_arccat_ids
             union all
-            select * from null_pressures
-            union all
             select * from invalid_materials
+            union all
+            select * from null_pressures
             """
         )
 
