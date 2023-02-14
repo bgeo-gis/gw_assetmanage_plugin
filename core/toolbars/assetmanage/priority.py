@@ -48,6 +48,9 @@ class ConfigCost:
         # order the dict by dnom
         self._data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
 
+    def arccat_ids(self):
+        return self._data.keys()
+
     def fill_table_widget(self, table_widget):
         # message
         headers = [
@@ -609,7 +612,6 @@ class CalculatePriority:
             config_engine,
         ) = inputs
 
-        # TODO: Check invalid arccat_ids
         filter_list = []
         if features:
             filter_list.append(f"""arc_id in ('{"','".join(features)}')""")
@@ -627,6 +629,18 @@ class CalculatePriority:
             f"""
             with assets as (
                 select * from asset.arc_asset {filters}),
+            list_invalid_arccat_ids as (
+                select count(*), coalesce(arccat_id, 'NULL')
+                from assets
+                where arccat_id is null 
+                    or arccat_id not in ('{"','".join(config_cost.arccat_ids())}')
+                group by arccat_id
+                order by arccat_id),
+            invalid_arccat_ids as (
+                select 'invalid_arccat_ids' as check,
+                    sum(count) as qtd,
+                    string_agg(coalesce, ', ') as list
+                from list_invalid_arccat_ids),
             null_pressures as (
                 select 'null_pressures' as check,
                     count(*) as qtd,
@@ -644,6 +658,8 @@ class CalculatePriority:
             invalid_materials as (
                 select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
                 from list_invalid_materials)
+            select * from invalid_arccat_ids
+            union all
             select * from null_pressures
             union all
             select * from invalid_materials
@@ -653,21 +669,20 @@ class CalculatePriority:
         for row in data_checks:
             if not row["qtd"]:
                 continue
-            if row["check"] == "invalid_diameters":
-                msg = (
-                    self._tr("Pipes with invalid diameters:")
+            if row["check"] == "invalid_arccat_ids":
+                message = (
+                    self._tr("Pipes with invalid arccat_ids:")
                     + f" {row['qtd']}.\n"
-                    + self._tr("Invalid diameters:")
+                    + self._tr("Invalid arccat_ids:")
                     + f" {row['list']}.\n\n"
                     + self._tr(
-                        "A diameter value is considered invalid if it is zero, negative, "
-                        "NULL or greater than the maximum diameter in the configuration table. "
+                        "An arccat_id is considered invalid if it is not listed in the costs configuration table. "
                         "As a result, these pipes will NOT be assigned a priority value."
                     )
                     + "\n\n"
                     + self._tr("Do you want to proceed?")
                 )
-                if not tools_qt.show_question(msg, force_action=True):
+                if not tools_qt.show_question(message, force_action=True):
                     return
             elif row["check"] == "invalid_materials":
                 if config_material.has_material(self.config.unknown_material):
