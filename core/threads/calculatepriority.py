@@ -238,6 +238,15 @@ class GwCalculatePriority(GwTask):
             unknown_material=self.unknown_material,
         )
 
+    def _invalid_pressures_report(self, null_pressures):
+        if not null_pressures:
+            return
+        message = self._tr(
+            "Pipes with invalid pressures: {qtd}.\n"
+            "These pipes received the maximum longevity value for their material."
+        )
+        return message.format(qtd=null_pressures)
+
     def _ivi_report(self, ivi):
         # message
         title = self._tr("IVI")
@@ -672,7 +681,7 @@ class GwCalculatePriority(GwTask):
         arcs = []
         invalid_arccat_id = {"qtd": 0, "set": set()}
         invalid_material = {"qtd": 0, "set": set()}
-        # TODO: Null pressions report
+        null_pressures = 0
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
@@ -702,7 +711,9 @@ class GwCalculatePriority(GwTask):
             builtdate = arc["builtdate"] or date(
                 self.config_material.get_default_builtdate(arc_material), 1, 1
             )
-            pression = (
+            if arc["press1"] is None and arc["press2"] is None:
+                null_pressures += 1
+            pressure = (
                 0
                 if arc["press1"] is None and arc["press2"] is None
                 else arc["press1"]
@@ -712,7 +723,7 @@ class GwCalculatePriority(GwTask):
                 else (arc["press1"] + arc["press2"]) / 2
             )
             arc["total_expected_useful_life"] = self.config_material.get_age(
-                arc_material, pression
+                arc_material, pressure
             )
             one_year = timedelta(days=365)
             duration = arc["total_expected_useful_life"] * one_year
@@ -834,6 +845,7 @@ class GwCalculatePriority(GwTask):
                     self._ivi_report(ivi),
                     self._invalid_arccat_id_report(invalid_arccat_id),
                     self._invalid_material_report(invalid_material),
+                    self._invalid_pressures_report(null_pressures),
                 ],
             )
         )
