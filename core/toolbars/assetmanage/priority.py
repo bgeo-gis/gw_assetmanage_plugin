@@ -607,20 +607,31 @@ class CalculatePriority:
         ) = inputs
 
         # FIXME: Take into account the unknown material from config.config
-        # FIXME: Add filters to checks
         # TODO: Check invalid arccat_ids
         # TODO: Check for invalid materials
+        filter_list = []
+        if features:
+            filter_list.append(f"""arc_id in ('{"','".join(features)}')""")
+        if exploitation:
+            filter_list.append(f"expl_id = {exploitation}")
+        if presszone:
+            filter_list.append(f"presszone_id = '{presszone}'")
+        if diameter:
+            filter_list.append(f"dnom = '{diameter}'")
+        if material:
+            filter_list.append(f"matcat_id = '{material}'")
+        filters = f"where {' and '.join(filter_list)}" if filter_list else ""
+
         data_checks = tools_db.get_rows(
             f"""
-            with list_null_pressures as (
-                select count(*)
-                from asset.arc_asset
-                where press1 is null and press2 is null),
+            with assets as (
+                select * from asset.arc_asset {filters}),
             null_pressures as (
                 select 'null_pressures' as check,
-                    count as qtd,
-                    null as list
-                from list_null_pressures)
+                count(*) as qtd,
+                null as list
+                from assets
+                where press1 is null and press2 is null)
             select * from null_pressures
             """
         )

@@ -672,6 +672,7 @@ class GwCalculatePriority(GwTask):
         arcs = []
         invalid_arccat_id = {"qtd": 0, "set": set()}
         invalid_material = {"qtd": 0, "set": set()}
+        # TODO: Null pressions report
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
