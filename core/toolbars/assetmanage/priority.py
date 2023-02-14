@@ -179,6 +179,9 @@ class ConfigMaterial:
     def has_material(self, material):
         return material in self._data
 
+    def materials(self):
+        return self._data.keys()
+
     def save(self, result_id):
         sql = f"""
             delete from asset.config_material where result_id = {result_id};
@@ -606,9 +609,7 @@ class CalculatePriority:
             config_engine,
         ) = inputs
 
-        # FIXME: Take into account the unknown material from config.config
         # TODO: Check invalid arccat_ids
-        # TODO: Check for invalid materials
         filter_list = []
         if features:
             filter_list.append(f"""arc_id in ('{"','".join(features)}')""")
@@ -628,11 +629,24 @@ class CalculatePriority:
                 select * from asset.arc_asset {filters}),
             null_pressures as (
                 select 'null_pressures' as check,
-                count(*) as qtd,
-                null as list
+                    count(*) as qtd,
+                    null as list
                 from assets
-                where press1 is null and press2 is null)
+                where press1 is null and press2 is null),
+            list_invalid_materials as (
+                select count(*), coalesce(matcat_id, 'NULL')
+                from assets
+                where matcat_id not in ('{"','".join(config_material.materials())}')
+                    or matcat_id = '{self.config.unknown_material}'
+                    or matcat_id is null
+                group by matcat_id
+                order by matcat_id),
+            invalid_materials as (
+                select 'invalid_materials', sum(count), string_agg(coalesce, ', ')
+                from list_invalid_materials)
             select * from null_pressures
+            union all
+            select * from invalid_materials
             """
         )
 
@@ -656,15 +670,24 @@ class CalculatePriority:
                 if not tools_qt.show_question(msg, force_action=True):
                     return
             elif row["check"] == "invalid_materials":
+                if config_material.has_material(self.config.unknown_material):
+                    main_message = self._tr(
+                        "A material is considered invalid if it is not listed in the material configuration table. "
+                        "As a result, the material of these pipes will be treated as:"
+                    )
+                else:
+                    main_message = self._tr(
+                        "A material is considered invalid if it is not listed in the material configuration table. "
+                        "These pipes will NOT be assigned a priority value "
+                        "as the configured unknown material "
+                        "is not listed in the configuration tab for materials:"
+                    )
                 message = (
                     self._tr("Pipes with invalid materials:")
                     + f" {row['qtd']}.\n"
                     + self._tr("Invalid materials:")
                     + f" {row['list']}.\n\n"
-                    + self._tr(
-                        "A material is considered invalid if it is not listed in the material configuration table. "
-                        "As a result, the material of these pipes will be treated as:"
-                    )
+                    + main_message
                     + f" {self.config.unknown_material}\n\n"
                     + self._tr("Do you want to proceed?")
                 )
