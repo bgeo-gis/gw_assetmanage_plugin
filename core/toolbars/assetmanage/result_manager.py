@@ -120,18 +120,19 @@ class ResultManager(dialog.GwAction):
         status = dlg.tbl_results.model().record(row).value("status")
 
         if status == 'FINISHED':
-            dlg.btn_delete.setEnabled(False)
-            dlg.btn_status.setEnabled(False)
+            dlg.btn_open.setEnabled(False)
             dlg.btn_duplicate.setEnabled(True)
-        else:
-            dlg.btn_delete.setEnabled(True)
-            dlg.btn_status.setEnabled(True)
-            dlg.btn_duplicate.setEnabled(False)
-        if status == 'ON PLANNING':
+            dlg.btn_status.setEnabled(False)
+            dlg.btn_delete.setEnabled(False)
+        elif status == 'ON PLANNING':
             dlg.btn_open.setEnabled(True)
+            dlg.btn_duplicate.setEnabled(True)
+            dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(False)
         else:
             dlg.btn_open.setEnabled(False)
+            dlg.btn_duplicate.setEnabled(False)
+            dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(True)
 
 
