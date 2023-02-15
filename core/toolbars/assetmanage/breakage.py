@@ -134,6 +134,7 @@ class AmBreakage(dialog.GwAction):
             QRegularExpression("\d+(\.\d*)?-\d+(\.\d*)?")
         )
         dlg.txt_diameter_range.setValidator(range_validator)
+        dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.checkState())
 
         # Disable tab log
         tools_gw.disable_tab_log(dlg)
@@ -187,6 +188,7 @@ class AmBreakage(dialog.GwAction):
                 self.dlg_assignation.lbl_diameter.setVisible(False)
                 self.dlg_assignation.chk_diameter.setChecked(False)
                 self.dlg_assignation.chk_diameter.setVisible(False)
+                self.dlg_assignation.txt_diameter_range.setVisible(False)
 
         except Exception as e:
             print("read_config_file error %s" % e)
@@ -203,7 +205,7 @@ class AmBreakage(dialog.GwAction):
             "txt_diameter_range",
         ]
         chk_widgets = ["chk_material", "chk_diameter"]
-        
+
         for widget in txt_widgets:
             if action == "load":
                 value = tools_gw.get_config_parser(
@@ -249,8 +251,7 @@ class AmBreakage(dialog.GwAction):
     def _set_assignation_signals(self):
         dlg = self.dlg_assignation
 
-        # FIXME: Disable txt_diameter_text if chk_diameter is unchecked
-
+        dlg.chk_diameter.toggled.connect(dlg.txt_diameter_range.setEnabled)
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
         dlg.rejected.connect(partial(self._assignation_user_values, "save"))
