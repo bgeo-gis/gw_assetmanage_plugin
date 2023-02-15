@@ -41,21 +41,8 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
-            # sql = f"""
-            #     WITH
-            #         leak_dates AS (
-            #             SELECT id, "date" AS date_leak
-            #             FROM asset.leaks),
-            #         max_date AS (
-            #             SELECT max(date_leak)
-            #             FROM leak_dates)
-            #     SELECT id
-            #     FROM leak_dates
-            #     WHERE date_leak > (
-            #         (SELECT * FROM max_date) - INTERVAL '{self.years} year'
-            #     )::date
-            #     """
-            # all_leaks = {x["id"] for x in tools_db.get_rows(sql)}
+            self._emit_report(self._tr("Getting leak data from DB") + " (1/4)...")
+            self.setProgress(0)
 
             arcs = self._assign_leaks()
 
@@ -87,49 +74,9 @@ class GwAssignation(GwTask):
             sql = sql[:-1] + " ON CONFLICT(arc_id) DO UPDATE SET rleak=excluded.rleak;"
             tools_db.execute_sql(sql)
 
-            # FIXME: Reimplement the final report
-            orphan_pipes = tools_db.get_rows(
-                """
-                SELECT count(*) FROM asset.arc_input
-                    WHERE rleak IS NULL or rleak = 0
-                """
-            )[0][0]
-
-            max_rleak, min_rleak = tools_db.get_rows(
-                """
-                SELECT max(rleak), min(rleak) FROM asset.arc_input
-                    WHERE rleak IS NOT NULL AND rleak <> 0
-                """
-            )[0]
-
             self.setProgress(100)
 
-            # final_report = [
-            #     "Task finished!",
-            #     f"Leaks within the indicated period: {len(all_leaks)}.",
-            #     f"Leaks without pipes intersecting its buffer: {len(orphan_leaks)}.",
-            # ]
-
-            # if by_material_diameter:
-            #     final_report.append(
-            #         f"Leaks assigned by material and diameter: {by_material_diameter}."
-            #     )
-            # if by_material:
-            #     final_report.append(f"Leaks assigned by material only:  {by_material}.")
-            # if by_diameter:
-            #     final_report.append(f"Leaks assigned by diameter only: {by_diameter}.")
-            # if any_pipe:
-            #     final_report.append(f"Leaks assigned to any nearby pipes: {any_pipe}.")
-
-            # final_report += [
-            #     f"Total of pipes: {total_pipes}.",
-            #     f"Pipes with zero leaks per km per year: {orphan_pipes}.",
-            #     f"Max rleak: {max_rleak} leaks/km.year.",
-            #     f"Min non-zero rleak: {min_rleak} leaks/km.year.",
-            # ]
-
-            # self._emit_report(*final_report)
-            self._emit_report(self._tr("Task finished!"))
+            self._emit_report(*self._final_report())
             return True
 
         except Exception:
@@ -157,9 +104,6 @@ class GwAssignation(GwTask):
                 self._tr("Newest leak") + f": {max_date}.",
             )
             return False
-
-        self._emit_report(self._tr("Getting leak data from DB") + " (1/4)...")
-        self.setProgress(0)
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
@@ -246,25 +190,25 @@ class GwAssignation(GwTask):
                     ),
                 }
             )
-
-        # by_material_diameter = 0
-        # by_material = 0
-        # by_diameter = 0
-        # any_pipe = 0
+        self.assigned_leaks = len(leaks)
+        self.by_material_diameter = 0
+        self.by_material = 0
+        self.by_diameter = 0
+        self.any_pipe = 0
         arcs = {}
         for leak_id, leak_arcs in leaks.items():
             if any(a["same_material"] and a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
-                # by_material_diameter += 1
+                self.by_material_diameter += 1
             elif any(a["same_material"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_material"]
-                # by_material += 1
+                self.by_material += 1
             elif any(a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_diameter"]
-                # by_diameter += 1
+                self.by_diameter += 1
             else:
                 is_arc_valid = lambda x: True
-                # any_pipe += 1
+                self.any_pipe += 1
 
             valid_arcs = list(
                 filter(
@@ -354,6 +298,66 @@ class GwAssignation(GwTask):
 
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
+
+    def _final_report(self):
+        values = tools_db.get_row(
+            f"""
+            with total_leaks as (
+                select count(*) as total_leaks
+                from asset.leaks
+                where "date" > (
+                    (select max("date") from asset.leaks) - interval '{self.years} year'
+                )::date),
+            total_pipes as (
+                select count(*) as total_pipes
+                from asset.arc_asset),
+            orphan_pipes as (
+                select count(*) as orphan_pipes
+                from asset.v_asset_arc_input
+                where rleak is null or rleak = 0),
+            max_rleak as (
+                select max(rleak) as max_rleak
+                from asset.arc_input),
+            min_rleak as (
+                select min(rleak) as min_rleak
+                from asset.arc_input
+                where rleak is not null and rleak <> 0)
+            select *
+            from total_leaks
+            cross join total_pipes
+            cross join orphan_pipes
+            cross join max_rleak
+            cross join min_rleak
+            """
+        )
+
+        final_report = [
+            "Task finished!",
+            f"Leaks within the indicated period: {values['total_leaks']}.",
+            f"Leaks without pipes intersecting its buffer: {values['total_leaks'] - self.assigned_leaks}.",
+        ]
+
+        if self.by_material_diameter:
+            final_report.append(
+                f"Leaks assigned by material and diameter: {self.by_material_diameter}."
+            )
+        if self.by_material:
+            final_report.append(
+                f"Leaks assigned by material only:  {self.by_material}."
+            )
+        if self.by_diameter:
+            final_report.append(f"Leaks assigned by diameter only: {self.by_diameter}.")
+        if self.any_pipe:
+            final_report.append(f"Leaks assigned to any nearby pipes: {self.any_pipe}.")
+
+        final_report += [
+            f"Total of pipes: {values['total_pipes']}.",
+            f"Pipes with zero leaks per km per year: {values['orphan_pipes']}.",
+            f"Max rleak: {values['max_rleak']} leaks/km.year.",
+            f"Min non-zero rleak: {values['min_rleak']} leaks/km.year.",
+        ]
+
+        return final_report
 
     def _tr(self, msg):
         return tools_qt.tr(msg, context_name=global_vars.plugin_name)
