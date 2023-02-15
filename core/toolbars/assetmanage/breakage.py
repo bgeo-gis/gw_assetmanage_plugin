@@ -195,15 +195,16 @@ class AmBreakage(dialog.GwAction):
         return status
 
     def _assignation_user_values(self, action):
-        # FIXME: Save and load checkboxes values
-        widgets = [
+        txt_widgets = [
             "txt_buffer",
             "txt_years",
             "txt_max_distance",
             "txt_cluster_length",
             "txt_diameter_range",
         ]
-        for widget in widgets:
+        chk_widgets = ["chk_material", "chk_diameter"]
+        
+        for widget in txt_widgets:
             if action == "load":
                 value = tools_gw.get_config_parser(
                     "assignation",
@@ -220,6 +221,24 @@ class AmBreakage(dialog.GwAction):
             elif action == "save":
                 value = tools_qt.get_text(self.dlg_assignation, widget, False, False)
                 value = value.replace("%", "%%")
+                tools_gw.set_config_parser(
+                    "assignation",
+                    widget,
+                    value,
+                    plugin=global_vars.user_folder_name,
+                )
+        for widget in chk_widgets:
+            if action == "load":
+                value = tools_gw.get_config_parser(
+                    "assignation",
+                    widget,
+                    "user",
+                    "session",
+                    plugin=global_vars.user_folder_name,
+                )
+                tools_qt.set_checked(self.dlg_assignation, widget, value)
+            elif action == "save":
+                value = tools_qt.is_checked(self.dlg_assignation, widget)
                 tools_gw.set_config_parser(
                     "assignation",
                     widget,
