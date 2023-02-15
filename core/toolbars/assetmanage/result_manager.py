@@ -87,9 +87,6 @@ class ResultManager(dialog.GwAction):
 
         self._set_signals()
 
-        # TODO: finish "Duplicate" implementation
-        # self.dlg_priority_manager.btn_duplicate.hide()
-
         # Open the dialog
         tools_gw.open_dialog(
             self.dlg_priority_manager,

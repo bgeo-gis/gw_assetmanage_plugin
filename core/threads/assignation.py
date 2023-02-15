@@ -41,7 +41,7 @@ class GwAssignation(GwTask):
 
     def run(self):
         try:
-            self._emit_report(self._tr("Getting leak data from DB") + " (1/4)...")
+            self._emit_report(self._tr("Getting leak data from DB") + " (1/5)...")
             self.setProgress(0)
 
             arcs = self._assign_leaks()
@@ -61,8 +61,8 @@ class GwAssignation(GwTask):
                 self._emit_report(self.msg_task_canceled)
                 return False
 
-            self._emit_report(self._tr("Saving results to DB") + " (4/4)...")
-            self.setProgress(75)
+            self._emit_report(self._tr("Saving results to DB") + " (5/5)...")
+            self.setProgress(90)
             sql = (
                 "UPDATE asset.arc_input SET rleak = NULL; "
                 + "INSERT INTO asset.arc_input (arc_id, rleak) VALUES "
@@ -109,8 +109,8 @@ class GwAssignation(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/4)...")
-        self.setProgress(25)
+        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
+        self.setProgress(10)
 
         rows = tools_db.get_rows(
             f"""
@@ -148,8 +148,8 @@ class GwAssignation(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Assigning leaks to pipes") + " (3/4)...")
-        self.setProgress(50)
+        self._emit_report(self._tr("Assigning leaks to pipes") + " (3/5)...")
+        self.setProgress(40)
 
         leaks = {}
         for row in rows:
@@ -231,10 +231,12 @@ class GwAssignation(GwTask):
         return arcs
 
     def _calculate_rleak(self, arcs):
-        # TODO: Add progress messages
+        self._emit_report(self._tr("Calculating rleak values") + " (4/5)...")
+        self.setProgress(50)
+
         arc_list = sorted(arcs.values(), key=lambda a: a["length"], reverse=True)
         where_clause = self._where_clause()
-        for arc in arc_list:
+        for index, arc in enumerate(arc_list):
             if arc.get("done", False):
                 continue
             if arc.get("leaks", 0) == 0:
@@ -290,6 +292,8 @@ class GwAssignation(GwTask):
                 arcs[id]["rleak"] = rleak
                 arcs[id]["leaks"] = rleak * arcs[id]["length"]
                 arcs[id]["done"] = True
+
+            self.setProgress((90-50) / len(arc_list) * index + 50)
 
             if self.isCanceled():
                 self._emit_report(self.msg_task_canceled)
