@@ -888,10 +888,10 @@ class CalculatePriority:
             )
 
     def _manage_qtw_row(self, dialog, widget, action):
-        # TODO: jump to new row
         if action == "add":
             row_count = widget.rowCount()
             widget.insertRow(row_count)
+            widget.setCurrentCell(row_count, 0)
         elif action == "remove":
             selected_row = widget.currentRow()
             if selected_row != -1:
