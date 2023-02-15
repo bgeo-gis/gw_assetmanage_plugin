@@ -14,7 +14,8 @@ from time import time
 from datetime import timedelta
 
 from qgis.core import QgsApplication
-from qgis.PyQt.QtCore import QTimer, QPoint
+from qgis.PyQt.QtCore import QPoint, QRegularExpression, QTimer
+from qgis.PyQt.QtGui import QIntValidator, QRegularExpressionValidator
 from qgis.PyQt.QtWidgets import (
     QMenu,
     QAction,
@@ -118,24 +119,35 @@ class AmBreakage(dialog.GwAction):
         dlg.executing = False
 
         # Manage form
+        self._assignation_user_values("load")
 
         # Hidden widgets
         self._manage_hidden_form_leaks()
 
-        tools_qt.double_validator(dlg.txt_buffer, min_=0, decimals=0)
-        tools_qt.double_validator(dlg.txt_years, min_=0, decimals=0)
-        # FIXME: Add validator for new fields
+        int_validator = QIntValidator(0, 9999999)
+        dlg.txt_buffer.setValidator(int_validator)
+        dlg.txt_years.setValidator(int_validator)
+        dlg.txt_max_distance.setValidator(int_validator)
+        dlg.txt_cluster_length.setValidator(int_validator)
+
+        range_validator = QRegularExpressionValidator(
+            QRegularExpression("\d+(\.\d*)?-\d+(\.\d*)?")
+        )
+        dlg.txt_diameter_range.setValidator(range_validator)
 
         # Disable tab log
         tools_gw.disable_tab_log(dlg)
         dlg.progressBar.hide()
 
-        self._assignation_user_values("load")
-
         self._set_assignation_signals()
 
         # Open the dialog
-        tools_gw.open_dialog(self.dlg_assignation, dlg_name="assignation", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
+        tools_gw.open_dialog(
+            self.dlg_assignation,
+            dlg_name="assignation",
+            plugin_dir=global_vars.plugin_dir,
+            plugin_name=global_vars.plugin_name,
+        )
 
     def _manage_hidden_form_leaks(self):
 
