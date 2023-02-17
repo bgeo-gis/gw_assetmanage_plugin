@@ -133,10 +133,9 @@ class GwCalculatePriority(GwTask):
             ):
                 builtdate = arc["replacement_year"]
             else:
-                builtdate = (
-                    getattr(arc["builtdate"], "year", None)
-                    or self.config_material.get_default_builtdate()
-                )
+                builtdate = getattr(
+                    arc["builtdate"], "year", None
+                ) or self.config_material.get_default_builtdate(arc["matcat_id"])
             residual_useful_life = builtdate + arc["total_expected_useful_life"] - year
             current_value += (
                 arc["cost_constr"]
@@ -952,6 +951,11 @@ class GwCalculatePriority(GwTask):
                     arc = second_iteration[index]
                     if arc["replacement_year"] > self.target_year:
                         break
+                    builtdate_str = (
+                        f"'{arc['builtdate'].isoformat()}'"
+                        if arc["builtdate"]
+                        else "NULL"
+                    )
                     save_arcs_sql += f"""
                         ({arc["arc_id"]},
                         {self.result_id},
@@ -959,9 +963,9 @@ class GwCalculatePriority(GwTask):
                         '{arc["matcat_id"]}',
                         '{arc["dnom"]}',
                         {arc["rleak"]},
-                        '{arc["builtdate"].isoformat()}',
-                        {arc["press1"]},
-                        {arc["press2"]},
+                        {builtdate_str},
+                        {arc["press1"] or 'NULL'},
+                        {arc["press2"] or 'NULL'},
                         {arc["flow_avg"]},
                         {arc["dma_id"]},
                         {arc["strategic"] or 'false'},
