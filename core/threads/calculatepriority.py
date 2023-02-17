@@ -992,7 +992,7 @@ class GwCalculatePriority(GwTask):
                 break
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
-            progress = (100 - 70) / len(second_iteration) * 1000 * loop + 70
+            progress = (90 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
 
         # Copy data from arc_asset to arc_output
