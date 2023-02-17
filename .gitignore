@@ -13,3 +13,5 @@ build/
 .idea/
 test/log/
 __pycache__
+
+dbmodel/local_files/
