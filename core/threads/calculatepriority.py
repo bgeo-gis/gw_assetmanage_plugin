@@ -732,6 +732,11 @@ class GwCalculatePriority(GwTask):
 
             arc["nrw"] = nrw.get(arc["dma_id"], 0)
 
+            arc["compliance"] = min(
+                self.config_material.get_compliance(arc["matcat_id"]),
+                self.config_cost.get_compliance(arc["arccat_id"]),
+            )
+
             arcs.append(arc)
 
         min_rleak = min(arc["rleak"] for arc in arcs)
@@ -762,10 +767,7 @@ class GwCalculatePriority(GwTask):
                 else self._fit_to_scale(arc["nrw"], 2, 20)
             )
             arc["val_strategic"] = 10 if arc["strategic"] else 0
-            arc["val_compliance"] = 10 - min(
-                self.config_material.get_compliance(arc["matcat_id"]),
-                self.config_cost.get_compliance(arc["arccat_id"]),
-            )
+            arc["val_compliance"] = 10 - arc["compliance"]
 
             arc["val_1"] = (
                 arc["val_rleak"] * self.config_engine["rleak_1"]
@@ -921,8 +923,21 @@ class GwCalculatePriority(GwTask):
                 insert into asset.arc_output (
                     arc_id,
                     result_id,
+                    arccat_id,
+                    matcat_id,
+                    dnom,
+                    rleak,
+                    builtdate,
+                    press1,
+                    press2,
+                    flow_avg,
+                    dma_id,
+                    strategic,
+                    nrw,
+                    longevity,
                     val,
                     mandatory,
+                    compliance,
                     orderby,
                     expected_year,
                     replacement_year,
@@ -940,8 +955,21 @@ class GwCalculatePriority(GwTask):
                     save_arcs_sql += f"""
                         ({arc["arc_id"]},
                         {self.result_id},
+                        '{arc["arccat_id"]}',
+                        '{arc["matcat_id"]}',
+                        '{arc["dnom"]}',
+                        {arc["rleak"]},
+                        '{arc["builtdate"].isoformat()}',
+                        {arc["press1"]},
+                        {arc["press2"]},
+                        {arc["flow_avg"]},
+                        {arc["dma_id"]},
+                        {arc["strategic"] or 'false'},
+                        {arc["nrw"]},
+                        {arc["longevity"]},
                         {arc["val_2"]},
                         {arc["mandatory"]},
+                        {arc["compliance"]},
                         {index + 1},
                         {date.today().year + arc["longevity"]},
                         {arc["replacement_year"]},
@@ -962,6 +990,18 @@ class GwCalculatePriority(GwTask):
             loop += 1
             progress = (100 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
+
+        # Copy data from arc_asset to arc_output
+        tools_db.execute_sql(
+            f"""
+            update asset.arc_output o
+            set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
+                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id
+                    from asset.arc_asset a
+                    where a.arc_id = o.arc_id)
+            where o.result_id = {self.result_id}
+            """
+        )
 
         self._emit_report(self.statistics_report)
 

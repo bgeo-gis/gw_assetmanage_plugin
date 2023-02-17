@@ -34,7 +34,6 @@ class ResultSelector(dialog.GwAction):
         tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _fill_combos(self):
-        # TODO: Check for connection
         dlg = self.dlg_result_selector
         results = tools_db.get_rows(
             """
@@ -78,7 +77,6 @@ class ResultSelector(dialog.GwAction):
         return True
 
     def _save_selection(self):
-        # TODO: Check for connection
         dlg = self.dlg_result_selector
         result_main = tools_qt.get_combo_value(dlg, dlg.cmb_result_main)
         result_compare = tools_qt.get_combo_value(dlg, dlg.cmb_result_compare)
