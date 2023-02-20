@@ -74,7 +74,7 @@ class GwCalculatePriority(GwTask):
         material,
         budget,
         target_year,
-        config_cost,
+        config_catalog,
         config_material,
         config_engine,
     ):
@@ -90,7 +90,7 @@ class GwCalculatePriority(GwTask):
         self.material = material
         self.result_budget = budget
         self.target_year = target_year
-        self.config_cost = config_cost
+        self.config_catalog = config_catalog
         self.config_material = config_material
         self.config_engine = config_engine
 
@@ -684,7 +684,7 @@ class GwCalculatePriority(GwTask):
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
-            if not self.config_cost.has_arccat_id(arc["arccat_id"]):
+            if not self.config_catalog.has_arccat_id(arc["arccat_id"]):
                 invalid_arccat_id["qtd"] += 1
                 invalid_arccat_id["set"].add(arc["arccat_id"])
                 continue
@@ -704,7 +704,7 @@ class GwCalculatePriority(GwTask):
 
             arc["mleak"] = self.config_material.get_pleak(arc_material)
 
-            cost_by_meter = self.config_cost.get_cost_constr(arc["arccat_id"])
+            cost_by_meter = self.config_catalog.get_cost_constr(arc["arccat_id"])
             arc["cost_constr"] = cost_by_meter * float(arc["length"])
 
             builtdate = arc["builtdate"] or date(
@@ -733,7 +733,7 @@ class GwCalculatePriority(GwTask):
 
             arc["compliance"] = min(
                 self.config_material.get_compliance(arc["matcat_id"]),
-                self.config_cost.get_compliance(arc["arccat_id"]),
+                self.config_catalog.get_compliance(arc["arccat_id"]),
             )
 
             arcs.append(arc)
@@ -855,7 +855,7 @@ class GwCalculatePriority(GwTask):
         if not self.result_id:
             return False
 
-        self.config_cost.save(self.result_id)
+        self.config_catalog.save(self.result_id)
         self.config_material.save(self.result_id)
         self._save_config_engine()
 

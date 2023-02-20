@@ -2,7 +2,7 @@
 -- Default values
 --
 
-INSERT INTO asset.config_cost_def SELECT id AS arccat_id, dnom::NUMERIC, round(dnom::NUMERIC * 3 / 5 + 70) AS cost_constr, round(dnom::NUMERIC * 9 / 5 + 310) AS cost_repmain, 10 AS compliance FROM PARENT_SCHEMA.cat_arc WHERE dnom IS NOT NULL;
+INSERT INTO asset.config_catalog_def SELECT id AS arccat_id, dnom::NUMERIC, round(dnom::NUMERIC * 3 / 5 + 70) AS cost_constr, round(dnom::NUMERIC * 9 / 5 + 310) AS cost_repmain, 10 AS compliance FROM PARENT_SCHEMA.cat_arc WHERE dnom IS NOT NULL;
 
 INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM asset.cat_mat_arc;
 
@@ -31,10 +31,10 @@ INSERT INTO asset.config_engine_def VALUES ('compliance_2', '0.3', 'WM', NULL, N
 -- config_form_tableview
 --
 
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_cost_def', 'dnom', 0, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_cost_def', 'cost_constr', 1, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_cost_def', 'cost_repmain', 2, true, NULL, NULL, '{"stretch": true}');
-INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_cost_def', 'compliance', 3, true, NULL, NULL, '{"stretch": true}');
+INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_catalog_def', 'dnom', 0, true, NULL, NULL, '{"stretch": true}');
+INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_catalog_def', 'cost_constr', 1, true, NULL, NULL, '{"stretch": true}');
+INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_catalog_def', 'cost_repmain', 2, true, NULL, NULL, '{"stretch": true}');
+INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_catalog_def', 'compliance', 3, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'material', 0, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'pleak', 1, true, NULL, NULL, '{"stretch": true}');
 INSERT INTO asset.config_form_tableview VALUES ('priority_config', 'utils', 'config_material_def', 'age_max', 2, true, NULL, NULL, '{"stretch": true}');

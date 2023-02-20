@@ -11,11 +11,11 @@ UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por cumplimi
 UPDATE asset.config_engine_def SET descript = 'Tasa de crecimiento de fugas en tuberías' WHERE parameter = 'bratemain0' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Tasa de actualización real de precios (discount rate). Tiene en cuenta el aumento de precios descontando la inflación' WHERE parameter = 'drate' AND method = 'SH';
 
-UPDATE asset.config_form_tableview SET alias = 'Diámetro' WHERE tablename = 'config_cost_def' AND columnname = 'dnom';
-UPDATE asset.config_form_tableview SET alias = 'Coste reconstrucción' WHERE tablename = 'config_cost_def' AND columnname = 'cost_constr';
-UPDATE asset.config_form_tableview SET alias = 'Coste reparación tubería' WHERE tablename = 'config_cost_def' AND columnname = 'cost_repmain';
-UPDATE asset.config_form_tableview SET alias = 'Coste reparación acometida' WHERE tablename = 'config_cost_def' AND columnname = 'cost_repserv';
-UPDATE asset.config_form_tableview SET alias = 'Normativo' WHERE tablename = 'config_cost_def' AND columnname = 'compliance';
+UPDATE asset.config_form_tableview SET alias = 'Diámetro' WHERE tablename = 'config_catalog_def' AND columnname = 'dnom';
+UPDATE asset.config_form_tableview SET alias = 'Coste reconstrucción' WHERE tablename = 'config_catalog_def' AND columnname = 'cost_constr';
+UPDATE asset.config_form_tableview SET alias = 'Coste reparación tubería' WHERE tablename = 'config_catalog_def' AND columnname = 'cost_repmain';
+UPDATE asset.config_form_tableview SET alias = 'Coste reparación acometida' WHERE tablename = 'config_catalog_def' AND columnname = 'cost_repserv';
+UPDATE asset.config_form_tableview SET alias = 'Normativo' WHERE tablename = 'config_catalog_def' AND columnname = 'compliance';
 UPDATE asset.config_form_tableview SET alias = 'Material' WHERE tablename = 'config_material_def' AND columnname = 'material';
 UPDATE asset.config_form_tableview SET alias = 'Prob. de fallo' WHERE tablename = 'config_material_def' AND columnname = 'pleak';
 UPDATE asset.config_form_tableview SET alias = 'Longevidad máx.' WHERE tablename = 'config_material_def' AND columnname = 'age_max';

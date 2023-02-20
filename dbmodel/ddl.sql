@@ -67,23 +67,23 @@ CREATE TABLE asset.value_status (
     idval character varying(50)
 );
 
-CREATE TABLE asset.config_cost_def (
+CREATE TABLE asset.config_catalog_def (
     arccat_id varchar(30) NOT NULL,
     dnom numeric(12,2) NOT NULL,
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
-    CONSTRAINT config_cost_def_pkey PRIMARY KEY (arccat_id, dnom)
+    CONSTRAINT config_catalog_def_pkey PRIMARY KEY (arccat_id, dnom)
 );
 
-CREATE TABLE asset.config_cost (
+CREATE TABLE asset.config_catalog (
     arccat_id varchar(30) NOT NULL,
     dnom numeric(12,2) NOT NULL,
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
     result_id integer NOT NULL,
-    CONSTRAINT config_cost_pkey PRIMARY KEY (arccat_id, dnom, result_id)
+    CONSTRAINT config_catalog_pkey PRIMARY KEY (arccat_id, dnom, result_id)
 );
 
 CREATE TABLE asset.config_material_def (

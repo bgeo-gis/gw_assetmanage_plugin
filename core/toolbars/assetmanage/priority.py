@@ -43,7 +43,7 @@ from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
 
 
-class ConfigCost:
+class ConfigCatalog:
     def __init__(self, data):
         # order the dict by dnom
         self._data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
@@ -84,8 +84,8 @@ class ConfigCost:
 
     def save(self, result_id):
         sql = f"""
-            delete from asset.config_cost where result_id = {result_id};
-            insert into asset.config_cost
+            delete from asset.config_catalog where result_id = {result_id};
+            insert into asset.config_catalog
                 (result_id, arccat_id, dnom, cost_constr, cost_repmain, compliance)
             values
         """
@@ -102,7 +102,7 @@ class ConfigCost:
         tools_db.execute_sql(sql)
 
 
-def configcost_from_sql(sql):
+def configcatalog_from_sql(sql):
     rows = tools_db.get_rows(sql)
     data = {}
     for row in rows:
@@ -113,10 +113,10 @@ def configcost_from_sql(sql):
             "cost_repmain": row["cost_repmain"],
             "compliance": row["compliance"],
         }
-    return ConfigCost(data)
+    return ConfigCatalog(data)
 
 
-def configcost_from_tablewidget(table_widget):
+def configcatalog_from_tablewidget(table_widget):
     data = {}
     for r in range(table_widget.rowCount()):
         data[table_widget.item(r, 0).text()] = {
@@ -126,7 +126,7 @@ def configcost_from_tablewidget(table_widget):
             "cost_repmain": float(table_widget.item(r, 3).text()),
             "compliance": int(table_widget.item(r, 4).text()),
         }
-    return ConfigCost(data)
+    return ConfigCatalog(data)
 
 
 class ConfigMaterial:
@@ -305,7 +305,7 @@ class CalculatePriorityConfig:
             self.show_presszone = config.getboolean(dialog_type, "show_presszone")
             self.show_ivi_button = config.getboolean(dialog_type, "show_ivi_button")
             self.show_config = config.getboolean(dialog_type, "show_config")
-            self.show_config_cost = config.getboolean(dialog_type, "show_config_cost")
+            self.show_config_catalog = config.getboolean(dialog_type, "show_config_catalog")
             self.show_config_material = config.getboolean(
                 dialog_type, "show_config_material"
             )
@@ -383,11 +383,11 @@ class CalculatePriority:
 
         icon_path = os.path.join(icons_folder, "111b.png")
         if os.path.exists(icon_path):
-            self.dlg_priority.btn_add_cost.setIcon(QIcon(icon_path))
+            self.dlg_priority.btn_add_catalog.setIcon(QIcon(icon_path))
             self.dlg_priority.btn_add_material.setIcon(QIcon(icon_path))
         icon_path = os.path.join(icons_folder, "112b.png")
         if os.path.exists(icon_path):
-            self.dlg_priority.btn_remove_cost.setIcon(QIcon(icon_path))
+            self.dlg_priority.btn_remove_catalog.setIcon(QIcon(icon_path))
             self.dlg_priority.btn_remove_material.setIcon(QIcon(icon_path))
 
         # Manage form
@@ -402,17 +402,17 @@ class CalculatePriority:
         self._manage_attr()
 
         # Define tableviews
-        self.qtbl_cost = self.dlg_priority.findChild(QTableWidget, "tbl_cost")
-        self.qtbl_cost.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.qtbl_cost.setSortingEnabled(True)
+        self.qtbl_catalog = self.dlg_priority.findChild(QTableWidget, "tbl_catalog")
+        self.qtbl_catalog.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.qtbl_catalog.setSortingEnabled(True)
         if self.mode == "new":
-            sql = "select * from asset.config_cost_def"
+            sql = "select * from asset.config_catalog_def"
         else:
             sql = (
-                f"select * from asset.config_cost where result_id = {self.result['id']}"
+                f"select * from asset.config_catalog where result_id = {self.result['id']}"
             )
-        configcost = configcost_from_sql(sql)
-        configcost.fill_table_widget(self.qtbl_cost)
+        configcatalog = configcatalog_from_sql(sql)
+        configcatalog.fill_table_widget(self.qtbl_catalog)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -578,7 +578,7 @@ class CalculatePriority:
         if self.config.show_config is not True:
             self.dlg_priority.grb_global.setVisible(False)
         else:
-            if self.config.show_config_cost is not True:
+            if self.config.show_config_catalog is not True:
                 self.dlg_priority.tab_widget.tab_diameter.setVisible(False)
             if self.config.show_config_material is not True:
                 self.dlg_priority.tab_widget.tab_material.setVisible(False)
@@ -607,7 +607,7 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_cost,
+            config_catalog,
             config_material,
             config_engine,
         ) = inputs
@@ -633,7 +633,7 @@ class CalculatePriority:
                 select count(*), coalesce(arccat_id, 'NULL')
                 from assets
                 where arccat_id is null 
-                    or arccat_id not in ('{"','".join(config_cost.arccat_ids())}')
+                    or arccat_id not in ('{"','".join(config_catalog.arccat_ids())}')
                 group by arccat_id
                 order by arccat_id),
             invalid_arccat_ids as (
@@ -676,7 +676,7 @@ class CalculatePriority:
                     + self._tr("Invalid arccat_ids:")
                     + f" {row['list']}.\n\n"
                     + self._tr(
-                        "An arccat_id is considered invalid if it is not listed in the costs configuration table. "
+                        "An arccat_id is considered invalid if it is not listed in the catalog configuration table. "
                         "As a result, these pipes will NOT be assigned a priority value."
                     )
                     + "\n\n"
@@ -736,7 +736,7 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_cost,
+            config_catalog,
             config_material,
             config_engine,
         )
@@ -863,11 +863,11 @@ class CalculatePriority:
         dlg.btn_calc.clicked.connect(self._manage_calculate)
         dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
-        dlg.btn_add_cost.clicked.connect(
-            partial(self._manage_qtw_row, dlg, dlg.tbl_cost, "add")
+        dlg.btn_add_catalog.clicked.connect(
+            partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "add")
         )
-        dlg.btn_remove_cost.clicked.connect(
-            partial(self._manage_qtw_row, dlg, dlg.tbl_cost, "remove")
+        dlg.btn_remove_catalog.clicked.connect(
+            partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "remove")
         )
         dlg.btn_add_material.clicked.connect(
             partial(self._manage_qtw_row, dlg, dlg.tbl_material, "add")
@@ -973,7 +973,7 @@ class CalculatePriority:
             return
 
         try:
-            config_cost = configcost_from_tablewidget(self.qtbl_cost)
+            config_catalog = configcatalog_from_tablewidget(self.qtbl_catalog)
         except ValueError as e:
             tools_qt.show_info_box(e)
             return
@@ -1021,7 +1021,7 @@ class CalculatePriority:
             material,
             budget,
             target_year,
-            config_cost,
+            config_catalog,
             config_material,
             config_engine,
         )

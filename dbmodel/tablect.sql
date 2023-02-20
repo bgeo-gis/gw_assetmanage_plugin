@@ -10,8 +10,8 @@ ALTER TABLE asset.arc_output
     ADD CONSTRAINT arc_output_result_id_fkey FOREIGN KEY (result_id)
     REFERENCES asset.cat_result(result_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-ALTER TABLE asset.config_cost
-    ADD CONSTRAINT config_cost_result_id_fkey FOREIGN KEY (result_id)
+ALTER TABLE asset.config_catalog
+    ADD CONSTRAINT config_catalog_result_id_fkey FOREIGN KEY (result_id)
     REFERENCES asset.cat_result(result_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 ALTER TABLE asset.config_engine
