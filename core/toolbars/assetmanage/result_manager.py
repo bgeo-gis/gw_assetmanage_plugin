@@ -16,7 +16,7 @@ from qgis.PyQt.QtWidgets import (
     QCompleter,
 )
 from qgis.PyQt.QtCore import QStringListModel
-from qgis.PyQt.QtSql import QSqlTableModel, QSqlDatabase, QSqlQueryModel
+from qgis.PyQt.QtSql import QSqlRelation, QSqlRelationalTableModel
 
 from .priority import CalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi, StatusSelectorUi
@@ -72,11 +72,15 @@ class ResultManager(dialog.GwAction):
         )
 
         # Fill results table
-        # TODO: use a join to translate type and status of a result
         self._fill_table(
             self.dlg_priority_manager,
             self.dlg_priority_manager.tbl_results,
             "asset.cat_result",
+            [
+                (2, "asset.value_result_type", "id", "idval"),
+                (5, "asset.exploitation", "expl_id", "name"),
+                (10, "asset.value_status", "id", "idval"),
+            ],
         )
         tools_gw.set_tablemodel_config(
             self.dlg_priority_manager,
@@ -251,6 +255,7 @@ class ResultManager(dialog.GwAction):
         dialog,
         widget,
         table_name,
+        relations=[],
         hidde=False,
         set_edit_triggers=QTableView.NoEditTriggers,
         expr=None,
@@ -265,14 +270,15 @@ class ResultManager(dialog.GwAction):
         try:
 
             # Set model
-            model = QSqlTableModel(db=gw_global_vars.qgis_db_credentials)
+            model = QSqlRelationalTableModel(db=gw_global_vars.qgis_db_credentials)
             model.setTable(table_name)
-            model.setEditStrategy(QSqlTableModel.OnFieldChange)
+            model.setJoinMode(QSqlRelationalTableModel.JoinMode.LeftJoin)
+            for column, table, key, value in relations:
+                model.setRelation(column, QSqlRelation(table, key, value))
+            model.setEditStrategy(QSqlRelationalTableModel.OnManualSubmit)
             model.setSort(0, 0)
             model.select()
 
-            # When change some field we need to refresh Qtableview and filter by psector_id
-            # model.dataChanged.connect(partial(self._refresh_table, dialog, widget))
             widget.setEditTriggers(set_edit_triggers)
             widget.setSelectionBehavior(QAbstractItemView.SelectRows)
 
