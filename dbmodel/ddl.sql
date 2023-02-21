@@ -318,19 +318,36 @@ CREATE TABLE asset.arc_asset AS
 
 CREATE VIEW asset.v_asset_arc_input AS
  SELECT a.arc_id,
-    a.sector_id,
-    a.macrosector_id,
-    a.presszone_id,
-    a.expl_id,
-    a.builtdate,
-    a.dnom,
+    i.mandatory,
+    i.strategic,
+    i.rleak,
+    a.arccat_id,
     a.matcat_id,
+    a.dnom,
+    a.builtdate,
+    a.press1,
+    a.press2,
+    a.flow_avg,
     a.pavcat_id,
     a.function_type,
-    i.rleak,
+    a.expl_id,
+    a.macrosector_id,
+    a.sector_id,
+    a.presszone_id,
+    a.dma_id,
+    a.code,
     a.the_geom
    FROM (asset.arc_asset a
      LEFT JOIN asset.arc_input i USING (arc_id));
+
+CREATE RULE v_asset_arc_input_update AS ON UPDATE TO asset.v_asset_arc_input
+ DO INSTEAD
+ INSERT INTO asset.arc_input (arc_id, mandatory, strategic, rleak)
+ VALUES (NEW.arc_id, NEW.mandatory, NEW.strategic, NEW.rleak)
+ ON CONFLICT(arc_id) DO
+ UPDATE SET mandatory = EXCLUDED.mandatory,
+    strategic = EXCLUDED.strategic,
+    rleak = EXCLUDED.rleak;
 
 CREATE VIEW asset.v_asset_arc_output AS
  SELECT arc_id,
