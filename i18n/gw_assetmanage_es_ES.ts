@@ -12,6 +12,7 @@
 
 	<!-- PYTHON MESSAGES -->
 	<context>
+		<name>gw_assetmanage</name>
 		<message>
 			<source>Task finished!</source>
 			<translation>Tarea finalizada!</translation>
@@ -282,11 +283,11 @@
 			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
-			<source>lbl_buffer</source>
-			<translation>Distancia de buffer:</translation>
+			<source>lbl_pipes</source>
+			<translation>Tuberías</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_buffer</source>
+			<source>tooltip_lbl_pipes</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -298,11 +299,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Distancia del cluster:</translation>
+			<source>lbl_buffer</source>
+			<translation>Distancia de buffer:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_cluster_length</source>
+			<source>tooltip_lbl_buffer</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -330,11 +331,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_pipes</source>
-			<translation>Tuberías</translation>
+			<source>lbl_cluster_length</source>
+			<translation>Longitud del cluster:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_pipes</source>
+			<source>tooltip_lbl_cluster_length</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -385,11 +386,11 @@
 			<translation>Cálculo de prioridad</translation>
 		</message>
 		<message>
-			<source>tab_diameter</source>
-			<translation>Diámetro</translation>
+			<source>lbl_budget</source>
+			<translation>Presupuesto anual:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_diameter</source>
+			<source>tooltip_lbl_budget</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -489,19 +490,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_budget</source>
-			<translation>Presupuesto:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_year</source>
 			<translation>Año horizonte:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_diameter</source>
+			<translation>Diámetro</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_diameter</source>
 			<translation>None</translation>
 		</message>
 		<message>
