@@ -14,8 +14,8 @@ INSERT INTO asset.config_engine_def VALUES ('compliance', '0.1', 'SH', NULL, NUL
 INSERT INTO asset.config_engine_def VALUES ('strategic', '0.2', 'SH', NULL, NULL, true, 'lyt_engine_2', 3, 'Weight strategic', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO asset.config_engine_def VALUES ('rleak_1', '0.2', 'WM', NULL, NULL, true, 'lyt_engine_1', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO asset.config_engine_def VALUES ('rleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 1, 'Roturas reales', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('mleak_1', '0.1', 'WM', NULL, NULL, true, 'lyt_engine_1', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO asset.config_engine_def VALUES ('mleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 2, 'Roturas por material', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('mleak_1', '0.1', 'WM', NULL, NULL, true, 'lyt_engine_1', 2, 'Probabilidad de falla', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO asset.config_engine_def VALUES ('mleak_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 2, 'Probabilidad de falla', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO asset.config_engine_def VALUES ('longevity_1', '0.7', 'WM', NULL, NULL, true, 'lyt_engine_1', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO asset.config_engine_def VALUES ('longevity_2', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_2', 3, 'Longevidad', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO asset.config_engine_def VALUES ('flow_1', '0.0', 'WM', NULL, NULL, true, 'lyt_engine_1', 4, 'Caudal circulante', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
