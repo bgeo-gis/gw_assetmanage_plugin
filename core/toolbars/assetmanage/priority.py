@@ -20,6 +20,7 @@ from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
     QAction,
     QActionGroup,
+    QHeaderView,
     QTableView,
     QTableWidget,
     QTableWidgetItem,
@@ -305,7 +306,9 @@ class CalculatePriorityConfig:
             self.show_presszone = config.getboolean(dialog_type, "show_presszone")
             self.show_ivi_button = config.getboolean(dialog_type, "show_ivi_button")
             self.show_config = config.getboolean(dialog_type, "show_config")
-            self.show_config_catalog = config.getboolean(dialog_type, "show_config_catalog")
+            self.show_config_catalog = config.getboolean(
+                dialog_type, "show_config_catalog"
+            )
             self.show_config_material = config.getboolean(
                 dialog_type, "show_config_material"
             )
@@ -408,11 +411,12 @@ class CalculatePriority:
         if self.mode == "new":
             sql = "select * from asset.config_catalog_def"
         else:
-            sql = (
-                f"select * from asset.config_catalog where result_id = {self.result['id']}"
-            )
+            sql = f"select * from asset.config_catalog where result_id = {self.result['id']}"
         configcatalog = configcatalog_from_sql(sql)
         configcatalog.fill_table_widget(self.qtbl_catalog)
+        self.qtbl_catalog.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -422,6 +426,9 @@ class CalculatePriority:
             sql = f"select * from asset.config_material where result_id = {self.result['id']}"
         configmaterial = configmaterial_from_sql(sql, self.config.unknown_material)
         configmaterial.fill_table_widget(self.qtbl_material)
+        self.qtbl_material.horizontalHeader().setSectionResizeMode(
+            QHeaderView.ResizeMode.Stretch
+        )
 
         self._fill_engine_options()
         self._set_signals()
