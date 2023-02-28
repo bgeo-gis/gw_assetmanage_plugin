@@ -359,7 +359,7 @@ class CalculatePriority:
         self.mode = mode
         self.layer_to_work = "v_asset_arc_input"
         self.layers = {}
-        self.layers["arc"] = self.result["features"] or []
+        self.layers["arc"] = []
         self.list_ids = {}
         self.config = CalculatePriorityConfig(type)
         self.total_weight = {}

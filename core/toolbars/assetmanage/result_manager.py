@@ -91,6 +91,18 @@ class ResultManager(dialog.GwAction):
 
         self._set_signals()
 
+        # Create dicts for i18n labels:
+        self._value_status = {}
+        for id, idval in tools_db.get_rows("select id, idval from asset.value_status"):
+            self._value_status[idval] = id
+
+        self._value_result_type = {}
+        for id, idval in tools_db.get_rows(
+            "select id, idval from asset.value_result_type"
+        ):
+            self._value_result_type[idval] = id
+        print(self._value_result_type)
+
         # Open the dialog
         tools_gw.open_dialog(
             self.dlg_priority_manager,
@@ -128,7 +140,8 @@ class ResultManager(dialog.GwAction):
             return
 
         row = selected_list[0].row()
-        status = dlg.tbl_results.model().record(row).value("status")
+        status_i18n = dlg.tbl_results.model().record(row).value(10)
+        status = self._value_status[status_i18n]
 
         if status == "FINISHED":
             dlg.btn_open.setEnabled(False)
@@ -230,7 +243,8 @@ class ResultManager(dialog.GwAction):
         selected_list = dlg.tbl_results.selectionModel().selectedRows()
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
-        result_type = dlg.tbl_results.model().record(row).value("result_type")
+        result_type_i18n = dlg.tbl_results.model().record(row).value(2)
+        result_type = self._value_result_type[result_type_i18n]
 
         calculate_priority = CalculatePriority(
             type=result_type, mode="edit", result_id=result_id
@@ -243,7 +257,8 @@ class ResultManager(dialog.GwAction):
         selected_list = dlg.tbl_results.selectionModel().selectedRows()
         row = selected_list[0].row()
         result_id = dlg.tbl_results.model().record(row).value("result_id")
-        result_type = dlg.tbl_results.model().record(row).value("result_type")
+        result_type_i18n = dlg.tbl_results.model().record(row).value(2)
+        result_type = self._value_result_type[result_type_i18n]
 
         calculate_priority = CalculatePriority(
             type=result_type, mode="duplicate", result_id=result_id
