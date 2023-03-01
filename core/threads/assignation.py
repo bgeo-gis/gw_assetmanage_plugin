@@ -130,7 +130,8 @@ class GwAssignation(GwTask):
                 ) AS length
             FROM asset.leaks AS l
             JOIN asset.arc_asset AS a ON
-                ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})     
+                l.date > a.builtdate
+                AND ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})     
             WHERE l.date > (
                 (SELECT * FROM max_date) - INTERVAL '{self.years} year')::date
                 AND ST_LENGTH(
