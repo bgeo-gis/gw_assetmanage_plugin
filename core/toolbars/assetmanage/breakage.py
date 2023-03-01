@@ -127,6 +127,7 @@ class AmBreakage(dialog.GwAction):
         int_validator = QIntValidator(0, 9999999)
         dlg.txt_buffer.setValidator(int_validator)
         dlg.txt_years.setValidator(int_validator)
+        dlg.txt_years.setEnabled(not dlg.chk_all_leaks.isChecked())
         dlg.txt_max_distance.setValidator(int_validator)
         dlg.txt_cluster_length.setValidator(int_validator)
 
@@ -134,7 +135,7 @@ class AmBreakage(dialog.GwAction):
             QRegularExpression("\d+(\.\d*)?-\d+(\.\d*)?")
         )
         dlg.txt_diameter_range.setValidator(range_validator)
-        dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.checkState())
+        dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.isChecked())
 
         # Disable tab log
         tools_gw.disable_tab_log(dlg)
@@ -204,7 +205,7 @@ class AmBreakage(dialog.GwAction):
             "txt_cluster_length",
             "txt_diameter_range",
         ]
-        chk_widgets = ["chk_material", "chk_diameter"]
+        chk_widgets = ["chk_all_leaks", "chk_material", "chk_diameter"]
 
         for widget in txt_widgets:
             if action == "load":
@@ -251,6 +252,7 @@ class AmBreakage(dialog.GwAction):
     def _set_assignation_signals(self):
         dlg = self.dlg_assignation
 
+        dlg.chk_all_leaks.toggled.connect(lambda x: dlg.txt_years.setEnabled(not x))
         dlg.chk_diameter.toggled.connect(dlg.txt_diameter_range.setEnabled)
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
@@ -324,12 +326,15 @@ class AmBreakage(dialog.GwAction):
             tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
             return
 
-        try:
-            years = int(dlg.txt_years.text())
-        except ValueError:
-            msg = "Please enter a valid integer for the number of years."
-            tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
-            return
+        if dlg.chk_all_leaks.isChecked():
+            years = None
+        else:
+            try:
+                years = int(dlg.txt_years.text())
+            except ValueError:
+                msg = "Please enter a valid integer for the number of years."
+                tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
+                return
 
         try:
             max_distance = int(dlg.txt_max_distance.text())

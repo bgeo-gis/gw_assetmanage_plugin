@@ -95,7 +95,10 @@ class GwAssignation(GwTask):
             FROM leak_dates
             """
         )
-        self.years = min(self.years, interval / 365)
+        if self.years:
+            self.years = min(self.years, interval / 365)
+        else:
+            self.years = interval / 365
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
