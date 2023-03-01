@@ -417,6 +417,8 @@ class CalculatePriority:
         self.qtbl_catalog.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
+        if self.config.method == "WM":
+            self.qtbl_catalog.hideColumn(3)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
