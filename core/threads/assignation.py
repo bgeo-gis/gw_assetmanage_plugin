@@ -84,17 +84,7 @@ class GwAssignation(GwTask):
             return False
 
     def _assign_leaks(self):
-        max_date, min_date, interval = tools_db.get_row(
-            """
-            WITH leak_dates AS (
-                SELECT id, "date" AS date_leak
-                FROM asset.leaks)
-            SELECT max(date_leak) AS max_date,
-                min(date_leak) AS min_date,
-                max(date_leak) - min(date_leak) AS interval
-            FROM leak_dates
-            """
-        )
+        interval = tools_db.get_row("select max(date) - min(date) from asset.leaks")[0]
         if self.years:
             self.years = min(self.years, interval / 365)
         else:
@@ -284,7 +274,7 @@ class GwAssignation(GwTask):
                 arcs[id]["leaks"] = rleak * arcs[id]["length"]
                 arcs[id]["done"] = True
 
-            self.setProgress((90-50) / len(arc_list) * index + 50)
+            self.setProgress((90 - 50) / len(arc_list) * index + 50)
 
             if self.isCanceled():
                 self._emit_report(self.msg_task_canceled)
