@@ -75,6 +75,9 @@
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="lbl_diameter">
+            <property name="toolTip">
+             <string>Uses only pipes that match the diameter range of the initial one.</string>
+            </property>
             <property name="text">
              <string>Filter by diameter:</string>
             </property>
@@ -91,6 +94,9 @@
             <property name="enabled">
              <bool>true</bool>
             </property>
+            <property name="toolTip">
+             <string>Uses only pipes of the same material as the initial one.</string>
+            </property>
             <property name="text">
              <string>Filter by material:</string>
             </property>
@@ -101,6 +107,9 @@
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="lbl_diameter_range">
+            <property name="toolTip">
+             <string>Diameter range based on factors of the initial pipe.</string>
+            </property>
             <property name="text">
              <string>Diameter range:</string>
             </property>
@@ -121,8 +130,11 @@
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_max_distance">
+            <property name="toolTip">
+             <string>Maximum distance, in meters, between the initial pipe and other pipes included in the cluster.</string>
+            </property>
             <property name="text">
-             <string>Maximum distance:</string>
+             <string>Maximum distance (m):</string>
             </property>
             <property name="buddy">
              <cstring>txt_max_distance</cstring>
@@ -131,8 +143,11 @@
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="lbl_cluster_length">
+            <property name="toolTip">
+             <string>Maximum sum of pipe lengths within a cluster, in meters.</string>
+            </property>
             <property name="text">
-             <string>Cluster length:</string>
+             <string>Cluster length (m):</string>
             </property>
             <property name="buddy">
              <cstring>txt_cluster_length</cstring>
@@ -150,6 +165,9 @@
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="1" column="0">
            <widget class="QLabel" name="lbl_years">
+            <property name="toolTip">
+             <string>Number of years of leak data to consider, based on recency.</string>
+            </property>
             <property name="text">
              <string>Years to calculate:</string>
             </property>
@@ -163,8 +181,11 @@
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_buffer">
+            <property name="toolTip">
+             <string>Distance from a leak at which pipes are selected to be assigned that leak.</string>
+            </property>
             <property name="text">
-             <string>Buffer distance:</string>
+             <string>Buffer distance (m):</string>
             </property>
             <property name="buddy">
              <cstring>txt_buffer</cstring>
@@ -173,6 +194,9 @@
           </item>
           <item row="1" column="2">
            <widget class="QCheckBox" name="chk_all_leaks">
+            <property name="toolTip">
+             <string>Calculates leaks per kilometer per year using all available data, regardless of the 'years to calculate' parameter.</string>
+            </property>
             <property name="text">
              <string>Use all leaks</string>
             </property>
