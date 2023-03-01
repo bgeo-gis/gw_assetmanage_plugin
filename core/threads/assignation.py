@@ -95,15 +95,7 @@ class GwAssignation(GwTask):
             FROM leak_dates
             """
         )
-        if self.years > interval / 365:
-            self._emit_report(
-                self._tr(
-                    "Task canceled: The number of years is greater than the interval disponible."
-                ),
-                self._tr("Oldest leak") + f": {min_date}.",
-                self._tr("Newest leak") + f": {max_date}.",
-            )
-            return False
+        self.years = min(self.years, interval / 365)
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
@@ -333,6 +325,7 @@ class GwAssignation(GwTask):
 
         final_report = [
             "Task finished!",
+            f"Period of leaks: {self.years:.4g} years.",
             f"Leaks within the indicated period: {values['total_leaks']}.",
             f"Leaks without pipes intersecting its buffer: {values['total_leaks'] - self.assigned_leaks}.",
         ]
