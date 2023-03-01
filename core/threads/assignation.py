@@ -114,13 +114,9 @@ class GwAssignation(GwTask):
 
         rows = tools_db.get_rows(
             f"""
-            WITH
-                leak_dates AS (
-                    SELECT id, "date" AS date_leak
-                    FROM asset.leaks),
-                max_date AS (
-                    SELECT max(date_leak)
-                    FROM leak_dates)
+            WITH max_date AS (
+                SELECT max(date)
+                FROM asset.leaks)
             SELECT l.id AS leak_id,
                 l.diameter AS leak_diameter,
                 l.material AS leak_material,
@@ -133,10 +129,9 @@ class GwAssignation(GwTask):
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
                 ) AS length
             FROM asset.leaks AS l
-            JOIN leak_dates AS d USING (id)
-            JOIN asset.arc_asset AS a ON 
-                ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})
-            WHERE d.date_leak > (
+            JOIN asset.arc_asset AS a ON
+                ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})     
+            WHERE l.date > (
                 (SELECT * FROM max_date) - INTERVAL '{self.years} year')::date
                 AND ST_LENGTH(
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
