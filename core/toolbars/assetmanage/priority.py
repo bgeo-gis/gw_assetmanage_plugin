@@ -568,7 +568,7 @@ class CalculatePriority:
                 self.dlg_priority.cmb_material.setVisible(False)
             # Hide Explotation filter if there's arcs without expl_id
             null_expl = tools_db.get_row(
-                "SELECT 1 FROM asset.arc_asset WHERE expl_id IS NULL"
+                "SELECT 1 FROM asset.ext_arc_asset WHERE expl_id IS NULL"
             )
             if not self.result["expl_id"] and (
                 self.config.show_exploitation is not True or null_expl
@@ -577,7 +577,7 @@ class CalculatePriority:
                 self.dlg_priority.cmb_expl_selection.setVisible(False)
             # Hide Presszone filter if there's arcs without presszone_id
             null_presszone = tools_db.get_row(
-                "SELECT 1 FROM asset.arc_asset WHERE presszone_id IS NULL"
+                "SELECT 1 FROM asset.ext_arc_asset WHERE presszone_id IS NULL"
             )
             if not self.result["presszone_id"] and (
                 self.config.show_presszone is not True or null_presszone
@@ -637,7 +637,7 @@ class CalculatePriority:
         data_checks = tools_db.get_rows(
             f"""
             with assets as (
-                select * from asset.arc_asset {filters}),
+                select * from asset.ext_arc_asset {filters}),
             list_invalid_arccat_ids as (
                 select count(*), coalesce(arccat_id, 'NULL')
                 from assets
@@ -1065,7 +1065,12 @@ class CalculatePriority:
             )
 
         # Combo material
-        sql = "SELECT id, id as idval FROM cat_mat_arc ORDER BY id;"
+        sql = f"""
+            SELECT id, id as idval
+            FROM {gw_global_vars.schema_name}.cat_mat_arc
+            WHERE active = true
+            ORDER BY id;
+            """
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_material, rows, 1, add_empty=True)
         tools_qt.set_combo_value(
@@ -1073,7 +1078,7 @@ class CalculatePriority:
         )
 
         # Combo exploitation
-        sql = "SELECT expl_id as id, name as idval FROM asset.exploitation;"
+        sql = f"SELECT expl_id as id, name as idval FROM {gw_global_vars.schema_name}.exploitation;"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_expl_selection, rows, 1, add_empty=True)
         tools_qt.set_combo_value(
@@ -1084,7 +1089,7 @@ class CalculatePriority:
         )
 
         # Combo presszone
-        sql = "SELECT presszone_id as id, name as idval FROM asset.presszone"
+        sql = f"SELECT presszone_id as id, name as idval FROM {gw_global_vars.schema_name}.presszone"
         rows = tools_db.get_rows(sql)
         tools_qt.fill_combo_values(dlg.cmb_presszone, rows, 1, add_empty=True)
         tools_qt.set_combo_value(

@@ -61,7 +61,9 @@ class ResultManager(dialog.GwAction):
             self.dlg_priority_manager.cmb_type, rows, 1, add_empty=True
         )
 
-        rows = tools_db.get_rows("SELECT expl_id, name FROM asset.exploitation")
+        rows = tools_db.get_rows(
+            f"SELECT expl_id, name FROM {gw_global_vars.schema_name}.exploitation"
+        )
         tools_qt.fill_combo_values(
             self.dlg_priority_manager.cmb_expl, rows, 1, add_empty=True
         )
@@ -78,7 +80,7 @@ class ResultManager(dialog.GwAction):
             "asset.cat_result",
             [
                 (2, "asset.value_result_type", "id", "idval"),
-                (5, "asset.exploitation", "expl_id", "name"),
+                (5, f"{gw_global_vars.schema_name}.exploitation", "expl_id", "name"),
                 (10, "asset.value_status", "id", "idval"),
             ],
         )

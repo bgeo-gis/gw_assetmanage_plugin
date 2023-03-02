@@ -4,7 +4,7 @@
 
 INSERT INTO asset.config_catalog_def SELECT id AS arccat_id, dnom::NUMERIC, round(dnom::NUMERIC * 3 / 5 + 70) AS cost_constr, round(dnom::NUMERIC * 9 / 5 + 310) AS cost_repmain, 10 AS compliance FROM PARENT_SCHEMA.cat_arc WHERE dnom IS NOT NULL;
 
-INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM asset.cat_mat_arc;
+INSERT INTO asset.config_material_def SELECT id, 0.16, 58, 50, 42, 1964, 10 FROM PARENT_SCHEMA.cat_mat_arc WHERE active = true;
 
 -- TODO: translate labels
 INSERT INTO asset.config_engine_def VALUES ('bratemain0', '0.05', 'SH', NULL, NULL, true, 'lyt_engine_1', 1, 'Break rate on mains', 'float', 'text', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);

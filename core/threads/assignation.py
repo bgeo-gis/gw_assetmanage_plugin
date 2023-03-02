@@ -114,7 +114,7 @@ class GwAssignation(GwTask):
                     ST_INTERSECTION(ST_BUFFER(l.the_geom, {self.buffer}), a.the_geom)
                 ) AS length
             FROM asset.leaks AS l
-            JOIN asset.arc_asset AS a ON
+            JOIN asset.ext_arc_asset AS a ON
                 l.date > a.builtdate
                 AND ST_DWITHIN(l.the_geom, a.the_geom, {self.buffer})     
             WHERE l.date > (
@@ -230,7 +230,7 @@ class GwAssignation(GwTask):
                 f"""
                 WITH start_pipe AS (
                         SELECT arc_id, matcat_id, dnom, the_geom
-                        FROM asset.arc_asset
+                        FROM asset.ext_arc_asset
                         WHERE arc_id = '{arc["id"]}'),
                     ordered_list AS (
                         SELECT a.arc_id, 
@@ -239,7 +239,7 @@ class GwAssignation(GwTask):
                             a.dnom,
                             a.the_geom <-> s.the_geom AS dist,
                             ST_LENGTH(a.the_geom) AS length
-                        FROM asset.arc_asset AS a, start_pipe AS s
+                        FROM asset.ext_arc_asset AS a, start_pipe AS s
                         {where_clause}
                         ORDER BY start DESC, dist ASC),
                     cum_list AS (
@@ -295,7 +295,7 @@ class GwAssignation(GwTask):
                 )::date),
             total_pipes as (
                 select count(*) as total_pipes
-                from asset.arc_asset),
+                from asset.ext_arc_asset),
             orphan_pipes as (
                 select count(*) as orphan_pipes
                 from asset.v_asset_arc_input

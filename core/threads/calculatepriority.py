@@ -197,7 +197,7 @@ class GwCalculatePriority(GwTask):
 
         sql = f"""
             select {columns}
-            from asset.arc_asset a 
+            from asset.ext_arc_asset a 
             left join asset.arc_input ai using (arc_id)
             {filters}
         """
@@ -523,7 +523,7 @@ class GwCalculatePriority(GwTask):
                     mandatory
                 from asset.arc_engine_sh sh
                 left join asset.arc_input i using (arc_id)
-                left join asset.arc_asset a using (arc_id)
+                left join asset.ext_arc_asset a using (arc_id)
                 where sh.result_id = {self.result_id}
                 order by total;
             """
@@ -538,7 +538,7 @@ class GwCalculatePriority(GwTask):
         invalid_diameters_count = tools_db.get_row(
             f"""
             select count(*)
-            from asset.arc_asset
+            from asset.ext_arc_asset
             where dnom is null 
                 or dnom::numeric <= 0
                 or dnom::numeric > (
@@ -556,7 +556,7 @@ class GwCalculatePriority(GwTask):
                 for x in tools_db.get_rows(
                     f"""
                     select distinct dnom
-                    from asset.arc_asset
+                    from asset.ext_arc_asset
                     where dnom is null 
                         or dnom::numeric <= 0
                         or dnom::numeric > (
@@ -571,7 +571,7 @@ class GwCalculatePriority(GwTask):
         invalid_materials_count = tools_db.get_row(
             f"""
             select count(*)
-            from asset.arc_asset a
+            from asset.ext_arc_asset a
             where not exists (
                 select 1
                 from asset.config_material
@@ -589,7 +589,7 @@ class GwCalculatePriority(GwTask):
                 for x in tools_db.get_rows(
                     f"""
                     select distinct matcat_id
-                    from asset.arc_asset a
+                    from asset.ext_arc_asset a
                     where not exists (
                         select 1
                         from asset.config_material
@@ -644,7 +644,7 @@ class GwCalculatePriority(GwTask):
             """
             with lengths AS (
                 select a.dma_id, sum(st_length(a.the_geom)) as length 
-                from asset.arc_asset a
+                from asset.ext_arc_asset a
                 group by dma_id
             )
             select d.dma_id, (d.nrw / d.days / l.length * 1000) as nrw_m3kmd
@@ -1001,7 +1001,7 @@ class GwCalculatePriority(GwTask):
             update asset.arc_output o
             set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
                 = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id
-                    from asset.arc_asset a
+                    from asset.ext_arc_asset a
                     where a.arc_id = o.arc_id)
             where o.result_id = {self.result_id}
             """
