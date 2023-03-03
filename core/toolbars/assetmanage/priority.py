@@ -45,12 +45,18 @@ from ...ui.ui_manager import PriorityUi, PriorityManagerUi
 
 
 class ConfigCatalog:
-    def __init__(self, data):
-        # order the dict by dnom
-        self._data = {k: v for k, v in sorted(data.items(), key=lambda i: i[1]["dnom"])}
+    def __init__(self, data, key="arccat_id"):
+        self._data = {}
+        for entry in sorted(data, key=lambda i: i["dnom"]):
+            if entry[key] in self._data:
+                raise ValueError(f"Key {key} is not unique in the config catalog.")
+            self._data[entry[key]] = entry
 
     def arccat_ids(self):
-        return self._data.keys()
+        return [x["arccat_id"] for x in self._data.values()]
+
+    def diameters(self):
+        return [x["dnom"] for x in self._data.values()]
 
     def fill_table_widget(self, table_widget):
         # message
@@ -71,14 +77,17 @@ class ConfigCatalog:
             table_widget.setItem(r, 3, QTableWidgetItem(str(row["cost_repmain"])))
             table_widget.setItem(r, 4, QTableWidgetItem(str(row["compliance"])))
 
-    def get_compliance(self, arccat_id):
-        return self._data[arccat_id]["compliance"]
+    def get_compliance(self, key):
+        return self._data[key]["compliance"]
 
-    def get_cost_constr(self, arccat_id):
-        return self._data[arccat_id]["cost_constr"]
+    def get_cost_constr(self, key):
+        return self._data[key]["cost_constr"]
+    
+    def get_cost_repmain(self, key):
+        return self._data[key]["cost_repmain"]
 
-    def has_arccat_id(self, arccat_id):
-        return arccat_id in self._data
+    def has_key(self, key):
+        return key in self._data
 
     def max_diameter(self):
         return max(x["dnom"] for x in self._data.values())
@@ -103,31 +112,19 @@ class ConfigCatalog:
         tools_db.execute_sql(sql)
 
 
-def configcatalog_from_sql(sql):
-    rows = tools_db.get_rows(sql)
-    data = {}
-    for row in rows:
-        data[row["arccat_id"]] = {
-            "arccat_id": row["arccat_id"],
-            "dnom": row["dnom"],
-            "cost_constr": row["cost_constr"],
-            "cost_repmain": row["cost_repmain"],
-            "compliance": row["compliance"],
-        }
-    return ConfigCatalog(data)
-
-
-def configcatalog_from_tablewidget(table_widget):
-    data = {}
+def configcatalog_from_tablewidget(table_widget, key="arccat_id"):
+    data = []
     for r in range(table_widget.rowCount()):
-        data[table_widget.item(r, 0).text()] = {
-            "arccat_id": table_widget.item(r, 0).text(),
-            "dnom": float(table_widget.item(r, 1).text()),
-            "cost_constr": float(table_widget.item(r, 2).text()),
-            "cost_repmain": float(table_widget.item(r, 3).text()),
-            "compliance": int(table_widget.item(r, 4).text()),
-        }
-    return ConfigCatalog(data)
+        data.append(
+            {
+                "arccat_id": table_widget.item(r, 0).text(),
+                "dnom": float(table_widget.item(r, 1).text()),
+                "cost_constr": float(table_widget.item(r, 2).text()),
+                "cost_repmain": float(table_widget.item(r, 3).text()),
+                "compliance": int(table_widget.item(r, 4).text()),
+            }
+        )
+    return ConfigCatalog(data, key)
 
 
 class ConfigMaterial:
@@ -412,7 +409,7 @@ class CalculatePriority:
             sql = "select * from asset.config_catalog_def"
         else:
             sql = f"select * from asset.config_catalog where result_id = {self.result['id']}"
-        configcatalog = configcatalog_from_sql(sql)
+        configcatalog = ConfigCatalog(tools_db.get_rows(sql))
         configcatalog.fill_table_widget(self.qtbl_catalog)
         self.qtbl_catalog.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
@@ -420,6 +417,8 @@ class CalculatePriority:
         if self.config.method == "WM":
             self.qtbl_catalog.hideColumn(1)
             self.qtbl_catalog.hideColumn(3)
+        if self.config.method == "SH":
+            self.qtbl_catalog.hideColumn(0)
 
         self.qtbl_material = self.dlg_priority.findChild(QTableWidget, "tbl_material")
         self.qtbl_material.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -679,7 +678,7 @@ class CalculatePriority:
         for row in data_checks:
             if not row["qtd"]:
                 continue
-            if row["check"] == "invalid_arccat_ids":
+            if row["check"] == "invalid_arccat_ids" and self.config.method != "SH":
                 message = (
                     self._tr("Pipes with invalid arccat_ids:")
                     + f" {row['qtd']}.\n"
@@ -983,7 +982,8 @@ class CalculatePriority:
             return
 
         try:
-            config_catalog = configcatalog_from_tablewidget(self.qtbl_catalog)
+            key = "dnom" if self.config.method == "SH" else "arccat_id"
+            config_catalog = configcatalog_from_tablewidget(self.qtbl_catalog, key)
         except ValueError as e:
             tools_qt.show_info_box(e)
             return

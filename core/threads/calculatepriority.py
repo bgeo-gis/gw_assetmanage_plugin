@@ -282,13 +282,9 @@ class GwCalculatePriority(GwTask):
         discount_rate = float(self.config_engine["drate"])
         break_growth_rate = float(self.config_engine["bratemain0"])
 
-        last_leak_year = tools_db.get_rows(
-            """
-            select max(year) from (select 
-                date_part('year', "date") as year
-                FROM asset.leaks) years
-            """
-        )[0][0]
+        last_leak_year = tools_db.get_row(
+            "select max(date_part('year', date)) from asset.leaks"
+        )[0]
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
@@ -322,12 +318,12 @@ class GwCalculatePriority(GwTask):
                 presszone_id,
                 strategic,
             ) = arc
-            if arc_material not in self.config_material:
+            if not self.config_material.has_material(arc_material):
                 arc_material = self.unknown_material
             if (
                 arc_diameter is None
                 or int(arc_diameter) <= 0
-                or int(arc_diameter) > max(self.config_diameter.keys())
+                or int(arc_diameter) > self.config_catalog.max_diameter()
             ):
                 continue
             if arc_length is None:
@@ -342,23 +338,16 @@ class GwCalculatePriority(GwTask):
                 continue
 
             reference_dnom = get_min_greater_than(
-                self.config_diameter.keys(), int(arc_diameter)
+                self.config_catalog.diameters(), int(arc_diameter)
             )
-            cost_repmain = self.config_diameter[reference_dnom]["cost_repmain"]
+            cost_repmain = self.config_catalog.get_cost_repmain(reference_dnom)
 
-            replacement_cost = self.config_diameter[reference_dnom]["cost_constr"]
+            replacement_cost = self.config_catalog.get_cost_constr(reference_dnom)
             cost_constr = replacement_cost * float(arc_length)
 
-            material_compliance = 10
-            if (
-                arc_material in self.config_material
-                and self.config_material[arc_material]
-            ):
-                material_compliance = self.config_material[arc_material]["compliance"]
-
             compliance = 10 - min(
-                self.config_diameter[reference_dnom]["compliance"],
-                material_compliance,
+                self.config_catalog.get_compliance(reference_dnom),
+                self.config_material.get_compliance(arc_material),
             )
 
             strategic_val = 10 if strategic else 0
@@ -420,16 +409,18 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/5)...")
         self.setProgress(60)
 
+        self.statistics_report = ""
+
         self.result_id = self._save_result_info()
 
         if not self.result_id:
             return False
 
-        self._save_config_diameter()
+        self.config_catalog.save(self.result_id)
 
         self.setProgress(66)
 
-        self._save_config_material()
+        self.config_material.save(self.result_id)
 
         self.setProgress(69)
 
@@ -543,7 +534,7 @@ class GwCalculatePriority(GwTask):
                 or dnom::numeric <= 0
                 or dnom::numeric > (
                     select max(dnom)
-                    from asset.config_diameter
+                    from asset.config_catalog
                     where result_id = {self.result_id}
                 )
             """
@@ -561,7 +552,7 @@ class GwCalculatePriority(GwTask):
                         or dnom::numeric <= 0
                         or dnom::numeric > (
                             select max(dnom)
-                            from asset.config_diameter
+                            from asset.config_catalog
                             where result_id = {self.result_id}
                         )
                     """
@@ -684,7 +675,7 @@ class GwCalculatePriority(GwTask):
         for row in rows:
             # Convert arc from psycopg2.extras.DictRow to OrderedDict
             arc = row.copy()
-            if not self.config_catalog.has_arccat_id(arc["arccat_id"]):
+            if not self.config_catalog.has_key(arc["arccat_id"]):
                 invalid_arccat_id["qtd"] += 1
                 invalid_arccat_id["set"].add(arc["arccat_id"])
                 continue
@@ -1012,23 +1003,6 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Task finished!"))
         return True
 
-    def _save_config_diameter(self):
-        config_diameter_fields = list(self.config_diameter.values())[0].keys()
-        save_config_diameter_sql = f"""
-            delete from asset.config_diameter where result_id = {self.result_id};
-            insert into asset.config_diameter 
-                (result_id, dnom, {','.join(config_diameter_fields)})
-            values
-        """
-        for dnom, fields in self.config_diameter.items():
-            save_config_diameter_sql += f"""
-                ({self.result_id},
-                {dnom},
-                {','.join([str(fields[x]) for x in config_diameter_fields])}),
-            """
-        save_config_diameter_sql = save_config_diameter_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_diameter_sql)
-
     def _save_config_engine(self):
         save_config_engine_sql = f"""
             delete from asset.config_engine where result_id = {self.result_id};
@@ -1040,23 +1014,6 @@ class GwCalculatePriority(GwTask):
             save_config_engine_sql += f"({self.result_id}, '{k}', {v}),"
         save_config_engine_sql = save_config_engine_sql.strip()[:-1]
         tools_db.execute_sql(save_config_engine_sql)
-
-    def _save_config_material(self):
-        config_material_fields = list(self.config_material.values())[0].keys()
-        save_config_material_sql = f"""
-            delete from asset.config_material where result_id = {self.result_id};
-            insert into asset.config_material 
-                (result_id, material, {','.join(config_material_fields)})
-            values
-        """
-        for material, fields in self.config_material.items():
-            save_config_material_sql += f"""
-                ({self.result_id},
-                '{material}',
-                {','.join([str(fields[x]) for x in config_material_fields])}),
-            """
-        save_config_material_sql = save_config_material_sql.strip()[:-1]
-        tools_db.execute_sql(save_config_material_sql)
 
     def _save_result_info(self):
         str_features = (
