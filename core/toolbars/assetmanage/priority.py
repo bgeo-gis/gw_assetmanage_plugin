@@ -409,7 +409,8 @@ class CalculatePriority:
             sql = "select * from asset.config_catalog_def"
         else:
             sql = f"select * from asset.config_catalog where result_id = {self.result['id']}"
-        configcatalog = ConfigCatalog(tools_db.get_rows(sql))
+        key = "arccat_id" if self.config.method == "WM" else "dnom"
+        configcatalog = ConfigCatalog(tools_db.get_rows(sql), key)
         configcatalog.fill_table_widget(self.qtbl_catalog)
         self.qtbl_catalog.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch

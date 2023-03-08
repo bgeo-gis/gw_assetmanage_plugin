@@ -16,7 +16,9 @@ from ...settings import tools_db, tools_qt
 def get_min_greater_than(iterable, value):
     result = None
     for item in iterable:
-        if item <= value:
+        if item == value:
+            return item
+        if item < value:
             continue
         if result is None or item < result:
             result = item

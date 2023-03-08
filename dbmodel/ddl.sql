@@ -66,22 +66,24 @@ CREATE TABLE asset.value_status (
 );
 
 CREATE TABLE asset.config_catalog_def (
-    arccat_id varchar(30) NOT NULL,
-    dnom numeric(12,2) NOT NULL,
+    arccat_id varchar(30),
+    dnom numeric(12,2),
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
-    CONSTRAINT config_catalog_def_pkey PRIMARY KEY (arccat_id, dnom)
+    CONSTRAINT config_catalog_def_arccat_id_or_dnom
+        CHECK (arccat_id IS NOT NULL OR dnom IS NOT NULL)
 );
 
 CREATE TABLE asset.config_catalog (
-    arccat_id varchar(30) NOT NULL,
-    dnom numeric(12,2) NOT NULL,
+    arccat_id varchar(30),
+    dnom numeric(12,2),
     cost_constr numeric(12,2),
     cost_repmain numeric(12,2),
     compliance integer,
     result_id integer NOT NULL,
-    CONSTRAINT config_catalog_pkey PRIMARY KEY (arccat_id, dnom, result_id)
+    CONSTRAINT config_catalog_arccat_id_or_dnom
+        CHECK (arccat_id IS NOT NULL OR dnom IS NOT NULL)
 );
 
 CREATE TABLE asset.config_material_def (
