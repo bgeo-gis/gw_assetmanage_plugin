@@ -432,6 +432,12 @@ class CalculatePriority:
         self.qtbl_material.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch
         )
+        if self.config.method == "SH":
+            self.qtbl_material.hideColumn(1)
+            self.qtbl_material.hideColumn(2)
+            self.qtbl_material.hideColumn(3)
+            self.qtbl_material.hideColumn(4)
+            self.qtbl_material.hideColumn(5)
 
         self._fill_engine_options()
         self._set_signals()
