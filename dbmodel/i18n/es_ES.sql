@@ -30,8 +30,14 @@ UPDATE asset.config_form_tableview SET alias = 'Id' WHERE tablename = 'cat_resul
 UPDATE asset.config_form_tableview SET alias = 'Resultado' WHERE tablename = 'cat_result' AND columnname = 'result_name';
 UPDATE asset.config_form_tableview SET alias = 'Tipo' WHERE tablename = 'cat_result' AND columnname = 'result_type';
 UPDATE asset.config_form_tableview SET alias = 'Descripción' WHERE tablename = 'cat_result' AND columnname = 'descript';
+UPDATE asset.config_form_tableview SET alias = 'Informe' WHERE tablename = 'cat_result' AND columnname = 'report';
 UPDATE asset.config_form_tableview SET alias = 'Explotación' WHERE tablename = 'cat_result' AND columnname = 'expl_id';
+UPDATE asset.config_form_tableview SET alias = 'Presupuesto anual' WHERE tablename = 'cat_result' AND columnname = 'budget';
+UPDATE asset.config_form_tableview SET alias = 'Año horizonte' WHERE tablename = 'cat_result' AND columnname = 'target_year';
 UPDATE asset.config_form_tableview SET alias = 'Fecha' WHERE tablename = 'cat_result' AND columnname = 'tstamp';
 UPDATE asset.config_form_tableview SET alias = 'Usuario' WHERE tablename = 'cat_result' AND columnname = 'cur_user';
 UPDATE asset.config_form_tableview SET alias = 'Status' WHERE tablename = 'cat_result' AND columnname = 'status';
+UPDATE asset.config_form_tableview SET alias = 'Zona de presión' WHERE tablename = 'cat_result' AND columnname = 'presszone_id';
+UPDATE asset.config_form_tableview SET alias = 'Material' WHERE tablename = 'cat_result' AND columnname = 'material_id';
 UPDATE asset.config_form_tableview SET alias = 'Selección' WHERE tablename = 'cat_result' AND columnname = 'features';
+UPDATE asset.config_form_tableview SET alias = 'Diámetro' WHERE tablename = 'cat_result' AND columnname = 'dnom';

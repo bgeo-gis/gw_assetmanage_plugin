@@ -15,7 +15,7 @@ from qgis.PyQt.QtWidgets import (
     QTableView,
     QCompleter,
 )
-from qgis.PyQt.QtCore import QStringListModel
+from qgis.PyQt.QtCore import QStringListModel, Qt
 from qgis.PyQt.QtSql import QSqlRelation, QSqlRelationalTableModel
 
 from .priority import CalculatePriority
@@ -90,6 +90,19 @@ class ResultManager(dialog.GwAction):
             "cat_result",
             schema_name="asset",
         )
+        rows = tools_db.get_rows(
+            """
+            select columnname, alias
+            from asset.config_form_tableview
+            where tablename = 'cat_result'
+            """
+        )
+        self.headers = {row["columnname"]: row["alias"] for row in rows}
+        self.headers["value_result_type_idval_2"] = self.headers.get(
+            "result_type", "Type"
+        )
+        self.headers["name"] = self.headers.get("expl_id", "Explotation")
+        self.headers["idval"] = self.headers.get("status", "Status")
 
         self._set_signals()
 
@@ -124,9 +137,24 @@ class ResultManager(dialog.GwAction):
             return
 
         row = selected_list[0].row()
-        report = dlg.tbl_results.model().record(row).value("report")
+        record = dlg.tbl_results.model().record(row)
+        txt = ""
+        for i in range(len(record)):
+            if not record.value(i):
+                continue
 
-        dlg.txt_info.setText(report)
+            field_name = record.fieldName(i)
+            value = record.value(i)
+
+            txt += f"<b>{self.headers.get(field_name, field_name)}:</b><br>"
+            if field_name == "report":
+                txt += value.replace("\n", "<br>") + "<br><br>"
+            elif field_name == "tstamp":
+                txt += value.toString() + "<br><br>"
+            else:
+                txt += f"{value}<br><br>"
+
+        dlg.txt_info.setText(txt)
 
     def _manage_btn_action(self):
 

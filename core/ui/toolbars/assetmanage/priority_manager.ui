@@ -32,6 +32,7 @@
         <property name="font">
          <font>
           <family>Courier New</family>
+          <pointsize>10</pointsize>
          </font>
         </property>
        </widget>
