@@ -215,6 +215,18 @@ class GwCalculatePriority(GwTask):
         )
         return message.format(qtd=obj["qtd"], list=", ".join(obj["set"]))
 
+    def _invalid_diameter_report(self, obj):
+        if not obj["qtd"]:
+            return
+        message = self._tr(
+            "Pipes with invalid diameter: {qtd}.\n"
+            "Invalid diameters: {list}.\n"
+            "These pipes have NOT been assigned a priority value."
+        )
+        return message.format(
+            qtd=obj["qtd"], list=", ".join(map(str, sorted(obj["set"])))
+        )
+
     def _invalid_material_report(self, obj):
         if not obj["qtd"]:
             return
@@ -309,6 +321,8 @@ class GwCalculatePriority(GwTask):
         self.setProgress(40)
 
         output_arcs = []
+        invalid_material = {"qtd": 0, "set": set()}
+        invalid_diameter = {"qtd": 0, "set": set()}
         for arc in arcs:
             (
                 arc_id,
@@ -321,12 +335,16 @@ class GwCalculatePriority(GwTask):
                 strategic,
             ) = arc
             if not self.config_material.has_material(arc_material):
+                invalid_material["qtd"] += 1
+                invalid_material["set"].add(arc_material)
                 arc_material = self.unknown_material
             if (
                 arc_diameter is None
                 or int(arc_diameter) <= 0
                 or int(arc_diameter) > self.config_catalog.max_diameter()
             ):
+                invalid_diameter["qtd"] += 1
+                invalid_diameter["set"].add(arc_diameter)
                 continue
             if arc_length is None:
                 continue
@@ -411,7 +429,15 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Updating tables") + " (4/5)...")
         self.setProgress(60)
 
-        self.statistics_report = ""
+        self.statistics_report = "\n\n".join(
+            filter(
+                lambda x: x,
+                [
+                    self._invalid_diameter_report(invalid_diameter),
+                    self._invalid_material_report(invalid_material),
+                ],
+            )
+        )
 
         self.result_id = self._save_result_info()
 
@@ -528,103 +554,12 @@ class GwCalculatePriority(GwTask):
         self._emit_report(self._tr("Generating result stats") + " (5/5)...")
         self.setProgress(80)
 
-        invalid_diameters_count = tools_db.get_row(
-            f"""
-            select count(*)
-            from asset.ext_arc_asset
-            where dnom is null 
-                or dnom::numeric <= 0
-                or dnom::numeric > (
-                    select max(dnom)
-                    from asset.config_catalog
-                    where result_id = {self.result_id}
-                )
-            """
-        )[0]
-
-        invalid_diameters = []
-        if invalid_diameters_count:
-            invalid_diameters = [
-                x[0]
-                for x in tools_db.get_rows(
-                    f"""
-                    select distinct dnom
-                    from asset.ext_arc_asset
-                    where dnom is null 
-                        or dnom::numeric <= 0
-                        or dnom::numeric > (
-                            select max(dnom)
-                            from asset.config_catalog
-                            where result_id = {self.result_id}
-                        )
-                    """
-                )
-            ]
-
-        invalid_materials_count = tools_db.get_row(
-            f"""
-            select count(*)
-            from asset.ext_arc_asset a
-            where not exists (
-                select 1
-                from asset.config_material
-                where 
-                    material = a.matcat_id
-                    and result_id = {self.result_id}
-            )
-            """
-        )[0]
-
-        invalid_materials = []
-        if invalid_materials_count:
-            invalid_materials = [
-                x[0]
-                for x in tools_db.get_rows(
-                    f"""
-                    select distinct matcat_id
-                    from asset.ext_arc_asset a
-                    where not exists (
-                        select 1
-                        from asset.config_material
-                        where 
-                            material = a.matcat_id
-                            and result_id = {self.result_id}
-                    )
-                    """
-                )
-            ]
-
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(
-            self._tr("Task finished!"),
-            self._tr("Warnings:")
-            if invalid_diameters_count or invalid_materials_count
-            else "",
-        )
-
-        if invalid_diameters_count:
-            self._emit_report(
-                self._tr("Pipes with invalid diameters:")
-                + f" {invalid_diameters_count}.",
-                self._tr("Invalid diameters:")
-                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_diameters))}.",
-                self._tr("These pipes have NOT been assigned a priority value."),
-            )
-
-        if invalid_materials_count:
-            self._emit_report(
-                self._tr("Pipes with invalid materials:")
-                + f" {invalid_materials_count}.",
-                self._tr("Invalid materials:")
-                + f" {', '.join(map(lambda x: 'NULL' if x is None else str(x), invalid_materials))}.",
-                self._tr(
-                    "These pipes have been assigned as compliant by default, "
-                    "which may affect their priority value."
-                ),
-            )
+        self._emit_report(self.statistics_report)
+        self._emit_report(self._tr("Task finished!"))
 
         return True
 
