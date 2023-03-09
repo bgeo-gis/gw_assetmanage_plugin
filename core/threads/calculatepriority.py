@@ -337,6 +337,8 @@ class GwCalculatePriority(GwTask):
             if not self.config_material.has_material(arc_material):
                 invalid_material["qtd"] += 1
                 invalid_material["set"].add(arc_material)
+                if not self.config_material.has_material(self.unknown_material):
+                    continue
                 arc_material = self.unknown_material
             if (
                 arc_diameter is None
