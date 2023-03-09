@@ -657,6 +657,19 @@ class CalculatePriority:
                     sum(count) as qtd,
                     string_agg(coalesce, ', ') as list
                 from list_invalid_arccat_ids),
+            list_invalid_diameters as (
+                select count(*), coalesce(dnom::text, 'NULL')
+                from assets
+                where dnom is null 
+                    or dnom::numeric <= 0
+                    or dnom::numeric > {config_catalog.max_diameter()}
+                group by dnom
+                order by dnom),
+            invalid_diameters as (
+                select 'invalid_diameters' as check,
+                    sum(count) as qtd,
+                    string_agg(coalesce, ', ') as list
+                from list_invalid_diameters),
             list_invalid_materials as (
                 select count(*), coalesce(matcat_id, 'NULL')
                 from assets
@@ -676,6 +689,8 @@ class CalculatePriority:
                 where press1 is null and press2 is null)
             select * from invalid_arccat_ids
             union all
+            select * from invalid_diameters
+            union all
             select * from invalid_materials
             union all
             select * from null_pressures
@@ -685,7 +700,7 @@ class CalculatePriority:
         for row in data_checks:
             if not row["qtd"]:
                 continue
-            if row["check"] == "invalid_arccat_ids" and self.config.method != "SH":
+            if row["check"] == "invalid_arccat_ids" and self.config.method == "WM":
                 message = (
                     self._tr("Pipes with invalid arccat_ids:")
                     + f" {row['qtd']}.\n"
@@ -699,6 +714,22 @@ class CalculatePriority:
                     + self._tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(message, force_action=True):
+                    return
+            elif row["check"] == "invalid_diameters" and self.config.method == "SH":
+                msg = (
+                    self._tr("Pipes with invalid diameters:")
+                    + f" {row['qtd']}.\n"
+                    + self._tr("Invalid diameters:")
+                    + f" {row['list']}.\n\n"
+                    + self._tr(
+                        "A diameter value is considered invalid if it is zero, negative, NULL "
+                        "or greater than the maximum diameter in the configuration table. "
+                        "As a result, these pipes will NOT be assigned a priority value."
+                    )
+                    + "\n\n"
+                    + self._tr("Do you want to proceed?")
+                )
+                if not tools_qt.show_question(msg, force_action=True):
                     return
             elif row["check"] == "invalid_materials":
                 if config_material.has_material(self.config.unknown_material):
@@ -724,7 +755,7 @@ class CalculatePriority:
                 )
                 if not tools_qt.show_question(message, force_action=True):
                     return
-            elif row["check"] == "null_pressures":
+            elif row["check"] == "null_pressures" and self.config.method == "WM":
                 message = (
                     self._tr("Pipes with invalid pressures:")
                     + f" {row['qtd']}.\n"
