@@ -146,6 +146,18 @@ class GwCalculatePriority(GwTask):
             )
         return current_value / replacement_cost
 
+    def _copy_input_to_output(self):
+        tools_db.execute_sql(
+            f"""
+            update asset.arc_output o
+            set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
+                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id
+                    from asset.ext_arc_asset a
+                    where a.arc_id = o.arc_id)
+            where o.result_id = {self.result_id}
+            """
+        )
+
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
 
@@ -550,6 +562,8 @@ class GwCalculatePriority(GwTask):
             """
         )
 
+        self._copy_input_to_output()
+
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
@@ -925,17 +939,7 @@ class GwCalculatePriority(GwTask):
             progress = (90 - 70) / len(second_iteration) * 1000 * loop + 70
             self.setProgress(progress)
 
-        # Copy data from arc_asset to arc_output
-        tools_db.execute_sql(
-            f"""
-            update asset.arc_output o
-            set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
-                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id
-                    from asset.ext_arc_asset a
-                    where a.arc_id = o.arc_id)
-            where o.result_id = {self.result_id}
-            """
-        )
+        self._copy_input_to_output()
 
         self._emit_report(self.statistics_report)
 
