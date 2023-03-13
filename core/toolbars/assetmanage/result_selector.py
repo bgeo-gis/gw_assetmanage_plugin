@@ -10,6 +10,7 @@ from qgis.PyQt.QtWidgets import QMenu, QAction, QActionGroup, QTableView
 from ....settings import tools_qt, tools_gw, dialog, tools_db, tools_qgis
 from .... import global_vars
 
+from ...utils import open_dialog
 from ...ui.ui_manager import ResultSelectorUi
 
 
@@ -31,7 +32,7 @@ class ResultSelector(dialog.GwAction):
             return
         self._update_descriptions()
         self._set_signals()
-        tools_gw.open_dialog(self.dlg_result_selector, dlg_name="result_selection", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
+        open_dialog(self.dlg_result_selector, dlg_name="result_selection", plugin_dir=global_vars.plugin_dir, plugin_name=global_vars.plugin_name)
 
     def _fill_combos(self):
         dlg = self.dlg_result_selector

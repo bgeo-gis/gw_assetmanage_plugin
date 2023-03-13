@@ -42,7 +42,7 @@ from .priority import CalculatePriority
 from ...threads.assignation import GwAssignation
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import AssignationUi, PriorityUi
-from ...utils import tr
+from ...utils import open_dialog, tr
 
 
 class AmBreakage(dialog.GwAction):
@@ -145,7 +145,7 @@ class AmBreakage(dialog.GwAction):
         self._set_assignation_signals()
 
         # Open the dialog
-        tools_gw.open_dialog(
+        open_dialog(
             self.dlg_assignation,
             dlg_name="assignation",
             plugin_dir=global_vars.plugin_dir,

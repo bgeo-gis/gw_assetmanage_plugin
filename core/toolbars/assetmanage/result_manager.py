@@ -32,6 +32,7 @@ from ....settings import (
 )
 from .... import global_vars
 from .priority import CalculatePriority
+from ...utils import open_dialog
 
 
 class ResultManager(dialog.GwAction):
@@ -116,10 +117,9 @@ class ResultManager(dialog.GwAction):
             "select id, idval from asset.value_result_type"
         ):
             self._value_result_type[idval] = id
-        print(self._value_result_type)
 
         # Open the dialog
-        tools_gw.open_dialog(
+        open_dialog(
             self.dlg_priority_manager,
             dlg_name="priority_manager",
             plugin_dir=global_vars.plugin_dir,
@@ -379,7 +379,7 @@ class ResultManager(dialog.GwAction):
         )
         self.dlg_status.btn_cancel.clicked.connect(self.dlg_status.reject)
 
-        tools_gw.open_dialog(
+        open_dialog(
             self.dlg_status,
             dlg_name="status_selector",
             plugin_dir=global_vars.plugin_dir,

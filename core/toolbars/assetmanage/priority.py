@@ -42,7 +42,7 @@ from .... import global_vars
 
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
-from ...utils import tr
+from ...utils import open_dialog, tr
 
 
 class ConfigCatalog:
@@ -446,7 +446,7 @@ class CalculatePriority:
         self.dlg_priority.executing = False
 
         # Open the dialog
-        tools_gw.open_dialog(
+        open_dialog(
             self.dlg_priority,
             dlg_name="priority",
             plugin_dir=global_vars.plugin_dir,
