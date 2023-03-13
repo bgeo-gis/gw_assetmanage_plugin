@@ -42,7 +42,7 @@ from .... import global_vars
 
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
-from ...utils.translate import tr
+from ...utils import tr
 
 
 class ConfigCatalog:

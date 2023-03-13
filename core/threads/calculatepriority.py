@@ -9,7 +9,7 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
-from ..utils.translate import tr
+from ..utils import tr
 from ... import global_vars
 from ...settings import tools_db
 

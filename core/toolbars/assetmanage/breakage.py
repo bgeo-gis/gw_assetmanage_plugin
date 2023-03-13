@@ -42,7 +42,7 @@ from .priority import CalculatePriority
 from ...threads.assignation import GwAssignation
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import AssignationUi, PriorityUi
-from ...utils.translate import tr
+from ...utils import tr
 
 
 class AmBreakage(dialog.GwAction):
