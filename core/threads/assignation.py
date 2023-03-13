@@ -24,6 +24,7 @@ class GwAssignation(GwTask):
         cluster_length,
         filter_material=False,
         diameter_range=None,
+        builtdate_range=None,
     ):
         super().__init__(description, QgsTask.CanCancel)
         self.buffer = buffer
@@ -32,6 +33,7 @@ class GwAssignation(GwTask):
         self.cluster_length = cluster_length
         self.filter_material = filter_material
         self.diameter_range = diameter_range
+        self.builtdate_range = builtdate_range
 
         config_path = Path(global_vars.plugin_dir) / "config" / "config.config"
         config = configparser.ConfigParser()
@@ -230,7 +232,7 @@ class GwAssignation(GwTask):
             cluster = tools_db.get_rows(
                 f"""
                 WITH start_pipe AS (
-                        SELECT arc_id, matcat_id, dnom, the_geom
+                        SELECT arc_id, matcat_id, dnom, builtdate, the_geom
                         FROM asset.ext_arc_asset
                         WHERE arc_id = '{arc["id"]}'),
                     ordered_list AS (
@@ -349,12 +351,21 @@ class GwAssignation(GwTask):
     def _where_clause(self):
         conditions = []
         if self.filter_material:
-            conditions.append("a.matcat_id = s.matcat_id")
+            conditions.append("coalesce(a.matcat_id = s.matcat_id, true)")
         if self.diameter_range:
             conditions.append(
                 f"""
-                a.dnom::numeric >= s.dnom::numeric * {self.diameter_range[0]}
-                AND a.dnom::numeric <= s.dnom::numeric * {self.diameter_range[1]}
+                coalesce(a.dnom::numeric >= s.dnom::numeric * {self.diameter_range[0]}
+                AND a.dnom::numeric <= s.dnom::numeric * {self.diameter_range[1]},
+                true)
+                """
+            )
+        if self.builtdate_range:
+            conditions.append(
+                f"""
+                coalesce(a.builtdate >= s.builtdate - interval '{self.builtdate_range} year'
+                and a.builtdate <= s.builtdate + interval '{self.builtdate_range} year',
+                true)
                 """
             )
         if conditions:

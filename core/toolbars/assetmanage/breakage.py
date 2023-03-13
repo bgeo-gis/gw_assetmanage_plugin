@@ -138,6 +138,9 @@ class AmBreakage(dialog.GwAction):
         dlg.txt_diameter_range.setValidator(range_validator)
         dlg.txt_diameter_range.setEnabled(dlg.chk_diameter.isChecked())
 
+        dlg.txt_builtdate_range.setValidator(int_validator)
+        dlg.txt_builtdate_range.setEnabled(dlg.chk_builtdate.isChecked())
+
         # Disable tab log
         tools_gw.disable_tab_log(dlg)
         dlg.progressBar.hide()
@@ -205,8 +208,9 @@ class AmBreakage(dialog.GwAction):
             "txt_max_distance",
             "txt_cluster_length",
             "txt_diameter_range",
+            "txt_builtdate_range",
         ]
-        chk_widgets = ["chk_all_leaks", "chk_material", "chk_diameter"]
+        chk_widgets = ["chk_all_leaks", "chk_material", "chk_diameter", "chk_builtdate"]
 
         for widget in txt_widgets:
             if action == "load":
@@ -255,6 +259,7 @@ class AmBreakage(dialog.GwAction):
 
         dlg.chk_all_leaks.toggled.connect(lambda x: dlg.txt_years.setEnabled(not x))
         dlg.chk_diameter.toggled.connect(dlg.txt_diameter_range.setEnabled)
+        dlg.chk_builtdate.toggled.connect(dlg.txt_builtdate_range.setEnabled)
         dlg.buttonBox.accepted.disconnect()
         dlg.buttonBox.accepted.connect(self._execute_assignation)
         dlg.rejected.connect(partial(self._assignation_user_values, "save"))
@@ -267,7 +272,14 @@ class AmBreakage(dialog.GwAction):
         if not inputs:
             return
         use_material = dlg.chk_material.isChecked()
-        buffer, years, max_distance, cluster_length, diameter_range = inputs
+        (
+            buffer,
+            years,
+            max_distance,
+            cluster_length,
+            diameter_range,
+            builtdate_range,
+        ) = inputs
 
         msg = "This task may take some time to complete, do you want to proceed?"
         if not tools_qt.show_question(msg, context_name=global_vars.plugin_name):
@@ -281,6 +293,7 @@ class AmBreakage(dialog.GwAction):
             cluster_length,
             use_material,
             diameter_range,
+            builtdate_range,
         )
         t = self.thread
         t.taskCompleted.connect(self._assignation_ended)
@@ -365,7 +378,24 @@ class AmBreakage(dialog.GwAction):
         else:
             diameter_range = None
 
-        return buffer, years, max_distance, cluster_length, diameter_range
+        if dlg.chk_builtdate.isChecked():
+            try:
+                builtdate_range = int(dlg.txt_builtdate_range.text())
+            except ValueError:
+                message = "Please enter a valid integer for the built date range."
+                tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
+                return
+        else:
+            builtdate_range = None
+
+        return (
+            buffer,
+            years,
+            max_distance,
+            cluster_length,
+            diameter_range,
+            builtdate_range,
+        )
 
     def _update_timer(self, widget):
         elapsed_time = time() - self.t0

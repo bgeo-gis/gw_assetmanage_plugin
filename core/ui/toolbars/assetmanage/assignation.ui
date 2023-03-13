@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
-    <height>340</height>
+    <width>377</width>
+    <height>417</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,15 +63,12 @@
           <string>Pipes</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_5">
-          <item row="3" column="1">
-           <widget class="QCheckBox" name="chk_diameter">
+          <item row="5" column="1">
+           <widget class="QCheckBox" name="chk_builtdate">
             <property name="text">
              <string/>
             </property>
            </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="txt_max_distance"/>
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="lbl_diameter">
@@ -86,8 +83,48 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="txt_diameter_range"/>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lbl_cluster_length">
+            <property name="toolTip">
+             <string>Maximum sum of pipe lengths within a cluster, in meters.</string>
+            </property>
+            <property name="text">
+             <string>Cluster length (m):</string>
+            </property>
+            <property name="buddy">
+             <cstring>txt_cluster_length</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lbl_builtdate">
+            <property name="toolTip">
+             <string>Uses only pipes that match the builtdate range of the initial one.</string>
+            </property>
+            <property name="text">
+             <string>Filter by built date:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lbl_diameter_range">
+            <property name="toolTip">
+             <string>Diameter range based on factors of the initial pipe.</string>
+            </property>
+            <property name="text">
+             <string>Diameter range:</string>
+            </property>
+            <property name="buddy">
+             <cstring>txt_diameter_range</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="chk_diameter">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="lbl_material">
@@ -105,18 +142,11 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lbl_diameter_range">
-            <property name="toolTip">
-             <string>Diameter range based on factors of the initial pipe.</string>
-            </property>
-            <property name="text">
-             <string>Diameter range:</string>
-            </property>
-            <property name="buddy">
-             <cstring>txt_diameter_range</cstring>
-            </property>
-           </widget>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="txt_cluster_length"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="txt_diameter_range"/>
           </item>
           <item row="2" column="1">
            <widget class="QCheckBox" name="chk_material">
@@ -125,8 +155,8 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="txt_cluster_length"/>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="txt_max_distance"/>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="lbl_max_distance">
@@ -141,18 +171,18 @@
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lbl_cluster_length">
+          <item row="6" column="0">
+           <widget class="QLabel" name="lbl_builtdate_range">
             <property name="toolTip">
-             <string>Maximum sum of pipe lengths within a cluster, in meters.</string>
+             <string>Built date range, in years before or after the initial pipe.</string>
             </property>
             <property name="text">
-             <string>Cluster length (m):</string>
-            </property>
-            <property name="buddy">
-             <cstring>txt_cluster_length</cstring>
+             <string>Built date range (years):</string>
             </property>
            </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="txt_builtdate_range"/>
           </item>
          </layout>
         </widget>
