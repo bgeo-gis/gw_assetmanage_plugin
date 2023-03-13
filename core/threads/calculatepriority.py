@@ -9,8 +9,9 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
+from ..utils.translate import tr
 from ... import global_vars
-from ...settings import tools_db, tools_qt
+from ...settings import tools_db
 
 
 def get_min_greater_than(iterable, value):
@@ -102,7 +103,7 @@ class GwCalculatePriority(GwTask):
         self.method = config.get("general", "engine_method")
         self.unknown_material = config.get("general", "unknown_material")
 
-        self.msg_task_canceled = self._tr("Task canceled.")
+        self.msg_task_canceled = tr("Task canceled.")
 
     def run(self):
         try:
@@ -112,7 +113,7 @@ class GwCalculatePriority(GwTask):
                 return self._run_wm()
             else:
                 raise ValueError(
-                    self._tr(
+                    tr(
                         "Method of calculation not defined in configuration file. ",
                         "Please check config file.",
                     )
@@ -220,7 +221,7 @@ class GwCalculatePriority(GwTask):
     def _invalid_arccat_id_report(self, obj):
         if not obj["qtd"]:
             return
-        message = self._tr(
+        message = tr(
             "Pipes with invalid arccat_id: {qtd}.\n"
             "Invalid arccat_ids: {list}.\n"
             "These pipes have NOT been assigned a priority value."
@@ -230,7 +231,7 @@ class GwCalculatePriority(GwTask):
     def _invalid_diameter_report(self, obj):
         if not obj["qtd"]:
             return
-        message = self._tr(
+        message = tr(
             "Pipes with invalid diameter: {qtd}.\n"
             "Invalid diameters: {list}.\n"
             "These pipes have NOT been assigned a priority value."
@@ -243,14 +244,14 @@ class GwCalculatePriority(GwTask):
         if not obj["qtd"]:
             return
         if self.config_material.has_material(self.unknown_material):
-            message = self._tr(
+            message = tr(
                 "Pipes with invalid material: {qtd}.\n"
                 "Invalid materials: {list}.\n"
                 "These pipes have been identified as the configured unknown material, "
                 "{unknown_material}."
             )
         else:
-            message = self._tr(
+            message = tr(
                 "Pipes with invalid material: {qtd}.\n"
                 "Invalid materials: {list}.\n"
                 "These pipes have NOT been assigned a priority value "
@@ -266,7 +267,7 @@ class GwCalculatePriority(GwTask):
     def _invalid_pressures_report(self, null_pressures):
         if not null_pressures:
             return
-        message = self._tr(
+        message = tr(
             "Pipes with invalid pressures: {qtd}.\n"
             "These pipes received the maximum longevity value for their material."
         )
@@ -274,13 +275,13 @@ class GwCalculatePriority(GwTask):
 
     def _ivi_report(self, ivi):
         # message
-        title = self._tr("IVI")
+        title = tr("IVI")
         # message
-        year_header = self._tr("Year")
+        year_header = tr("Year")
         # message
-        without_replacements_header = self._tr("Without replacements")
+        without_replacements_header = tr("Without replacements")
         # message
-        with_replacements_header = self._tr("With replacements")
+        with_replacements_header = tr("With replacements")
         columns = [
             [year_header],
             [without_replacements_header],
@@ -302,7 +303,7 @@ class GwCalculatePriority(GwTask):
         return txt.strip()
 
     def _run_sh(self):
-        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/5)...")
+        self._emit_report(tr("Getting auxiliary data from DB") + " (1/5)...")
         self.setProgress(0)
 
         discount_rate = float(self.config_engine["drate"])
@@ -315,21 +316,21 @@ class GwCalculatePriority(GwTask):
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
+        self._emit_report(tr("Getting pipe data from DB") + " (2/5)...")
         self.setProgress(20)
 
         arcs = self._get_arcs()
         if not arcs:
             self._emit_report(
-                self._tr("Task canceled:"),
-                self._tr("No pipes found matching your selected filters."),
+                tr("Task canceled:"),
+                tr("No pipes found matching your selected filters."),
             )
             return False
 
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report(self._tr("Calculating values") + " (3/5)...")
+        self._emit_report(tr("Calculating values") + " (3/5)...")
         self.setProgress(40)
 
         output_arcs = []
@@ -412,8 +413,8 @@ class GwCalculatePriority(GwTask):
             )
         if not len(output_arcs):
             self._emit_report(
-                self._tr("Task canceled:"),
-                self._tr("No pipes found matching your selected filters."),
+                tr("Task canceled:"),
+                tr("No pipes found matching your selected filters."),
             )
             return False
 
@@ -440,7 +441,7 @@ class GwCalculatePriority(GwTask):
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report(self._tr("Updating tables") + " (4/5)...")
+        self._emit_report(tr("Updating tables") + " (4/5)...")
         self.setProgress(60)
 
         self.statistics_report = "\n\n".join(
@@ -567,7 +568,7 @@ class GwCalculatePriority(GwTask):
         if self.isCanceled():
             self._emit_report(self.msg_task_canceled)
             return False
-        self._emit_report(self._tr("Generating result stats") + " (5/5)...")
+        self._emit_report(tr("Generating result stats") + " (5/5)...")
         self.setProgress(80)
 
         if self.isCanceled():
@@ -575,13 +576,13 @@ class GwCalculatePriority(GwTask):
             return False
 
         self._emit_report(self.statistics_report)
-        self._emit_report(self._tr("Task finished!"))
+        self._emit_report(tr("Task finished!"))
 
         return True
 
     def _run_wm(self):
 
-        self._emit_report(self._tr("Getting auxiliary data from DB") + " (1/4)...")
+        self._emit_report(tr("Getting auxiliary data from DB") + " (1/4)...")
         self.setProgress(10)
 
         rows = tools_db.get_rows(
@@ -603,14 +604,14 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/4)...")
+        self._emit_report(tr("Getting pipe data from DB") + " (2/4)...")
         self.setProgress(20)
 
         rows = self._get_arcs()
         if not rows:
             self._emit_report(
-                self._tr("Task canceled:"),
-                self._tr("No pipes found matching your selected filters."),
+                tr("Task canceled:"),
+                tr("No pipes found matching your selected filters."),
             )
             return False
 
@@ -618,7 +619,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Calculating values") + " (3/4)...")
+        self._emit_report(tr("Calculating values") + " (3/4)...")
         self.setProgress(30)
 
         arcs = []
@@ -746,9 +747,9 @@ class GwCalculatePriority(GwTask):
 
         if not len(second_iteration):
             self._emit_report(
-                self._tr("Task canceled:"),
+                tr("Task canceled:"),
                 # message (yet to translate)
-                self._tr("No pipes found matching your budget."),
+                tr("No pipes found matching your budget."),
             )
             return False
 
@@ -780,7 +781,7 @@ class GwCalculatePriority(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Updating tables") + " (4/4)...")
+        self._emit_report(tr("Updating tables") + " (4/4)...")
         self.setProgress(40)
 
         self.statistics_report = "\n\n".join(
@@ -943,7 +944,7 @@ class GwCalculatePriority(GwTask):
 
         self._emit_report(self.statistics_report)
 
-        self._emit_report(self._tr("Task finished!"))
+        self._emit_report(tr("Task finished!"))
         return True
 
     def _save_config_engine(self):
@@ -1014,6 +1015,3 @@ class GwCalculatePriority(GwTask):
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
         result_id = tools_db.get_row(sql)[0]
         return result_id
-
-    def _tr(self, msg):
-        return tools_qt.tr(msg, context_name=global_vars.plugin_name)

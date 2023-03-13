@@ -42,6 +42,7 @@ from .... import global_vars
 
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import PriorityUi, PriorityManagerUi
+from ...utils.translate import tr
 
 
 class ConfigCatalog:
@@ -82,7 +83,7 @@ class ConfigCatalog:
 
     def get_cost_constr(self, key):
         return self._data[key]["cost_constr"]
-    
+
     def get_cost_repmain(self, key):
         return self._data[key]["cost_repmain"]
 
@@ -272,7 +273,7 @@ class CalculatePriorityConfig:
                 dialog_type = "dialog_priority_selection"
             else:
                 raise ValueError(
-                    self._tr(
+                    tr(
                         "Invalid value for type of priority dialog. "
                         "Please pass either 'GLOBAL' or 'SELECTION'. "
                         "Value passed:"
@@ -370,7 +371,7 @@ class CalculatePriority:
     def clicked_event(self):
         self.dlg_priority = PriorityUi()
         dlg = self.dlg_priority
-        dlg.setWindowTitle(dlg.windowTitle() + f" ({self._tr(self.type)})")
+        dlg.setWindowTitle(dlg.windowTitle() + f" ({tr(self.type)})")
 
         tools_gw.disable_tab_log(self.dlg_priority)
 
@@ -454,7 +455,7 @@ class CalculatePriority:
 
     def _add_total(self, lyt):
         lbl = QLabel()
-        lbl.setText(self._tr("Total"))
+        lbl.setText(tr("Total"))
         value = QLabel()
         position_config = {"layoutname": lyt, "layoutorder": 100}
         tools_gw.add_widget(self.dlg_priority, position_config, lbl, value)
@@ -472,7 +473,7 @@ class CalculatePriority:
         self.thread.cancel()
         tools_gw.fill_tab_log(
             dlg,
-            {"info": {"values": [{"message": self._tr("Canceling task...")}]}},
+            {"info": {"values": [{"message": tr("Canceling task...")}]}},
             reset_text=False,
             close=False,
         )
@@ -533,12 +534,12 @@ class CalculatePriority:
         )
 
         if self.config.method == "SH":
-            dlg.grb_engine_1.setTitle(self._tr("Shamir-Howard parameters"))
-            dlg.grb_engine_2.setTitle(self._tr("Weights"))
+            dlg.grb_engine_1.setTitle(tr("Shamir-Howard parameters"))
+            dlg.grb_engine_2.setTitle(tr("Weights"))
             self._add_total("lyt_engine_2")
         elif self.config.method == "WM":
-            dlg.grb_engine_1.setTitle(self._tr("First iteration"))
-            dlg.grb_engine_2.setTitle(self._tr("Second iteration"))
+            dlg.grb_engine_1.setTitle(tr("First iteration"))
+            dlg.grb_engine_2.setTitle(tr("Second iteration"))
             self._add_total("lyt_engine_1")
             self._add_total("lyt_engine_2")
 
@@ -702,76 +703,76 @@ class CalculatePriority:
                 continue
             if row["check"] == "invalid_arccat_ids" and self.config.method == "WM":
                 message = (
-                    self._tr("Pipes with invalid arccat_ids:")
+                    tr("Pipes with invalid arccat_ids:")
                     + f" {row['qtd']}.\n"
-                    + self._tr("Invalid arccat_ids:")
+                    + tr("Invalid arccat_ids:")
                     + f" {row['list']}.\n\n"
-                    + self._tr(
+                    + tr(
                         "An arccat_id is considered invalid if it is not listed in the catalog configuration table. "
                         "As a result, these pipes will NOT be assigned a priority value."
                     )
                     + "\n\n"
-                    + self._tr("Do you want to proceed?")
+                    + tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(message, force_action=True):
                     return
             elif row["check"] == "invalid_diameters" and self.config.method == "SH":
                 msg = (
-                    self._tr("Pipes with invalid diameters:")
+                    tr("Pipes with invalid diameters:")
                     + f" {row['qtd']}.\n"
-                    + self._tr("Invalid diameters:")
+                    + tr("Invalid diameters:")
                     + f" {row['list']}.\n\n"
-                    + self._tr(
+                    + tr(
                         "A diameter value is considered invalid if it is zero, negative, NULL "
                         "or greater than the maximum diameter in the configuration table. "
                         "As a result, these pipes will NOT be assigned a priority value."
                     )
                     + "\n\n"
-                    + self._tr("Do you want to proceed?")
+                    + tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(msg, force_action=True):
                     return
             elif row["check"] == "invalid_materials":
                 if config_material.has_material(self.config.unknown_material):
-                    main_message = self._tr(
+                    main_message = tr(
                         "A material is considered invalid if it is not listed in the material configuration table. "
                         "As a result, the material of these pipes will be treated as:"
                     )
                 else:
-                    main_message = self._tr(
+                    main_message = tr(
                         "A material is considered invalid if it is not listed in the material configuration table. "
                         "These pipes will NOT be assigned a priority value "
                         "as the configured unknown material "
                         "is not listed in the configuration tab for materials:"
                     )
                 message = (
-                    self._tr("Pipes with invalid materials:")
+                    tr("Pipes with invalid materials:")
                     + f" {row['qtd']}.\n"
-                    + self._tr("Invalid materials:")
+                    + tr("Invalid materials:")
                     + f" {row['list']}.\n\n"
                     + main_message
                     + f" {self.config.unknown_material}\n\n"
-                    + self._tr("Do you want to proceed?")
+                    + tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(message, force_action=True):
                     return
             elif row["check"] == "null_pressures" and self.config.method == "WM":
                 message = (
-                    self._tr("Pipes with invalid pressures:")
+                    tr("Pipes with invalid pressures:")
                     + f" {row['qtd']}.\n"
-                    + self._tr(
+                    + tr(
                         "These pipes have no pressure information for their nodes. "
                         "This will result in them receiving the maximum longevity value for their material, "
                         "which may affect the final priority value."
                     )
                     + "\n\n"
-                    + self._tr("Do you want to proceed?")
+                    + tr("Do you want to proceed?")
                 )
                 if not tools_qt.show_question(message, force_action=True):
                     return
 
         self.thread = GwCalculatePriority(
-            self._tr("Calculate Priority"),
+            tr("Calculate Priority"),
             self.type,
             result_name,
             result_description,
@@ -943,9 +944,6 @@ class CalculatePriority:
             selected_row = widget.currentRow()
             if selected_row != -1:
                 widget.removeRow(selected_row)
-
-    def _tr(self, msg):
-        return tools_qt.tr(msg, context_name=global_vars.plugin_name)
 
     def _update_timer(self, widget):
         elapsed_time = time() - self.t0

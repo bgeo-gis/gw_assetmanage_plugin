@@ -6,8 +6,9 @@ from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
 from .task import GwTask
+from ..utils.translate import tr
 from ... import global_vars
-from ...settings import tools_db, tools_qt
+from ...settings import tools_db
 
 
 class GwAssignation(GwTask):
@@ -37,11 +38,11 @@ class GwAssignation(GwTask):
         config.read(config_path)
         self.unknown_material = config.get("general", "unknown_material")
 
-        self.msg_task_canceled = self._tr("Task canceled.")
+        self.msg_task_canceled = tr("Task canceled.")
 
     def run(self):
         try:
-            self._emit_report(self._tr("Getting leak data from DB") + " (1/5)...")
+            self._emit_report(tr("Getting leak data from DB") + " (1/5)...")
             self.setProgress(0)
 
             arcs = self._assign_leaks()
@@ -61,7 +62,7 @@ class GwAssignation(GwTask):
                 self._emit_report(self.msg_task_canceled)
                 return False
 
-            self._emit_report(self._tr("Saving results to DB") + " (5/5)...")
+            self._emit_report(tr("Saving results to DB") + " (5/5)...")
             self.setProgress(90)
             sql = (
                 "UPDATE asset.arc_input SET rleak = NULL; "
@@ -94,7 +95,7 @@ class GwAssignation(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Getting pipe data from DB") + " (2/5)...")
+        self._emit_report(tr("Getting pipe data from DB") + " (2/5)...")
         self.setProgress(10)
 
         rows = tools_db.get_rows(
@@ -129,7 +130,7 @@ class GwAssignation(GwTask):
             self._emit_report(self.msg_task_canceled)
             return False
 
-        self._emit_report(self._tr("Assigning leaks to pipes") + " (3/5)...")
+        self._emit_report(tr("Assigning leaks to pipes") + " (3/5)...")
         self.setProgress(40)
 
         leaks = {}
@@ -212,7 +213,7 @@ class GwAssignation(GwTask):
         return arcs
 
     def _calculate_rleak(self, arcs):
-        self._emit_report(self._tr("Calculating rleak values") + " (4/5)...")
+        self._emit_report(tr("Calculating rleak values") + " (4/5)...")
         self.setProgress(50)
 
         arc_list = sorted(arcs.values(), key=lambda a: a["length"], reverse=True)
@@ -344,9 +345,6 @@ class GwAssignation(GwTask):
         ]
 
         return final_report
-
-    def _tr(self, msg):
-        return tools_qt.tr(msg, context_name=global_vars.plugin_name)
 
     def _where_clause(self):
         conditions = []

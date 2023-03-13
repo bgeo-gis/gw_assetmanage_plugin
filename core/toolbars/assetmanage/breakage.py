@@ -42,6 +42,7 @@ from .priority import CalculatePriority
 from ...threads.assignation import GwAssignation
 from ...threads.calculatepriority import GwCalculatePriority
 from ...ui.ui_manager import AssignationUi, PriorityUi
+from ...utils.translate import tr
 
 
 class AmBreakage(dialog.GwAction):
@@ -88,8 +89,8 @@ class AmBreakage(dialog.GwAction):
         ag = QActionGroup(self.iface.mainWindow())
 
         actions = [
-            self._tr("Leak Assignation"),
-            self._tr("Priority Calculation (Global)"),
+            "Leak Assignation",
+            "Priority Calculation (Global)",
         ]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
@@ -99,9 +100,9 @@ class AmBreakage(dialog.GwAction):
     def _get_selected_action(self, name):
         """Gets selected action"""
 
-        if name == self._tr("Leak Assignation"):
+        if name == "Leak Assignation":
             self.assignation()
-        elif name == self._tr("Priority Calculation (Global)"):
+        elif name == "Priority Calculation (Global)":
             self.priority_config()
         else:
             msg = f"No action found"
@@ -163,7 +164,7 @@ class AmBreakage(dialog.GwAction):
             )
             if not os.path.exists(config_path):
                 print(
-                    self._tr(
+                    tr(
                         "Configuration file not found, "
                         "please make sure it is located in the correct directory "
                         "and try again"
@@ -273,7 +274,7 @@ class AmBreakage(dialog.GwAction):
             return
 
         self.thread = GwAssignation(
-            self._tr("Leak Assignation"),
+            tr("Leak Assignation"),
             buffer,
             years,
             max_distance,
@@ -375,7 +376,7 @@ class AmBreakage(dialog.GwAction):
         self.thread.cancel()
         tools_gw.fill_tab_log(
             dlg,
-            {"info": {"values": [{"message": self._tr("Canceling task...")}]}},
+            {"info": {"values": [{"message": tr("Canceling task...")}]}},
             reset_text=False,
             close=False,
         )
@@ -386,6 +387,3 @@ class AmBreakage(dialog.GwAction):
         dlg.buttonBox.rejected.connect(dlg.reject)
         dlg.executing = False
         self.timer.stop()
-
-    def _tr(self, msg):
-        return tools_qt.tr(msg, context_name=global_vars.plugin_name)
