@@ -174,7 +174,7 @@
           <item row="6" column="0">
            <widget class="QLabel" name="lbl_builtdate_range">
             <property name="toolTip">
-             <string>Built date range, in years before or after the initial pipe.</string>
+             <string>Built date range, in years before and after the initial pipe.</string>
             </property>
             <property name="text">
              <string>Built date range (years):</string>

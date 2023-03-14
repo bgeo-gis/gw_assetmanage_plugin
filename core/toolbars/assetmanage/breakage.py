@@ -382,8 +382,8 @@ class AmBreakage(dialog.GwAction):
             try:
                 builtdate_range = int(dlg.txt_builtdate_range.text())
             except ValueError:
-                message = "Please enter a valid integer for the built date range."
-                tools_qt.show_info_box(message, context_name=global_vars.plugin_name)
+                msg = "Please enter a valid integer for the built date range."
+                tools_qt.show_info_box(msg, context_name=global_vars.plugin_name)
                 return
         else:
             builtdate_range = None

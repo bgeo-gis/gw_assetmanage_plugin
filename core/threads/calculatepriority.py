@@ -221,44 +221,49 @@ class GwCalculatePriority(GwTask):
     def _invalid_arccat_id_report(self, obj):
         if not obj["qtd"]:
             return
-        message = tr(
-            "Pipes with invalid arccat_id: {qtd}.\n"
-            "Invalid arccat_ids: {list}.\n"
-            "These pipes have NOT been assigned a priority value."
+        msg = "\n".join(
+            [
+                tr("Pipes with invalid arccat_ids: {qtd}."),
+                tr("Invalid arccat_ids: {list}."),
+                tr("These pipes have NOT been assigned a priority value."),
+            ]
         )
-        return message.format(qtd=obj["qtd"], list=", ".join(obj["set"]))
+        return msg.format(qtd=obj["qtd"], list=", ".join(obj["set"]))
 
     def _invalid_diameter_report(self, obj):
         if not obj["qtd"]:
             return
-        message = tr(
-            "Pipes with invalid diameter: {qtd}.\n"
-            "Invalid diameters: {list}.\n"
-            "These pipes have NOT been assigned a priority value."
+        msg = "\n".join(
+            [
+                tr("Pipes with invalid diameters: {qtd}."),
+                tr("Invalid diameters: {list}."),
+                tr("These pipes have NOT been assigned a priority value."),
+            ]
         )
-        return message.format(
-            qtd=obj["qtd"], list=", ".join(map(str, sorted(obj["set"])))
-        )
+        return msg.format(qtd=obj["qtd"], list=", ".join(map(str, sorted(obj["set"]))))
 
     def _invalid_material_report(self, obj):
         if not obj["qtd"]:
             return
         if self.config_material.has_material(self.unknown_material):
-            message = tr(
-                "Pipes with invalid material: {qtd}.\n"
-                "Invalid materials: {list}.\n"
+            info = tr(
                 "These pipes have been identified as the configured unknown material, "
                 "{unknown_material}."
             )
         else:
-            message = tr(
-                "Pipes with invalid material: {qtd}.\n"
-                "Invalid materials: {list}.\n"
+            info = tr(
                 "These pipes have NOT been assigned a priority value "
                 "as the configured unknown material, {unknown_material}, "
                 "is not listed in the configuration tab for materials."
             )
-        return message.format(
+        msg = "\n".join(
+            [
+                tr("Pipes with invalid materials: {qtd}."),
+                tr("Invalid materials: {list}."),
+                info,
+            ]
+        )
+        return msg.format(
             qtd=obj["qtd"],
             list=", ".join(obj["set"]),
             unknown_material=self.unknown_material,
@@ -267,20 +272,20 @@ class GwCalculatePriority(GwTask):
     def _invalid_pressures_report(self, null_pressures):
         if not null_pressures:
             return
-        message = tr(
-            "Pipes with invalid pressures: {qtd}.\n"
-            "These pipes received the maximum longevity value for their material."
+        msg = "\n".join(
+            [
+                tr("Pipes with invalid pressures: {qtd}."),
+                tr(
+                    "These pipes received the maximum longevity value for their material."
+                ),
+            ]
         )
-        return message.format(qtd=null_pressures)
+        return msg.format(qtd=null_pressures)
 
     def _ivi_report(self, ivi):
-        # message
         title = tr("IVI")
-        # message
         year_header = tr("Year")
-        # message
         without_replacements_header = tr("Without replacements")
-        # message
         with_replacements_header = tr("With replacements")
         columns = [
             [year_header],
@@ -748,7 +753,6 @@ class GwCalculatePriority(GwTask):
         if not len(second_iteration):
             self._emit_report(
                 tr("Task canceled:"),
-                # message (yet to translate)
                 tr("No pipes found matching your budget."),
             )
             return False

@@ -320,30 +320,50 @@ class GwAssignation(GwTask):
         )
 
         final_report = [
-            "Task finished!",
-            f"Period of leaks: {self.years:.4g} years.",
-            f"Leaks within the indicated period: {values['total_leaks']}.",
-            f"Leaks without pipes intersecting its buffer: {values['total_leaks'] - self.assigned_leaks}.",
+            tr("Task finished!"),
+            tr("Period of leaks: {years:.4g} years.").format(years=self.years),
+            tr("Leaks within the indicated period: {leaks}.").format(
+                leaks=values["total_leaks"]
+            ),
+            tr("Leaks without pipes intersecting its buffer: {leaks}.").format(
+                leaks=values["total_leaks"] - self.assigned_leaks
+            ),
         ]
 
         if self.by_material_diameter:
             final_report.append(
-                f"Leaks assigned by material and diameter: {self.by_material_diameter}."
+                tr("Leaks assigned by material and diameter: {leaks}.").format(
+                    leaks=self.by_material_diameter
+                )
             )
         if self.by_material:
             final_report.append(
-                f"Leaks assigned by material only:  {self.by_material}."
+                tr("Leaks assigned by material only: {leaks}.").format(
+                    leaks=self.by_material
+                )
             )
         if self.by_diameter:
-            final_report.append(f"Leaks assigned by diameter only: {self.by_diameter}.")
+            final_report.append(
+                tr("Leaks assigned by diameter only: {leaks}.").format(
+                    leaks=self.by_diameter
+                )
+            )
         if self.any_pipe:
-            final_report.append(f"Leaks assigned to any nearby pipes: {self.any_pipe}.")
+            final_report.append(
+                tr("Leaks assigned to any nearby pipes: {leaks}.").format(
+                    leaks=self.any_pipe
+                )
+            )
 
         final_report += [
-            f"Total of pipes: {values['total_pipes']}.",
-            f"Pipes with zero leaks per km per year: {values['orphan_pipes']}.",
-            f"Max rleak: {values['max_rleak']} leaks/km.year.",
-            f"Min non-zero rleak: {values['min_rleak']} leaks/km.year.",
+            tr("Total of pipes: {pipes}.").format(pipes=values["total_pipes"]),
+            tr("Pipes with zero leaks per km per year: {pipes}.").format(
+                pipes=values["orphan_pipes"]
+            ),
+            tr("Max rleak: {rleak} leaks/km.year.").format(rleak=values["max_rleak"]),
+            tr("Min non-zero rleak: {rleak} leaks/km.year.").format(
+                rleak=values["min_rleak"]
+            ),
         ]
 
         return final_report
