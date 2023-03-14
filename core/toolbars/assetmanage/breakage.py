@@ -60,6 +60,10 @@ class AmBreakage(dialog.GwAction):
         self.toolbar = toolbar
         self.action_group = action_group
 
+        # Menu labels
+        self.txt_assignation = tr("Leak Assignation")
+        self.txt_priority = tr("Priority Calculation (Global)")
+
         # Create a menu and add all the actions
         self.menu = QMenu()
         self.menu.setObjectName("AM_breakage_tools")
@@ -89,8 +93,8 @@ class AmBreakage(dialog.GwAction):
         ag = QActionGroup(self.iface.mainWindow())
 
         actions = [
-            "Leak Assignation",
-            "Priority Calculation (Global)",
+            self.txt_assignation,
+            self.txt_priority,
         ]
         for action in actions:
             obj_action = QAction(f"{action}", ag)
@@ -100,9 +104,9 @@ class AmBreakage(dialog.GwAction):
     def _get_selected_action(self, name):
         """Gets selected action"""
 
-        if name == "Leak Assignation":
+        if name == self.txt_assignation:
             self.assignation()
-        elif name == "Priority Calculation (Global)":
+        elif name == self.txt_priority:
             self.priority_config()
         else:
             msg = f"No action found"
