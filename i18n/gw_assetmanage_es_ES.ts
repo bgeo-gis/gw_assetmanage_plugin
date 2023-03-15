@@ -54,24 +54,24 @@
 			<translation>Advertencias:</translation>
 		</message>
 		<message>
-			<source>Pipes with invalid diameters:</source>
-			<translation>Tuberías con diámetro no válido:</translation>
+			<source>Invalid diameters: {list}.</source>
+			<translation>Diámetros no válidos: {list}.</translation>
 		</message>
 		<message>
-			<source>Invalid diameters:</source>
-			<translation>Diámetros no válidos:</translation>
+			<source>Pipes with invalid materials: {qtd}.</source>
+			<translation>Tuberías con material no válido: {qtd}.</translation>
 		</message>
 		<message>
-			<source>Invalid materials:</source>
-			<translation>Materiales no válidos:</translation>
+			<source>Pipes with invalid diameters: {qtd}.</source>
+			<translation>Tuberías con diámetro no válido: {qtd}.</translation>
 		</message>
 		<message>
 			<source>Leak Assignation</source>
 			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
-			<source>Pipes with invalid materials:</source>
-			<translation>Tuberías con material no válido:</translation>
+			<source>Invalid materials: {list}.</source>
+			<translation>Materiales no válidos: {list}.</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Global)</source>
@@ -234,16 +234,28 @@
 			<translation>Parámetros de Shamir-Howard</translation>
 		</message>
 		<message>
+			<source>These pipes have NOT been assigned a priority value.</source>
+			<translation>A estas tuberías NO se les ha asignado un valor de prioridad.</translation>
+		</message>
+		<message>
+			<source>Invalid arccat_ids: {list}.</source>
+			<translation>Arccat_ids no válidos: {list}.</translation>
+		</message>
+		<message>
+			<source>Pipes with invalid arccat_id: {qtd}.</source>
+			<translation>Tuberías con arccat_id no válido: {qtd}.</translation>
+		</message>
+		<message>
+			<source>These pipes have been identified as the configured unknown material, {unknown_material}.</source>
+			<translation>These pipes have been identified as the configured unknown material, {unknown_material}.</translation>
+		</message>
+		<message>
 			<source>No pipes found matching your selected filters.</source>
 			<translation>No se han encontrado tuberías que coincidan con los filtros seleccionados.</translation>
 		</message>
 		<message>
 			<source>Result name already in use, please choose a different name.</source>
 			<translation>Nombre de resultado ya en uso, por favor elija un nombre diferente.</translation>
-		</message>
-		<message>
-			<source>These pipes have NOT been assigned a priority value</source>
-			<translation>A estas tuberías NO se les ha asignado un valor de prioridad</translation>
 		</message>
 		<message>
 			<source>Empty value detected in 'Diameter' tab. Please enter a value for diameter.</source>
@@ -272,6 +284,42 @@
 		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
 			<translation>Estas tuberías se han asignado como normativas por defecto, lo que puede afectar a su valor de prioridad.</translation>
+		</message>
+		<message>
+			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
+			<translation>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
+		</message>
+		<message>
+			<source>Pipes with invalid pressures: {qtd}.</source>
+			<translation>Pipes with invalid pressures: {qtd}.</translation>
+		</message>
+		<message>
+			<source>These pipes received the maximum longevity value for their material.</source>
+			<translation>These pipes received the maximum longevity value for their material.</translation>
+		</message>
+		<message>
+			<source>IVI</source>
+			<translation>IVI</translation>
+		</message>
+		<message>
+			<source>Year</source>
+			<translation>Año</translation>
+		</message>
+		<message>
+			<source>Without replacements</source>
+			<translation>Without replacements</translation>
+		</message>
+		<message>
+			<source>With replacements</source>
+			<translation>With replacements</translation>
+		</message>
+		<message>
+			<source>No pipes found matching your budget.</source>
+			<translation>No pipes found matching your budget.</translation>
+		</message>
+		<message>
+			<source>Please enter a valid integer for the built date range.</source>
+			<translation>Please enter a valid integer for the built date range.</translation>
 		</message>
 	</context>
 
@@ -307,6 +355,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_cluster_length</source>
+			<translation>Longitud del cluster:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cluster_length</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>lbl_material</source>
 			<translation>Filtrar por material:</translation>
 		</message>
@@ -328,14 +384,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter_range</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Longitud del cluster:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cluster_length</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -426,6 +474,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_status</source>
+			<translation>Estado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_calc</source>
 			<translation>Cálculo</translation>
 		</message>
@@ -447,14 +503,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Estatus:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
 			<translation>None</translation>
 		</message>
 		<message>

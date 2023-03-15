@@ -12,6 +12,7 @@
 
 	<!-- PYTHON MESSAGES -->
 	<context>
+		<name>gw_assetmanage</name>
 		<message>
 			<source>Task finished!</source>
 			<translation>Task finished!</translation>
@@ -53,24 +54,24 @@
 			<translation>Warnings:</translation>
 		</message>
 		<message>
-			<source>Pipes with invalid diameters:</source>
-			<translation>Pipes with invalid diameters:</translation>
+			<source>Invalid diameters: {list}.</source>
+			<translation>Invalid diameters: {list}.</translation>
 		</message>
 		<message>
-			<source>Invalid diameters:</source>
-			<translation>Invalid diameters:</translation>
+			<source>Pipes with invalid materials: {qtd}.</source>
+			<translation>Pipes with invalid materials: {qtd}.</translation>
 		</message>
 		<message>
-			<source>Invalid materials:</source>
-			<translation>Invalid materials:</translation>
+			<source>Pipes with invalid diameters: {qtd}.</source>
+			<translation>Pipes with invalid diameters: {qtd}.</translation>
 		</message>
 		<message>
 			<source>Leak Assignation</source>
 			<translation>Leak Assignation</translation>
 		</message>
 		<message>
-			<source>Pipes with invalid materials:</source>
-			<translation>Pipes with invalid materials:</translation>
+			<source>Invalid materials: {list}.</source>
+			<translation>Invalid materials: {list}.</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Global)</source>
@@ -217,16 +218,44 @@
 			<translation>Please enter a valid integer for the number of years.</translation>
 		</message>
 		<message>
+			<source>First iteration</source>
+			<translation>First iteration</translation>
+		</message>
+		<message>
+			<source>Second iteration</source>
+			<translation>Second iteration</translation>
+		</message>
+		<message>
+			<source>Weights</source>
+			<translation>Weights</translation>
+		</message>
+		<message>
+			<source>Shamir-Howard parameters</source>
+			<translation>Shamir-Howard parameters</translation>
+		</message>
+		<message>
+			<source>These pipes have NOT been assigned a priority value.</source>
+			<translation>These pipes have NOT been assigned a priority value.</translation>
+		</message>
+		<message>
+			<source>Invalid arccat_ids: {list}.</source>
+			<translation>Invalid arccat_ids: {list}.</translation>
+		</message>
+		<message>
+			<source>Pipes with invalid arccat_id: {qtd}.</source>
+			<translation>Pipes with invalid arccat_id: {qtd}.</translation>
+		</message>
+		<message>
+			<source>These pipes have been identified as the configured unknown material, {unknown_material}.</source>
+			<translation>These pipes have been identified as the configured unknown material, {unknown_material}.</translation>
+		</message>
+		<message>
 			<source>No pipes found matching your selected filters.</source>
 			<translation>No pipes found matching your selected filters.</translation>
 		</message>
 		<message>
 			<source>Result name already in use, please choose a different name.</source>
 			<translation>Result name already in use, please choose a different name.</translation>
-		</message>
-		<message>
-			<source>These pipes have NOT been assigned a priority value</source>
-			<translation>These pipes have NOT been assigned a priority value</translation>
 		</message>
 		<message>
 			<source>Empty value detected in 'Diameter' tab. Please enter a value for diameter.</source>
@@ -256,6 +285,42 @@
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
 			<translation>These pipes have been assigned as compliant by default, which may affect their priority value.</translation>
 		</message>
+		<message>
+			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
+			<translation>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
+		</message>
+		<message>
+			<source>Pipes with invalid pressures: {qtd}.</source>
+			<translation>Pipes with invalid pressures: {qtd}.</translation>
+		</message>
+		<message>
+			<source>These pipes received the maximum longevity value for their material.</source>
+			<translation>These pipes received the maximum longevity value for their material.</translation>
+		</message>
+		<message>
+			<source>IVI</source>
+			<translation>IVI</translation>
+		</message>
+		<message>
+			<source>Year</source>
+			<translation>Year</translation>
+		</message>
+		<message>
+			<source>Without replacements</source>
+			<translation>Without replacements</translation>
+		</message>
+		<message>
+			<source>With replacements</source>
+			<translation>With replacements</translation>
+		</message>
+		<message>
+			<source>No pipes found matching your budget.</source>
+			<translation>No pipes found matching your budget.</translation>
+		</message>
+		<message>
+			<source>Please enter a valid integer for the built date range.</source>
+			<translation>Please enter a valid integer for the built date range.</translation>
+		</message>
 	</context>
 
 	<!-- UI TRANSLATION -->
@@ -264,6 +329,30 @@
 		<message>
 			<source>title</source>
 			<translation>Leak Assignation</translation>
+		</message>
+		<message>
+			<source>lbl_pipes</source>
+			<translation>Pipes</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_max_distance</source>
+			<translation>Maximum distance:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Buffer distance:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
@@ -295,30 +384,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter_range</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_pipes</source>
-			<translation>Pipes</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Buffer distance:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_max_distance</source>
-			<translation>Maximum distance:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -369,27 +434,11 @@
 			<translation>Priority Calculation</translation>
 		</message>
 		<message>
-			<source>tab_diameter</source>
-			<translation>Diameter</translation>
+			<source>lbl_budget</source>
+			<translation>Yearly budget:</translation>
 		</message>
 		<message>
-			<source>tooltip_tab_diameter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_sh</source>
-			<translation>Shamir-Howard parameters</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_sh</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_weights</source>
-			<translation>Weights</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_weights</source>
+			<source>tooltip_lbl_budget</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -425,6 +474,14 @@
 			<translation>None</translation>
 		</message>
 		<message>
+			<source>lbl_status</source>
+			<translation>Status:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
 			<source>tab_calc</source>
 			<translation>Calculation</translation>
 		</message>
@@ -446,14 +503,6 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_status</source>
-			<translation>Status:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_status</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -489,19 +538,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_budget</source>
-			<translation>Budget:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_budget</source>
-			<translation>None</translation>
-		</message>
-		<message>
 			<source>lbl_year</source>
 			<translation>Horizon year:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_diameter</source>
+			<translation>Diameter</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_diameter</source>
 			<translation>None</translation>
 		</message>
 		<message>

@@ -15,6 +15,7 @@ from qgis.PyQt.QtCore import QObject, QSettings
 from qgis.PyQt.QtWidgets import QActionGroup, QDockWidget, QToolBar
 from qgis.core import Qgis
 from qgis.utils import plugins
+from .core.utils import tr
 
 from .plugin_toolbar import PluginToolbar
 from .core.toolbars import buttons
@@ -236,8 +237,7 @@ class GWAssetPlugin(QObject):
 
         if type(list_actions) != list:
             list_actions = [list_actions]
-
-        toolbar_name = tools_qt.tr(f'toolbar_{toolbar_id}_name', context_name=global_vars.plugin_name)
+        toolbar_name = tr(f'toolbar_{toolbar_id}_name')
         plugin_toolbar = PluginToolbar(toolbar_id, toolbar_name, True)
 
         # Check if there is a giswater toolbar suiting for the plugin buttons
