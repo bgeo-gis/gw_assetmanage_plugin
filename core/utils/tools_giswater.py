@@ -6,8 +6,15 @@ from ... import global_vars
 from ...settings import tools_db, tools_gw, tools_log, tools_qgis, tools_qt
 
 
+def manage_translation(*args, **kwargs):
+    if _use_polyfill():
+        _manage_translation_polyfill(*args, **kwargs)
+    else:
+        tools_qt.manage_translation(*args, **kwargs)
+
+
 def open_dialog(*args, **kwargs):
-    if _use_open_dialog_polyfill():
+    if _use_polyfill():
         _open_dialog_polyfill(*args, **kwargs)
     else:
         tools_gw.open_dialog(*args, **kwargs)
@@ -86,7 +93,7 @@ def _open_dialog_polyfill(
     dlg.open()
 
 
-def _use_open_dialog_polyfill():
+def _use_polyfill():
     """Return True if version equals or minor than 3.5.031"""
     gw_version_str = tools_qgis.get_plugin_version()[0]
     if not gw_version_str:
