@@ -8,6 +8,22 @@
 			<source>toolbar_assetmanage_name</source>
 			<translation>Giswater - Asset Manager</translation>
 		</message>
+		<message>
+			<source>ResultManager</source>
+			<translation>Gestor de resultados</translation>
+		</message>
+		<message>
+			<source>ResultSelector</source>
+			<translation>Selector de resultados</translation>
+		</message>
+		<message>
+			<source>AmBreakage</source>
+			<translation>Herramienta de administración</translation>
+		</message>
+		<message>
+			<source>AmPriority</source>
+			<translation>Cálculo de prioridades y selección</translation>
+		</message>
 	</context>
 
 	<!-- PYTHON MESSAGES -->
@@ -242,12 +258,12 @@
 			<translation>Arccat_ids no válidos: {list}.</translation>
 		</message>
 		<message>
-			<source>Pipes with invalid arccat_id: {qtd}.</source>
+			<source>Pipes with invalid arccat_ids: {qtd}.</source>
 			<translation>Tuberías con arccat_id no válido: {qtd}.</translation>
 		</message>
 		<message>
 			<source>These pipes have been identified as the configured unknown material, {unknown_material}.</source>
-			<translation>These pipes have been identified as the configured unknown material, {unknown_material}.</translation>
+			<translation>Estas tuberías se han identificado con material desconocido configurado, {unknown_material}.</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your selected filters.</source>
@@ -278,48 +294,156 @@
 			<translation>Valor normativo de diámetro no válido</translation>
 		</message>
 		<message>
-			<source>A material is considered invalid if it is not listed in the material configuration table. As a result, these pipes will be set as compliant by default, which may affect the priority value.</source>
-			<translation>Se considera que un material no es válido si no se encuentra en la tabla de configuración de materiales. Como resultado, estas tuberías se establecerán como normativas por defecto, lo que puede afectar al valor de prioridad.</translation>
-		</message>
-		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
 			<translation>Estas tuberías se han asignado como normativas por defecto, lo que puede afectar a su valor de prioridad.</translation>
-		</message>
-		<message>
-			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
-			<translation>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
-		</message>
-		<message>
-			<source>Pipes with invalid pressures: {qtd}.</source>
-			<translation>Pipes with invalid pressures: {qtd}.</translation>
-		</message>
-		<message>
-			<source>These pipes received the maximum longevity value for their material.</source>
-			<translation>These pipes received the maximum longevity value for their material.</translation>
-		</message>
-		<message>
-			<source>IVI</source>
-			<translation>IVI</translation>
 		</message>
 		<message>
 			<source>Year</source>
 			<translation>Año</translation>
 		</message>
 		<message>
+			<source>Prob. of Failure</source>
+			<translation>Prob. de fallo</translation>
+		</message>
+		<message>
+			<source>Max. Longevity</source>
+			<translation>Max. Longevidad</translation>
+		</message>
+		<message>
+			<source>Med. Longevity</source>
+			<translation>Med. Longevidad</translation>
+		</message>
+		<message>
+			<source>Min. Longevity</source>
+			<translation>Mín. Longevidad</translation>
+		</message>
+		<message>
+			<source>Default Built Date</source>
+			<translation>Fecha de construcción por defecto</translation>
+		</message>
+		<message>
+			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
+			<translation>Se considera que un material no es válido si no se encuentra en la tabla de configuración de materiales.</translation>
+		</message>
+		<message>
+			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
+			<translation>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</translation>
+		</message>
+		<message>
+			<source>These pipes will NOT be assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
+			<translation>These pipes will NOT be assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
+		</message>
+		<message>
+			<source>These pipes have no pressure information for their nodes. This will result in them receiving the maximum longevity value for their material, which may affect the final priority value.</source>
+			<translation>These pipes have no pressure information for their nodes. This will result in them receiving the maximum longevity value for their material, which may affect the final priority value.</translation>
+		</message>
+		<message>
+			<source>Please enter a valid number for the budget.</source>
+			<translation>Please enter a valid number for the budget.</translation>
+		</message>
+		<message>
+			<source>Please select a target year.</source>
+			<translation>Please select a target year.</translation>
+		</message>
+		<message>
+			<source>Period of leaks: {years:.4g} years.</source>
+			<translation>Period of leaks: {years:.4g} years.</translation>
+		</message>
+		<message>
+			<source>Leaks within the indicated period: {leaks}.</source>
+			<translation>Leaks within the indicated period: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Leaks without pipes intersecting its buffer: {leaks}.</source>
+			<translation>Leaks without pipes intersecting its buffer: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Leaks assigned by material and diameter: {leaks}.</source>
+			<translation>Leaks assigned by material and diameter: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Leaks assigned by material only: {leaks}.</source>
+			<translation>Leaks assigned by material only: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Leaks assigned by diameter only: {leaks}.</source>
+			<translation>Leaks assigned by diameter only: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Leaks assigned to any nearby pipes: {leaks}.</source>
+			<translation>Leaks assigned to any nearby pipes: {leaks}.</translation>
+		</message>
+		<message>
+			<source>Total of pipes: {pipes}.</source>
+			<translation>Total of pipes: {pipes}.</translation>
+		</message>
+		<message>
+			<source>Pipes with zero leaks per km per year: {pipes}.</source>
+			<translation>Pipes with zero leaks per km per year: {pipes}.</translation>
+		</message>
+		<message>
+			<source>Max rleak: {rleak} leaks/km.year.</source>
+			<translation>Max rleak: {rleak} leaks/km.year.</translation>
+		</message>
+		<message>
+			<source>Min non-zero rleak: {rleak} leaks/km.year.</source>
+			<translation>Min non-zero rleak: {rleak} leaks/km.year.</translation>
+		</message>
+		<message>
+			<source>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
+			<translation>Se considera que un arccat_id no es válido si no aparece en la tabla de configuración del catálogo. Como resultado, a estas tuberías NO se les asignará un valor de prioridad.</translation>
+		</message>
+		<message>
+			<source>Pipes with invalid pressures: {qtd}.</source>
+			<translation>Tuberías con presiones no válidas: {qtd}.</translation>
+		</message>
+		<message>
+			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
+			<translation>A estas tuberías NO se les ha asignado un valor de prioridad ya que el material desconocido configurado, {unknown_material}, no está listado en la pestaña de configuración para materiales.</translation>
+		</message>
+		<message>
+			<source>These pipes received the maximum longevity value for their material.</source>
+			<translation>Estas tuberías recibieron el máximo valor de longevidad para su material.</translation>
+		</message>
+		<message>
+			<source>IVI</source>
+			<translation>IVI</translation>
+		</message>
+		<message>
 			<source>Without replacements</source>
-			<translation>Without replacements</translation>
+			<translation>Sin sustituciones</translation>
 		</message>
 		<message>
 			<source>With replacements</source>
-			<translation>With replacements</translation>
+			<translation>Con sustituciones</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your budget.</source>
-			<translation>No pipes found matching your budget.</translation>
+			<translation>No se han encontrado tuberías que se ajusten a su presupuesto.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the built date range.</source>
-			<translation>Please enter a valid integer for the built date range.</translation>
+			<translation>Introduzca un número entero válido para el intervalo de fechas de construcción.</translation>
+		</message>
+		<message>
+			<source>Diameter</source>
+			<translation>Diámetro</translation>
+		</message>
+		<message>
+			<source>Replacement cost</source>
+			<translation>Costo de sustitución</translation>
+		</message>
+		<message>
+			<source>Repair cost</source>
+			<translation>Costo de reparación</translation>
+		</message>
+		<message>
+			<source>Compliance</source>
+			<translation>Normativo</translation>
+		</message>
+		<message>
+			<source>Material</source>
+			<translation>Material</translation>
 		</message>
 	</context>
 
@@ -331,75 +455,11 @@
 			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
-			<source>lbl_pipes</source>
-			<translation>Tuberías</translation>
+			<source>dlg_assignation</source>
+			<translation>Asignación de fugas</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_pipes</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_max_distance</source>
-			<translation>Distancia máxima:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_max_distance</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_buffer</source>
-			<translation>Distancia de buffer:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_buffer</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_cluster_length</source>
-			<translation>Longitud del cluster:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_cluster_length</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_material</source>
-			<translation>Filtrar por material:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_diameter</source>
-			<translation>Filtrar por diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_diameter_range</source>
-			<translation>Rango de diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_diameter_range</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_infolog</source>
-			<translation>Info Log</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_infolog</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_years</source>
-			<translation>Años a calcular:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_years</source>
+			<source>tooltip_dlg_assignation</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -411,12 +471,108 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_assignation</source>
-			<translation>Asignación de fugas</translation>
+			<source>lbl_max_distance</source>
+			<translation>Distancia máxima (m):</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_assignation</source>
+			<source>tooltip_lbl_max_distance</source>
+			<translation>Maximum distance, in meters, between the initial pipe and other pipes included in the cluster.</translation>
+		</message>
+		<message>
+			<source>lbl_cluster_length</source>
+			<translation>Longitud del cluster (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_cluster_length</source>
+			<translation>Maximum sum of pipe lengths within a cluster, in meters.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter</source>
+			<translation>Filtrar por diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter</source>
+			<translation>Uses only pipes that match the diameter range of the initial one.</translation>
+		</message>
+		<message>
+			<source>lbl_material</source>
+			<translation>Filtrar por material:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_material</source>
+			<translation>Uses only pipes of the same material as the initial one.</translation>
+		</message>
+		<message>
+			<source>lbl_pipes</source>
+			<translation>Tuberías</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_pipes</source>
 			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_infolog</source>
+			<translation>Info Log</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_infolog</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_buffer</source>
+			<translation>Distancia de buffer (m):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_buffer</source>
+			<translation>Distance from a leak at which pipes are selected to be assigned that leak.</translation>
+		</message>
+		<message>
+			<source>chk_all_leaks</source>
+			<translation>Use all leaks</translation>
+		</message>
+		<message>
+			<source>tooltip_chk_all_leaks</source>
+			<translation>Calculates leaks per kilometer per year using all available data, regardless of the 'years to calculate' parameter.</translation>
+		</message>
+		<message>
+			<source>lbl_years</source>
+			<translation>Años a calcular:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_years</source>
+			<translation>Number of years of leak data to consider, based on recency.</translation>
+		</message>
+		<message>
+			<source>lbl_leaks</source>
+			<translation>Leaks</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_leaks</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate_range</source>
+			<translation>Built date range (years):</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate_range</source>
+			<translation>Built date range, in years before and after the initial pipe.</translation>
+		</message>
+		<message>
+			<source>lbl_diameter_range</source>
+			<translation>Rango de diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_diameter_range</source>
+			<translation>Diameter range based on factors of the initial pipe.</translation>
+		</message>
+		<message>
+			<source>lbl_builtdate</source>
+			<translation>Filter by built date:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_builtdate</source>
+			<translation>Uses only pipes that match the builtdate range of the initial one.</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
@@ -432,6 +588,14 @@
 		<message>
 			<source>title</source>
 			<translation>Cálculo de prioridad</translation>
+		</message>
+		<message>
+			<source>lbl_year</source>
+			<translation>Año horizonte:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_year</source>
+			<translation>None</translation>
 		</message>
 		<message>
 			<source>lbl_budget</source>
@@ -466,11 +630,27 @@
 			<translation>Seleccione las entidades en la vista de mapa</translation>
 		</message>
 		<message>
-			<source>grb_selection</source>
-			<translation>Selección de entidades</translation>
+			<source>grb_global</source>
+			<translation>Parámetros de cálculo</translation>
 		</message>
 		<message>
-			<source>tooltip_grb_selection</source>
+			<source>tooltip_grb_global</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority</source>
+			<translation>Cálculo de prioridad</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_dnom</source>
+			<translation>Diámetro:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_dnom</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -479,6 +659,22 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>grb_selection</source>
+			<translation>Selección de entidades</translation>
+		</message>
+		<message>
+			<source>tooltip_grb_selection</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_material</source>
+			<translation>Material</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_material</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -503,6 +699,14 @@
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>tab_engine</source>
+			<translation>Motor de cálculo</translation>
+		</message>
+		<message>
+			<source>tooltip_tab_engine</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -538,59 +742,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_year</source>
-			<translation>Año horizonte:</translation>
+			<source>tab_catalog</source>
+			<translation>Catalog</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_year</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_diameter</source>
-			<translation>Diámetro</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_diameter</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_engine</source>
-			<translation>Motor de cálculo</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_engine</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>dlg_priority</source>
-			<translation>Cálculo de prioridad</translation>
-		</message>
-		<message>
-			<source>tooltip_dlg_priority</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_dnom</source>
-			<translation>Diámetro:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_dnom</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>tab_material</source>
-			<translation>Material</translation>
-		</message>
-		<message>
-			<source>tooltip_tab_material</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>grb_global</source>
-			<translation>Parámetros de cálculo</translation>
-		</message>
-		<message>
-			<source>tooltip_grb_global</source>
+			<source>tooltip_tab_catalog</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -601,11 +757,11 @@
 			<translation>Gestor de resultados</translation>
 		</message>
 		<message>
-			<source>btn_delete</source>
-			<translation>Eliminar</translation>
+			<source>lbl_info</source>
+			<translation>Info:</translation>
 		</message>
 		<message>
-			<source>tooltip_btn_delete</source>
+			<source>tooltip_lbl_info</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -617,11 +773,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>dlg_priority_manager</source>
-			<translation>Gestor de resultados</translation>
+			<source>btn_delete</source>
+			<translation>Eliminar</translation>
 		</message>
 		<message>
-			<source>tooltip_dlg_priority_manager</source>
+			<source>tooltip_btn_delete</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -630,6 +786,62 @@
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_priority_manager</source>
+			<translation>Gestor de resultados</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_priority_manager</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_type</source>
+			<translation>Type:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_type</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_expl</source>
+			<translation>Exploitation:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_expl</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_status</source>
+			<translation>Status:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_status</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_open</source>
+			<translation>Open</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_open</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>btn_duplicate</source>
+			<translation>Duplicate</translation>
+		</message>
+		<message>
+			<source>tooltip_btn_duplicate</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_filter</source>
+			<translation>Filter by: Result name</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_filter</source>
 			<translation>None</translation>
 		</message>
 	</context>
@@ -648,11 +860,27 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Resultado para mostrar:</translation>
+			<source>lbl_result_compare</source>
+			<translation>Resultado para comparar:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_lbl_result_compare</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript</source>
+			<translation>Descripción:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_descript_compare</source>
+			<translation>Descripción:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_descript_compare</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -672,27 +900,11 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_descript_compare</source>
-			<translation>Descripción:</translation>
+			<source>lbl_result_main</source>
+			<translation>Resultado para mostrar:</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_descript_compare</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_descript</source>
-			<translation>Descripción:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_descript</source>
-			<translation>None</translation>
-		</message>
-		<message>
-			<source>lbl_result_compare</source>
-			<translation>Resultado para comparar:</translation>
-		</message>
-		<message>
-			<source>tooltip_lbl_result_compare</source>
+			<source>tooltip_lbl_result_main</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -707,12 +919,8 @@
 	<context>
 		<name>status_selector</name>
 		<message>
-			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
-		</message>
-		<message>
-			<source>tooltip_btn_cancel</source>
-			<translation>None</translation>
+			<source>title</source>
+			<translation>Status Selector</translation>
 		</message>
 		<message>
 			<source>btn_accept</source>
@@ -720,6 +928,14 @@
 		</message>
 		<message>
 			<source>tooltip_btn_accept</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>lbl_result_main</source>
+			<translation>Está cambiando el estado del siguiente resultado:</translation>
+		</message>
+		<message>
+			<source>tooltip_lbl_result_main</source>
 			<translation>None</translation>
 		</message>
 		<message>
@@ -731,11 +947,19 @@
 			<translation>None</translation>
 		</message>
 		<message>
-			<source>lbl_result_main</source>
-			<translation>Está cambiando el estado del siguiente resultado:</translation>
+			<source>btn_cancel</source>
+			<translation>Cancelar</translation>
 		</message>
 		<message>
-			<source>tooltip_lbl_result_main</source>
+			<source>tooltip_btn_cancel</source>
+			<translation>None</translation>
+		</message>
+		<message>
+			<source>dlg_status_selector</source>
+			<translation>Status Selector</translation>
+		</message>
+		<message>
+			<source>tooltip_dlg_status_selector</source>
 			<translation>None</translation>
 		</message>
 	</context>
