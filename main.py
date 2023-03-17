@@ -211,7 +211,7 @@ class GWAssetPlugin(QObject):
                 button_def = self.settings.value(f"buttons_def/{index_action}")
                 button_tooltip = self.settings.value(f"buttons_tooltip/{index_action}")
                 if button_def:
-                    text = f'{button_tooltip}'
+                    text = tr(f'{button_tooltip}')
                     icon_path = self.icon_folder + plugin_toolbar.toolbar_id + os.sep + index_action + ".png"
                     button = getattr(buttons, button_def)(icon_path, button_def, text, plugin_toolbar.toolbar, ag)
                     self.buttons[index_action] = button
