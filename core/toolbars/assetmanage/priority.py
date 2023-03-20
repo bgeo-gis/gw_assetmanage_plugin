@@ -65,7 +65,7 @@ class ConfigCatalog:
             tr("Diameter"),
             tr("Replacement cost"),
             tr("Repair cost"),
-            tr("Compliance"),
+            tr("Compliance Grade"),
         ]
         table_widget.setColumnCount(len(headers))
         table_widget.setHorizontalHeaderLabels(headers)
@@ -141,7 +141,7 @@ class ConfigMaterial:
             tr("Med. Longevity"),
             tr("Min. Longevity"),
             tr("Default Built Date"),
-            tr("Compliance"),
+            tr("Compliance Grade"),
         ]
         columns = [
             "material",

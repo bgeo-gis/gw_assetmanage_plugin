@@ -5,6 +5,11 @@ INSERT INTO asset.value_status VALUES ('CANCELED', 'CANCELADO');
 INSERT INTO asset.value_status VALUES ('ON PLANNING', 'EN PLANIFICACIÓN');
 INSERT INTO asset.value_status VALUES ('FINISHED', 'FINALIZADO');
 
+UPDATE asset.config_engine_def SET label = 'Coeficiente de tasa de rotura' WHERE parameter = 'bratemain0' AND method = 'SH';
+UPDATE asset.config_engine_def SET label = 'Tasa de descuento (%)' WHERE parameter = 'drate' AND method = 'SH';
+UPDATE asset.config_engine_def SET label = 'Peso de año esperado' WHERE parameter = 'expected_year' AND method = 'SH';
+UPDATE asset.config_engine_def SET label = 'Peso de normativo' WHERE parameter = 'compliance' AND method = 'SH';
+UPDATE asset.config_engine_def SET label = 'Peso de estratégico' WHERE parameter = 'strategic' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por factores estratégicos' WHERE parameter = 'strategic' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por año de renovación' WHERE parameter = 'expected_year' AND method = 'SH';
 UPDATE asset.config_engine_def SET descript = 'Peso en matriz final por cumplimiento normativo' WHERE parameter = 'compliance' AND method = 'SH';
