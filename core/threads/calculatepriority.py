@@ -402,7 +402,7 @@ class GwCalculatePriority(GwTask):
                         break_growth_rate,
                         cost_repmain,
                         replacement_cost * 1000,
-                        discount_rate,
+                        discount_rate / 100,
                     )
                 )
             output_arcs.append(
