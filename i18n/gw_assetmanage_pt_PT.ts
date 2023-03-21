@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="es_ES">
+<TS version="2.0" language="pt_PT">
 	<!-- TOOLBARS AND ACTIONS -->
 	<context>
 		<name>gw_assetmanage</name>
@@ -10,19 +10,19 @@
 		</message>
 		<message>
 			<source>ResultManager</source>
-			<translation>Gestor de resultados</translation>
+			<translation>Result manager</translation>
 		</message>
 		<message>
 			<source>ResultSelector</source>
-			<translation>Selector de resultados</translation>
+			<translation>Result selector</translation>
 		</message>
 		<message>
 			<source>AmBreakage</source>
-			<translation>Herramienta de administración</translation>
+			<translation>Administrative tool</translation>
 		</message>
 		<message>
 			<source>AmPriority</source>
-			<translation>Cálculo de prioridades y selección</translation>
+			<translation>Priority selection and Calculation</translation>
 		</message>
 	</context>
 
@@ -31,67 +31,67 @@
 		<name>gw_assetmanage</name>
 		<message>
 			<source>Task finished!</source>
-			<translation>Tarea finalizada!</translation>
+			<translation>Task finished!</translation>
 		</message>
 		<message>
 			<source>Oldest leak</source>
-			<translation>Fuga más antigua</translation>
+			<translation>Oldest leak</translation>
 		</message>
 		<message>
 			<source>Newest leak</source>
-			<translation>Fuga más reciente</translation>
+			<translation>Newest leak</translation>
 		</message>
 		<message>
 			<source>Getting auxiliary data from DB</source>
-			<translation>Obteniendo datos auxiliares de la base de datos</translation>
+			<translation>Getting auxiliary data from DB</translation>
 		</message>
 		<message>
 			<source>Task canceled:</source>
-			<translation>Tarea cancelada:</translation>
+			<translation>Task canceled:</translation>
 		</message>
 		<message>
 			<source>Assigning leaks to pipes</source>
-			<translation>Asignando fugas a las tuberías</translation>
+			<translation>Assigning leaks to pipes</translation>
 		</message>
 		<message>
 			<source>Generating result stats</source>
-			<translation>Generando de estadísticas del resultado</translation>
+			<translation>Generating result stats</translation>
 		</message>
 		<message>
 			<source>Warnings:</source>
-			<translation>Advertencias:</translation>
+			<translation>Warnings:</translation>
 		</message>
 		<message>
 			<source>Invalid materials: {list}.</source>
-			<translation>Materiales no válidos: {list}.</translation>
+			<translation>Invalid materials: {list}.</translation>
 		</message>
 		<message>
 			<source>Leak Assignation</source>
-			<translation>Asignación de fugas</translation>
+			<translation>Leak Assignation</translation>
 		</message>
 		<message>
 			<source>Updating tables</source>
-			<translation>Actualizando tablas</translation>
+			<translation>Updating tables</translation>
 		</message>
 		<message>
 			<source>Calculating values</source>
-			<translation>Calculando valores</translation>
+			<translation>Calculating values</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid diameters: {qtd}.</source>
-			<translation>Tuberías con diámetro no válido: {qtd}.</translation>
+			<translation>Pipes with invalid diameters: {qtd}.</translation>
 		</message>
 		<message>
 			<source>SELECTION</source>
-			<translation>SELECCIÓN</translation>
+			<translation>SELECTION</translation>
 		</message>
 		<message>
 			<source>Please choose a different name.</source>
-			<translation>Por favor escoja un nombre diferente.</translation>
+			<translation>Please choose a different name.</translation>
 		</message>
 		<message>
 			<source>Do you want to proceed?</source>
-			<translation>¿Desea continuar?</translation>
+			<translation>Do you want to proceed?</translation>
 		</message>
 		<message>
 			<source>Total</source>
@@ -99,43 +99,43 @@
 		</message>
 		<message>
 			<source>Invalid buffer value. Please enter an valid integer.</source>
-			<translation>Valor de búfer no válido. Introduzca un número entero válido.</translation>
+			<translation>Invalid buffer value. Please enter an valid integer.</translation>
 		</message>
 		<message>
 			<source>Invalid value for field</source>
-			<translation>Valor no válido para el campo</translation>
+			<translation>Invalid value for field</translation>
 		</message>
 		<message>
 			<source>Please enter a valid number.</source>
-			<translation>Por favor ingrese un número válido.</translation>
+			<translation>Please enter a valid number.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the maximum distance.</source>
-			<translation>Por favor introduzca un número entero válido para la distancia máxima.</translation>
+			<translation>Please enter a valid integer for the maximum distance.</translation>
 		</message>
 		<message>
 			<source>Please provide a result name.</source>
-			<translation>Por favor indique el nombre del resultado.</translation>
+			<translation>Please provide a result name.</translation>
 		</message>
 		<message>
 			<source>Compliance value must be between 0 and 10 inclusive.</source>
-			<translation>El valor de compilación debe estar comprendido entre 0 y 10, ambos inclusive.</translation>
+			<translation>Compliance value must be between 0 and 10 inclusive.</translation>
 		</message>
 		<message>
 			<source>Invalid buffer value. Please enter an integer less than 1000.</source>
-			<translation>Valor de buffer no válido. Introduzca un número entero inferior a 1000.</translation>
+			<translation>Invalid buffer value. Please enter an integer less than 1000.</translation>
 		</message>
 		<message>
 			<source>This result name already exists</source>
-			<translation>Este nombre de resultado ya existe</translation>
+			<translation>This result name already exists</translation>
 		</message>
 		<message>
 			<source>You are about to delete the result </source>
-			<translation>Está a punto de borrar el resultado</translation>
+			<translation>You are about to delete the result </translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the cluster length.</source>
-			<translation>Por favor introduzca un número entero válido para la longitud del clúster.</translation>
+			<translation>Please enter a valid integer for the cluster length.</translation>
 		</message>
 		<message>
 			<source>GLOBAL</source>
@@ -143,187 +143,187 @@
 		</message>
 		<message>
 			<source>Canceling task...</source>
-			<translation>Cancelando tarea...</translation>
+			<translation>Canceling task...</translation>
 		</message>
 		<message>
 			<source>Calculate Priority</source>
-			<translation>Calcular Prioridad</translation>
+			<translation>Calculate Priority</translation>
 		</message>
 		<message>
 			<source>Please provide the repairing cost for diameter</source>
-			<translation>Por favor indique el coste de reparación del diámetro</translation>
+			<translation>Please provide the repairing cost for diameter</translation>
 		</message>
 		<message>
 			<source>This task may take some time to complete, do you want to proceed?</source>
-			<translation>Esta tarea puede tomar algún tiempo, ¿desea continuar?</translation>
+			<translation>This task may take some time to complete, do you want to proceed?</translation>
 		</message>
 		<message>
 			<source>Please enter the diameter range in this format: [minimum factor]-[maximum factor]. For example, 0.75-1.5</source>
-			<translation>Por favor introduzca el intervalo de diámetros en este formato: [factor mínimo]-[factor máximo]. Por ejemplo, 0.75-1.5</translation>
+			<translation>Please enter the diameter range in this format: [minimum factor]-[maximum factor]. For example, 0.75-1.5</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Global)</source>
-			<translation>Cálculo de prioridad (Global)</translation>
+			<translation>Priority Calculation (Global)</translation>
 		</message>
 		<message>
 			<source>Please provide the replacing cost for diameter</source>
-			<translation>Por favor indique el costo de sustitución del diámetro</translation>
+			<translation>Please provide the replacing cost for diameter</translation>
 		</message>
 		<message>
 			<source>Configuration file not found, please make sure it is located in the correct directory and try again</source>
-			<translation>Archivo de configuración no encontrado, por favor asegúrese de que se encuentra en la dirección correcta y vuelva a intentarlo.</translation>
+			<translation>Configuration file not found, please make sure it is located in the correct directory and try again</translation>
 		</message>
 		<message>
 			<source>Invalid compliance value for material</source>
-			<translation>Valor normativo no válido para el material</translation>
+			<translation>Invalid compliance value for material</translation>
 		</message>
 		<message>
 			<source>You can only delete results with the status 'CANCELED'.</source>
-			<translation>Sólo puede eliminar resultados con el estado 'CANCELADO'.</translation>
+			<translation>You can only delete results with the status 'CANCELED'.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid arccat_ids: {qtd}.</source>
-			<translation>Tuberías con arccat_id no válido: {qtd}.</translation>
+			<translation>Pipes with invalid arccat_ids: {qtd}.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the number of years.</source>
-			<translation>Por favor introduzca un número entero válido para el número de años.</translation>
+			<translation>Please enter a valid integer for the number of years.</translation>
 		</message>
 		<message>
 			<source>Priority Calculation (Selection)</source>
-			<translation>Cálculo de prioridad (Selección)</translation>
+			<translation>Priority Calculation (Selection)</translation>
 		</message>
 		<message>
 			<source>Result Manager</source>
-			<translation>Gestor de resultados</translation>
+			<translation>Result Manager</translation>
 		</message>
 		<message>
 			<source>Result Selector</source>
-			<translation>Selector de resultados</translation>
+			<translation>Result Selector</translation>
 		</message>
 		<message>
 			<source>Saving results to DB</source>
-			<translation>Guardar resultados en la BD</translation>
+			<translation>Saving results to DB</translation>
 		</message>
 		<message>
 			<source>A diameter value is considered invalid if it is zero, negative, NULL or greater than the maximum diameter in the configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
-			<translation>Un valor de diámetro se considera inválido si es cero, negativo, NULL o mayor que el diámetro máximo de la tabla de configuración. Como resultado, a estas tuberías NO se les asignará un valor de prioridad.</translation>
+			<translation>A diameter value is considered invalid if it is zero, negative, NULL or greater than the maximum diameter in the configuration table. As a result, these pipes will NOT be assigned a priority value.</translation>
 		</message>
 		<message>
 			<source>First iteration</source>
-			<translation>Primera iteración</translation>
+			<translation>First iteration</translation>
 		</message>
 		<message>
 			<source>Getting leak data from DB</source>
-			<translation>Obteniendo datos de fugas de la base de datos</translation>
+			<translation>Getting leak data from DB</translation>
 		</message>
 		<message>
 			<source>Getting pipe data from DB</source>
-			<translation>Obteniendo datos de tuberías de la base de datos</translation>
+			<translation>Getting pipe data from DB</translation>
 		</message>
 		<message>
 			<source>Invalid arccat_ids: {list}.</source>
-			<translation>Arccat_ids no válidos: {list}.</translation>
+			<translation>Invalid arccat_ids: {list}.</translation>
 		</message>
 		<message>
 			<source>Invalid diameters: {list}.</source>
-			<translation>Diámetros no válidos: {list}.</translation>
+			<translation>Invalid diameters: {list}.</translation>
 		</message>
 		<message>
 			<source>Invalid value for type of priority dialog. Please pass either 'GLOBAL' or 'SELECTION'. Value passed:</source>
-			<translation>Valor no válido para el tipo de diálogo de prioridad. Por favor, introduzca 'GLOBAL' o 'SELECTION'. Valor introducido:</translation>
+			<translation>Invalid value for type of priority dialog. Please pass either 'GLOBAL' or 'SELECTION'. Value passed:</translation>
 		</message>
 		<message>
 			<source>Method of calculation not defined in configuration file. Please check config file.</source>
-			<translation>El método de cálculo no está definido en el archivo de configuración. Compruebe el archivo de configuración</translation>
+			<translation>Method of calculation not defined in configuration file. Please check config file.</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by diameter only: {leaks}.</source>
-			<translation>Fugas asignadas sólo por diámetro: {leaks}.</translation>
+			<translation>Leaks assigned by diameter only: {leaks}.</translation>
 		</message>
 		<message>
 			<source>Leaks assigned to any nearby pipes: {leaks}.</source>
-			<translation>Fugas asignadas a cualquier tubería cercana: {leaks}.</translation>
+			<translation>Leaks assigned to any nearby pipes: {leaks}.</translation>
 		</message>
 		<message>
 			<source>Second iteration</source>
-			<translation>Segunda iteración</translation>
+			<translation>Second iteration</translation>
 		</message>
 		<message>
 			<source>Shamir-Howard parameters</source>
-			<translation>Parámetros de Shamir-Howard</translation>
+			<translation>Shamir-Howard parameters</translation>
 		</message>
 		<message>
 			<source>Task canceled.</source>
-			<translation>Tarea cancelada.</translation>
+			<translation>Task canceled.</translation>
 		</message>
 		<message>
 			<source>Task canceled: The number of years is greater than the interval disponible.</source>
-			<translation>Tarea cancelada: El número de años es mayor que el intervalo disponible.</translation>
+			<translation>Task canceled: The number of years is greater than the interval disponible.</translation>
 		</message>
 		<message>
 			<source>These pipes have been identified as the configured unknown material, {unknown_material}.</source>
-			<translation>Estas tuberías se han identificado con material desconocido configurado, {unknown_material}.</translation>
+			<translation>These pipes have been identified as the configured unknown material, {unknown_material}.</translation>
 		</message>
 		<message>
 			<source>Administrative tools</source>
-			<translation>Herramientas administrativas</translation>
+			<translation>Administrative tools</translation>
 		</message>
 		<message>
 			<source>These pipes have NOT been assigned a priority value.</source>
-			<translation>A estas tuberías NO se les ha asignado un valor de prioridad.</translation>
+			<translation>These pipes have NOT been assigned a priority value.</translation>
 		</message>
 		<message>
 			<source>Weights</source>
-			<translation>Pesos</translation>
+			<translation>Weights</translation>
 		</message>
 		<message>
 			<source>Max rleak: {rleak} leaks/km.year.</source>
-			<translation>Max rleak: {rleak} fugas/km.año.</translation>
+			<translation>Max rleak: {rleak} leaks/km.year.</translation>
 		</message>
 		<message>
 			<source>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
-			<translation>A estas tuberías NO se les ha asignado un valor de prioridad ya que el material desconocido configurado, {unknown_material}, no está listado en la pestaña de configuración para materiales.</translation>
+			<translation>These pipes have NOT been assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
 		</message>
 		<message>
 			<source>Repair cost</source>
-			<translation>Costo de reparación</translation>
+			<translation>Repair cost</translation>
 		</message>
 		<message>
 			<source>Please select a target year.</source>
-			<translation>Seleccione un año objetivo.</translation>
+			<translation>Please select a target year.</translation>
 		</message>
 		<message>
 			<source>Min. Longevity</source>
-			<translation>Mín. Longevidad</translation>
+			<translation>Min. Longevity</translation>
 		</message>
 		<message>
 			<source>Compliance Grade</source>
-			<translation>Grado de Normatividad</translation>
+			<translation>Compliance Grade</translation>
 		</message>
 		<message>
 			<source>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</source>
-			<translation>Se considera que un arccat_id no es válido si no aparece en la tabla de configuración del catálogo. Como resultado, a estas tuberías NO se les asignará un valor de prioridad.</translation>
+			<translation>An arccat_id is considered invalid if it is not listed in the catalog configuration table. As a result, these pipes will NOT be assigned a priority value.</translation>
 		</message>
 		<message>
 			<source>Prob. of Failure</source>
-			<translation>Prob. de fallo</translation>
+			<translation>Prob. of Failure</translation>
 		</message>
 		<message>
 			<source>Diameter</source>
-			<translation>Diámetro</translation>
+			<translation>Diameter</translation>
 		</message>
 		<message>
 			<source>The sum of weights must equal 1. Please adjust the values accordingly.</source>
-			<translation>La suma de los pesos debe ser igual a 1. Ajuste los valores de acuerdo a esta condición.</translation>
+			<translation>The sum of weights must equal 1. Please adjust the values accordingly.</translation>
 		</message>
 		<message>
 			<source>Default Built Date</source>
-			<translation>Fecha de construcción por defecto</translation>
+			<translation>Default Built Date</translation>
 		</message>
 		<message>
 			<source>Empty value detected in 'Diameter' tab. Please enter a value for diameter.</source>
-			<translation>Se ha detectado un valor vacío en la pestaña "Diámetro". Introduzca un valor para el diámetro.</translation>
+			<translation>Empty value detected in 'Diameter' tab. Please enter a value for diameter.</translation>
 		</message>
 		<message>
 			<source>IVI</source>
@@ -335,131 +335,131 @@
 		</message>
 		<message>
 			<source>Leaks without pipes intersecting its buffer: {leaks}.</source>
-			<translation>Fugas sin tuberías intersectando su buffer: {leaks}.</translation>
+			<translation>Leaks without pipes intersecting its buffer: {leaks}.</translation>
 		</message>
 		<message>
 			<source>Max. Longevity</source>
-			<translation>Max. Longevidad</translation>
+			<translation>Max. Longevity</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by material and diameter: {leaks}.</source>
-			<translation>Fugas asignadas por material y diámetro: {leaks}.</translation>
+			<translation>Leaks assigned by material and diameter: {leaks}.</translation>
 		</message>
 		<message>
 			<source>Med. Longevity</source>
-			<translation>Med. Longevidad</translation>
+			<translation>Med. Longevity</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your selected filters.</source>
-			<translation>No se han encontrado tuberías que coincidan con los filtros seleccionados.</translation>
+			<translation>No pipes found matching your selected filters.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid number for the budget.</source>
-			<translation>Introduzca un número válido para el presupuesto.</translation>
+			<translation>Please enter a valid number for the budget.</translation>
 		</message>
 		<message>
 			<source>Pipes with zero leaks per km per year: {pipes}.</source>
-			<translation>Tuberías con cero fugas por km y año: {pipes}.</translation>
+			<translation>Pipes with zero leaks per km per year: {pipes}.</translation>
 		</message>
 		<message>
 			<source>Period of leaks: {years:.4g} years.</source>
-			<translation>Periodo de fugas: {years:.4g} años.</translation>
+			<translation>Period of leaks: {years:.4g} years.</translation>
 		</message>
 		<message>
 			<source>Without replacements</source>
-			<translation>Sin sustituciones</translation>
+			<translation>Without replacements</translation>
 		</message>
 		<message>
 			<source>These pipes received the maximum longevity value for their material.</source>
-			<translation>Estas tuberías recibieron el máximo valor de longevidad para su material.</translation>
+			<translation>These pipes received the maximum longevity value for their material.</translation>
 		</message>
 		<message>
 			<source>Min non-zero rleak: {rleak} leaks/km.year.</source>
-			<translation>Fuga mínima no nula: {rleak} fugas/km.año.</translation>
+			<translation>Min non-zero rleak: {rleak} leaks/km.year.</translation>
 		</message>
 		<message>
 			<source>These pipes will NOT be assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</source>
-			<translation>A estas tuberías NO se les asignará un valor de prioridad ya que el material desconocido configurado, {unknown_material}, no aparece en la pestaña de configuración de materiales.</translation>
+			<translation>These pipes will NOT be assigned a priority value as the configured unknown material, {unknown_material}, is not listed in the configuration tab for materials.</translation>
 		</message>
 		<message>
 			<source>Total of pipes: {pipes}.</source>
-			<translation>Total de tuberías: {pipes}.</translation>
+			<translation>Total of pipes: {pipes}.</translation>
 		</message>
 		<message>
 			<source>Replacement cost</source>
-			<translation>Costo de sustitución</translation>
+			<translation>Replacement cost</translation>
 		</message>
 		<message>
 			<source>With replacements</source>
-			<translation>Con sustituciones</translation>
+			<translation>With replacements</translation>
 		</message>
 		<message>
 			<source>Year</source>
-			<translation>Año</translation>
+			<translation>Year</translation>
 		</message>
 		<message>
 			<source>Result name already in use, please choose a different name.</source>
-			<translation>Nombre de resultado ya en uso, por favor elija un nombre diferente.</translation>
+			<translation>Result name already in use, please choose a different name.</translation>
 		</message>
 		<message>
 			<source>The result cannot be deleted</source>
-			<translation>El resultado no puede borrarse</translation>
+			<translation>The result cannot be deleted</translation>
 		</message>
 		<message>
 			<source>Invalid compliance value for diameter</source>
-			<translation>Valor normativo no válido para el diámetro</translation>
+			<translation>Invalid compliance value for diameter</translation>
 		</message>
 		<message>
 			<source>A material is considered invalid if it is not listed in the material configuration table.</source>
-			<translation>Se considera que un material no es válido si no se encuentra en la tabla de configuración de materiales.</translation>
+			<translation>A material is considered invalid if it is not listed in the material configuration table.</translation>
 		</message>
 		<message>
 			<source>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</source>
-			<translation>Como resultado, el material de estas tuberías se considerará como material desconocido configurado, {unknown_material}.</translation>
+			<translation>As a result, the material of these pipes will be treated as the configured unknown material, {unknown_material}.</translation>
 		</message>
 		<message>
 			<source>Leaks assigned by material only: {leaks}.</source>
-			<translation>Fugas asignadas sólo por material: {leaks}.</translation>
+			<translation>Leaks assigned by material only: {leaks}.</translation>
 		</message>
 		<message>
 			<source>Leaks within the indicated period: {leaks}.</source>
-			<translation>Fugas dentro del periodo indicado: {leaks}.</translation>
+			<translation>Leaks within the indicated period: {leaks}.</translation>
 		</message>
 		<message>
 			<source>No pipes found matching your budget.</source>
-			<translation>No se han encontrado tuberías que se ajusten a su presupuesto.</translation>
+			<translation>No pipes found matching your budget.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid materials: {qtd}.</source>
-			<translation>Tuberías con material no válido: {qtd}.</translation>
+			<translation>Pipes with invalid materials: {qtd}.</translation>
 		</message>
 		<message>
 			<source>Pipes with invalid pressures: {qtd}.</source>
-			<translation>Tuberías con presiones no válidas: {qtd}.</translation>
+			<translation>Pipes with invalid pressures: {qtd}.</translation>
 		</message>
 		<message>
 			<source>Please enter a valid integer for the built date range.</source>
-			<translation>Introduzca un número entero válido para el intervalo de fechas de construcción.</translation>
+			<translation>Please enter a valid integer for the built date range.</translation>
 		</message>
 		<message>
 			<source>Please select only one result before changing its status.</source>
-			<translation>Por favor seleccione sólo un resultado antes de cambiar su estado.</translation>
+			<translation>Please select only one result before changing its status.</translation>
 		</message>
 		<message>
 			<source>There are no results available to display.</source>
-			<translation>No hay resultados disponibles para mostrar.</translation>
+			<translation>There are no results available to display.</translation>
 		</message>
 		<message>
 			<source>These pipes have been assigned as compliant by default, which may affect their priority value.</source>
-			<translation>Estas tuberías se han asignado como normativas por defecto, lo que puede afectar a su valor de prioridad.</translation>
+			<translation>These pipes have been assigned as compliant by default, which may affect their priority value.</translation>
 		</message>
 		<message>
 			<source>These pipes have no pressure information for their nodes. This will result in them receiving the maximum longevity value for their material, which may affect the final priority value.</source>
-			<translation>Estas tuberías no tienen información de presión para sus nodos. Esto hará que reciban el valor máximo de longevidad para su material, lo que puede afectar el valor de prioridad final.</translation>
+			<translation>These pipes have no pressure information for their nodes. This will result in them receiving the maximum longevity value for their material, which may affect the final priority value.</translation>
 		</message>
 		<message>
 			<source>You cannot change the status of a result with status 'FINISHED'.</source>
-			<translation>No se puede modificar el estado de un resultado con estado 'FINALIZADO'.</translation>
+			<translation>You cannot change the status of a result with status 'FINISHED'.</translation>
 		</message>
 	</context>
 
@@ -468,15 +468,15 @@
 		<name>assignation</name>
 		<message>
 			<source>title</source>
-			<translation>Asignación de fugas</translation>
+			<translation>Leak Assignation</translation>
 		</message>
 		<message>
 			<source>lbl_diameter_range</source>
-			<translation>Rango de diámetro:</translation>
+			<translation>Diameter range:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter_range</source>
-			<translation>Rango de diámetros basado en factores de la tubería inicial.</translation>
+			<translation>Diameter range based on factors of the initial pipe.</translation>
 		</message>
 		<message>
 			<source>tab_infolog</source>
@@ -488,15 +488,15 @@
 		</message>
 		<message>
 			<source>lbl_years</source>
-			<translation>Años a calcular:</translation>
+			<translation>Years to calculate:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_years</source>
-			<translation>Número de años de datos de fugas a tener en cuenta, en función de la antigüedad.</translation>
+			<translation>Number of years of leak data to consider, based on recency.</translation>
 		</message>
 		<message>
 			<source>lbl_pipes</source>
-			<translation>Tuberías</translation>
+			<translation>Pipes</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_pipes</source>
@@ -504,39 +504,39 @@
 		</message>
 		<message>
 			<source>chk_all_leaks</source>
-			<translation>Utilizar todas las fugas</translation>
+			<translation>Use all leaks</translation>
 		</message>
 		<message>
 			<source>tooltip_chk_all_leaks</source>
-			<translation>Calcula las fugas por kilómetro y año utilizando todos los datos disponibles, independientemente del parámetro 'años a calcular'.</translation>
+			<translation>Calculates leaks per kilometer per year using all available data, regardless of the 'years to calculate' parameter.</translation>
 		</message>
 		<message>
 			<source>lbl_builtdate_range</source>
-			<translation>Rango de fechas de construcción (years):</translation>
+			<translation>Built date range (years):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate_range</source>
-			<translation>Intervalo de fechas de construcción, en años anteriores y posteriores a la tubería inicial.</translation>
+			<translation>Built date range, in years before and after the initial pipe.</translation>
 		</message>
 		<message>
 			<source>lbl_max_distance</source>
-			<translation>Distancia máxima (m):</translation>
+			<translation>Maximum distance (m):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_max_distance</source>
-			<translation>Distancia máxima, en metros, entre la tubería inicial y otras tuberías incluidas en el cluster.</translation>
+			<translation>Maximum distance, in meters, between the initial pipe and other pipes included in the cluster.</translation>
 		</message>
 		<message>
 			<source>lbl_buffer</source>
-			<translation>Distancia de buffer (m):</translation>
+			<translation>Buffer distance (m):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_buffer</source>
-			<translation>Distancia desde una fuga a la que se seleccionan las tuberías a las que se asigna esa fuga.</translation>
+			<translation>Distance from a leak at which pipes are selected to be assigned that leak.</translation>
 		</message>
 		<message>
 			<source>lbl_leaks</source>
-			<translation>Fugas</translation>
+			<translation>Leaks</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_leaks</source>
@@ -544,23 +544,23 @@
 		</message>
 		<message>
 			<source>lbl_material</source>
-			<translation>Filtrar por material:</translation>
+			<translation>Filter by material:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_material</source>
-			<translation>Utiliza sólo tuberías del mismo material que el inicial.</translation>
+			<translation>Uses only pipes of the same material as the initial one.</translation>
 		</message>
 		<message>
 			<source>lbl_diameter</source>
-			<translation>Filtrar por diámetro:</translation>
+			<translation>Filter by diameter:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_diameter</source>
-			<translation>Utiliza sólo tuberías que coincidan con el rango de diámetros del inicial.</translation>
+			<translation>Uses only pipes that match the diameter range of the initial one.</translation>
 		</message>
 		<message>
 			<source>tab_infolog</source>
-			<translation>Fugas</translation>
+			<translation>Leaks</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_infolog</source>
@@ -568,7 +568,7 @@
 		</message>
 		<message>
 			<source>dlg_assignation</source>
-			<translation>Asignación de fugas</translation>
+			<translation>Leak Assignation</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_assignation</source>
@@ -576,15 +576,15 @@
 		</message>
 		<message>
 			<source>lbl_builtdate</source>
-			<translation>Filtrar por fecha de instalación:</translation>
+			<translation>Filter by built date:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_builtdate</source>
-			<translation>Utiliza sólo las tuberías que coinciden con el intervalo de fechas de instalación de la inicial.</translation>
+			<translation>Uses only pipes that match the builtdate range of the initial one.</translation>
 		</message>
 		<message>
 			<source>tab_config</source>
-			<translation>Configuración</translation>
+			<translation>Config</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_config</source>
@@ -592,22 +592,22 @@
 		</message>
 		<message>
 			<source>lbl_cluster_length</source>
-			<translation>Longitud del cluster (m):</translation>
+			<translation>Cluster length (m):</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_cluster_length</source>
-			<translation>Suma máxima de longitudes de tubería dentro de un cluster, en metros.</translation>
+			<translation>Maximum sum of pipe lengths within a cluster, in meters.</translation>
 		</message>
 	</context>
 	<context>
 		<name>priority</name>
 		<message>
 			<source>title</source>
-			<translation>Cálculo de prioridad</translation>
+			<translation>Priority Calculation</translation>
 		</message>
 		<message>
 			<source>lbl_expl_selection</source>
-			<translation>Explotación:</translation>
+			<translation>Exploitation:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl_selection</source>
@@ -615,7 +615,7 @@
 		</message>
 		<message>
 			<source>lbl_presszone</source>
-			<translation>Zona de presión:</translation>
+			<translation>Presszone:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_presszone</source>
@@ -623,7 +623,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Estado:</translation>
+			<translation>Status:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -631,7 +631,7 @@
 		</message>
 		<message>
 			<source>tab_calc</source>
-			<translation>Cálculo</translation>
+			<translation>Calculation</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_calc</source>
@@ -639,7 +639,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Descripción:</translation>
+			<translation>Description:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -655,7 +655,7 @@
 		</message>
 		<message>
 			<source>grb_selection</source>
-			<translation>Selección de entidades</translation>
+			<translation>Selection of features</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_selection</source>
@@ -671,7 +671,7 @@
 		</message>
 		<message>
 			<source>lbl_result_id</source>
-			<translation>Nombre del resultado:</translation>
+			<translation>Result name:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_id</source>
@@ -679,7 +679,7 @@
 		</message>
 		<message>
 			<source>btn_calc</source>
-			<translation>Calcular</translation>
+			<translation>Calculate</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_calc</source>
@@ -687,7 +687,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<translation>Cancel</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -695,7 +695,7 @@
 		</message>
 		<message>
 			<source>tab_catalog</source>
-			<translation>Catálogo</translation>
+			<translation>Catalog</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_catalog</source>
@@ -703,7 +703,7 @@
 		</message>
 		<message>
 			<source>tab_engine</source>
-			<translation>Motor de cálculo</translation>
+			<translation>Engine</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_engine</source>
@@ -711,7 +711,7 @@
 		</message>
 		<message>
 			<source>lbl_year</source>
-			<translation>Año horizonte:</translation>
+			<translation>Horizon year:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_year</source>
@@ -719,7 +719,7 @@
 		</message>
 		<message>
 			<source>lbl_budget</source>
-			<translation>Presupuesto anual:</translation>
+			<translation>Yearly budget:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_budget</source>
@@ -727,7 +727,7 @@
 		</message>
 		<message>
 			<source>grb_global</source>
-			<translation>Parámetros de cálculo</translation>
+			<translation>Calculation parameters</translation>
 		</message>
 		<message>
 			<source>tooltip_grb_global</source>
@@ -735,7 +735,7 @@
 		</message>
 		<message>
 			<source>lbl_dnom</source>
-			<translation>Diámetro:</translation>
+			<translation>Diameter:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_dnom</source>
@@ -751,7 +751,7 @@
 		</message>
 		<message>
 			<source>dlg_priority</source>
-			<translation>Cálculo de prioridad</translation>
+			<translation>Priority Calculation</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority</source>
@@ -763,18 +763,18 @@
 		</message>
 		<message>
 			<source>tooltip_btn_snapping</source>
-			<translation>Seleccione las entidades en la vista de mapa</translation>
+			<translation>Select features on canvas</translation>
 		</message>
 	</context>
 	<context>
 		<name>priority_manager</name>
 		<message>
 			<source>title</source>
-			<translation>Gestor de resultados</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>btn_duplicate</source>
-			<translation>Duplicar</translation>
+			<translation>Duplicate</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_duplicate</source>
@@ -782,7 +782,7 @@
 		</message>
 		<message>
 			<source>lbl_expl</source>
-			<translation>Explotación:</translation>
+			<translation>Exploitation:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_expl</source>
@@ -790,7 +790,7 @@
 		</message>
 		<message>
 			<source>lbl_filter</source>
-			<translation>Filtrar por: Nombre del resultado</translation>
+			<translation>Filter by: Result name</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_filter</source>
@@ -798,7 +798,7 @@
 		</message>
 		<message>
 			<source>btn_open</source>
-			<translation>Abrir</translation>
+			<translation>Open</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_open</source>
@@ -806,7 +806,7 @@
 		</message>
 		<message>
 			<source>lbl_status</source>
-			<translation>Estado:</translation>
+			<translation>Status:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_status</source>
@@ -814,7 +814,7 @@
 		</message>
 		<message>
 			<source>btn_delete</source>
-			<translation>Eliminar</translation>
+			<translation>Delete</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_delete</source>
@@ -822,7 +822,7 @@
 		</message>
 		<message>
 			<source>btn_status</source>
-			<translation>Cambiar estado</translation>
+			<translation>Change status</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_status</source>
@@ -838,7 +838,7 @@
 		</message>
 		<message>
 			<source>dlg_priority_manager</source>
-			<translation>Gestor de resultados</translation>
+			<translation>Results Manager</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_priority_manager</source>
@@ -846,7 +846,7 @@
 		</message>
 		<message>
 			<source>btn_close</source>
-			<translation>Cerrar</translation>
+			<translation>Close</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_close</source>
@@ -854,7 +854,7 @@
 		</message>
 		<message>
 			<source>lbl_type</source>
-			<translation>Tipo:</translation>
+			<translation>Type:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_type</source>
@@ -865,11 +865,11 @@
 		<name>result_selector</name>
 		<message>
 			<source>title</source>
-			<translation>Selector de resultados</translation>
+			<translation>Result Selector</translation>
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<translation>Cancel</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -877,7 +877,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Resultado para mostrar:</translation>
+			<translation>Result to show:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -885,7 +885,7 @@
 		</message>
 		<message>
 			<source>lbl_result_compare</source>
-			<translation>Resultado para comparar:</translation>
+			<translation>Result to compare:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_compare</source>
@@ -893,7 +893,7 @@
 		</message>
 		<message>
 			<source>dlg_result_selector</source>
-			<translation>Selector de resultados</translation>
+			<translation>Result Selector</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_result_selector</source>
@@ -901,7 +901,7 @@
 		</message>
 		<message>
 			<source>lbl_descript_compare</source>
-			<translation>Descripción:</translation>
+			<translation>Description:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript_compare</source>
@@ -917,7 +917,7 @@
 		</message>
 		<message>
 			<source>lbl_descript</source>
-			<translation>Descripción:</translation>
+			<translation>Description:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_descript</source>
@@ -925,7 +925,7 @@
 		</message>
 		<message>
 			<source>tab_result</source>
-			<translation>Resultado</translation>
+			<translation>Result</translation>
 		</message>
 		<message>
 			<source>tooltip_tab_result</source>
@@ -936,11 +936,11 @@
 		<name>status_selector</name>
 		<message>
 			<source>title</source>
-			<translation>Estado de selector</translation>
+			<translation>Status Selector</translation>
 		</message>
 		<message>
 			<source>lbl_new_status</source>
-			<translation>Nuevo estado: </translation>
+			<translation>New status:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_new_status</source>
@@ -948,7 +948,7 @@
 		</message>
 		<message>
 			<source>btn_cancel</source>
-			<translation>Cancelar</translation>
+			<translation>Cancel</translation>
 		</message>
 		<message>
 			<source>tooltip_btn_cancel</source>
@@ -956,7 +956,7 @@
 		</message>
 		<message>
 			<source>lbl_result_main</source>
-			<translation>Está cambiando el estado del siguiente resultado:</translation>
+			<translation>You are changing the status of the following result:</translation>
 		</message>
 		<message>
 			<source>tooltip_lbl_result_main</source>
@@ -964,7 +964,7 @@
 		</message>
 		<message>
 			<source>dlg_status_selector</source>
-			<translation>Estado de selector</translation>
+			<translation>Status Selector</translation>
 		</message>
 		<message>
 			<source>tooltip_dlg_status_selector</source>
