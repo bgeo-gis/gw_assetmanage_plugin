@@ -838,15 +838,22 @@ class CalculatePriority:
         self._manage_btn_snapping()
 
     def _manage_btn_snapping(self):
-
-        # FIXME: In case of "duplicate" or "edit", load result selection
-
         self.feature_type = "arc"
         layer = tools_qgis.get_layer_by_tablename(self.layer_to_work)
         self.layers["arc"].append(layer)
 
         # Remove all previous selections
         self.layers = tools_gw.remove_selection(True, layers=self.layers)
+
+        # In case of "duplicate" or "edit", load result selection
+        if self.result["features"]:
+            select_fid = []
+            self.list_ids["arc"] = []
+            for feature in layer.getFeatures():
+                if feature["arc_id"] in self.result["features"]:
+                    select_fid.append(feature.id())
+                    self.list_ids["arc"].append(feature["arc_id"])
+            layer.select(select_fid)
 
         self.dlg_priority.btn_snapping.clicked.connect(
             partial(
