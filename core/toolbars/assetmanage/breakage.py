@@ -417,6 +417,10 @@ class AmBreakage(dialog.GwAction):
 
     def _assignation_ended(self):
         dlg = self.dlg_assignation
+        cancel = dlg.buttonBox.StandardButton.Cancel
+        dlg.buttonBox.removeButton(dlg.buttonBox.button(cancel))
+        close = dlg.buttonBox.StandardButton.Close
+        dlg.buttonBox.addButton(close)
         dlg.buttonBox.rejected.disconnect()
         dlg.buttonBox.rejected.connect(dlg.reject)
         dlg.executing = False
