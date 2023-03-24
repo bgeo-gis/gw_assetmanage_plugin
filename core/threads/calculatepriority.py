@@ -315,7 +315,7 @@ class GwCalculatePriority(GwTask):
         break_growth_rate = float(self.config_engine["bratemain0"])
 
         last_leak_year = tools_db.get_row(
-            "select max(date_part('year', date)) from asset.leaks"
+            "select max(date_part('year', date)) from asset.leaks", is_admin=True
         )[0]
 
         if self.isCanceled():
@@ -1017,5 +1017,5 @@ class GwCalculatePriority(GwTask):
         )
 
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql)[0]
+        result_id = tools_db.get_row(sql, is_admin=True)[0]
         return result_id
