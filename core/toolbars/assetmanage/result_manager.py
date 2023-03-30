@@ -166,7 +166,7 @@ class ResultManager(dialog.GwAction):
             dlg.btn_delete.setEnabled(False)
             dlg.btn_status.setEnabled(False)
             dlg.btn_duplicate.setEnabled(False)
-            dlg.btn_open.setEnabled(False)
+            dlg.btn_edit.setEnabled(False)
             return
 
         row = selected_list[0].row()
@@ -174,17 +174,17 @@ class ResultManager(dialog.GwAction):
         status = self._value_status[status_i18n]
 
         if status == "FINISHED":
-            dlg.btn_open.setEnabled(False)
+            dlg.btn_edit.setEnabled(False)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(False)
             dlg.btn_delete.setEnabled(False)
         elif status == "ON PLANNING":
-            dlg.btn_open.setEnabled(True)
+            dlg.btn_edit.setEnabled(True)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(False)
         else:
-            dlg.btn_open.setEnabled(False)
+            dlg.btn_edit.setEnabled(False)
             dlg.btn_duplicate.setEnabled(False)
             dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(True)
@@ -265,7 +265,7 @@ class ResultManager(dialog.GwAction):
         self.dlg_status.close()
         self.dlg_priority_manager.tbl_results.model().select()
 
-    def _open_result(self):
+    def _edit_result(self):
 
         # Get parameters
 
@@ -388,7 +388,7 @@ class ResultManager(dialog.GwAction):
 
     def _set_signals(self):
         dlg = self.dlg_priority_manager
-        dlg.btn_open.clicked.connect(self._open_result)
+        dlg.btn_edit.clicked.connect(self._edit_result)
         dlg.btn_duplicate.clicked.connect(self._duplicate_result)
         dlg.btn_status.clicked.connect(self._open_status_selector)
         dlg.btn_delete.clicked.connect(self._delete_result)

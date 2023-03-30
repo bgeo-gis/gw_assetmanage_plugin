@@ -1,3 +1,11 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
+
 import configparser
 from pprint import pprint
 import traceback
@@ -315,7 +323,7 @@ class GwCalculatePriority(GwTask):
         break_growth_rate = float(self.config_engine["bratemain0"])
 
         last_leak_year = tools_db.get_row(
-            "select max(date_part('year', date)) from asset.leaks"
+            "select max(date_part('year', date)) from asset.leaks", is_admin=True
         )[0]
 
         if self.isCanceled():
@@ -1017,5 +1025,5 @@ class GwCalculatePriority(GwTask):
         )
 
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
-        result_id = tools_db.get_row(sql)[0]
+        result_id = tools_db.get_row(sql, is_admin=True)[0]
         return result_id

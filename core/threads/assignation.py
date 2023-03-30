@@ -1,3 +1,11 @@
+"""
+This file is part of Giswater 3
+The program is free software: you can redistribute it and/or modify it under the terms of the GNU
+General Public License as published by the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+"""
+# -*- coding: utf-8 -*-
+
 import configparser
 import traceback
 from pathlib import Path
@@ -87,7 +95,9 @@ class GwAssignation(GwTask):
             return False
 
     def _assign_leaks(self):
-        interval = tools_db.get_row("select max(date) - min(date) from asset.leaks")[0]
+        interval = tools_db.get_row(
+            "select max(date) - min(date) from asset.leaks", is_admin=True
+        )[0]
         if self.years:
             self.years = min(self.years, interval / 365)
         else:
@@ -316,7 +326,8 @@ class GwAssignation(GwTask):
             cross join orphan_pipes
             cross join max_rleak
             cross join min_rleak
-            """
+            """,
+            is_admin=True,
         )
 
         final_report = [

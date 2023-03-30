@@ -6,13 +6,16 @@ name=gw_assetmanage
 qgisMinimumVersion=3.10.13
 qgisMaximumVersion=3.99
 description=assetmanage tools for giswater plugin
-version=1.0.0
+version=1.0.1
 
 author=Nestor Ibáñez, David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís Sala, Edgar Fusté, Sergi Maspons, Albert Bofill, Xavier Torret, Pablo Marques
 
 # End of mandatory metadata
 
-changelog=Version 1.0.0 (21/03/2023)
+changelog=Version 1.0.1 (30/03/2023)
+    - Fix feature selection when editing or duplicating a result
+    - UI improvements
+Version 1.0.0 (21/03/2023)
     - First version
    
 # Tags are comma separated with spaces allowed
