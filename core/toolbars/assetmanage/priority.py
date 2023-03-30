@@ -462,8 +462,12 @@ class CalculatePriority:
 
     def _calculate_ended(self):
         dlg = self.dlg_priority
-        dlg.btn_cancel.clicked.disconnect()
-        dlg.btn_cancel.clicked.connect(dlg.reject)
+        cancel = dlg.buttonBox.StandardButton.Cancel
+        dlg.buttonBox.removeButton(dlg.buttonBox.button(cancel))
+        close = dlg.buttonBox.StandardButton.Close
+        dlg.buttonBox.addButton(close)
+        dlg.buttonBox.rejected.disconnect()
+        dlg.buttonBox.rejected.connect(dlg.reject)
         dlg.executing = False
         self.timer.stop()
 
@@ -821,11 +825,12 @@ class CalculatePriority:
         t.progressChanged.connect(dlg.progressBar.setValue)
 
         # Button OK behavior
-        dlg.btn_calc.setEnabled(False)
+        ok = dlg.buttonBox.StandardButton.Ok
+        dlg.buttonBox.button(ok).setEnabled(False)
 
         # Button Cancel behavior
-        dlg.btn_cancel.clicked.disconnect()
-        dlg.btn_cancel.clicked.connect(partial(self._cancel_thread, dlg))
+        dlg.buttonBox.rejected.disconnect()
+        dlg.buttonBox.rejected.connect(partial(self._cancel_thread, dlg))
 
         dlg.executing = True
         QgsApplication.taskManager().addTask(t)
@@ -929,8 +934,8 @@ class CalculatePriority:
 
     def _set_signals(self):
         dlg = self.dlg_priority
-        dlg.btn_calc.clicked.connect(self._manage_calculate)
-        dlg.btn_cancel.clicked.connect(partial(tools_gw.close_dialog, dlg))
+        dlg.buttonBox.accepted.connect(self._manage_calculate)
+        dlg.buttonBox.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.btn_add_catalog.clicked.connect(
             partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "add")
