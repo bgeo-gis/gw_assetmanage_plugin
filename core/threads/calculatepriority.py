@@ -160,7 +160,7 @@ class GwCalculatePriority(GwTask):
             f"""
             update asset.arc_output o
             set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
-                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id
+                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, st_multi(the_geom), code, expl_id
                     from asset.ext_arc_asset a
                     where a.arc_id = o.arc_id)
             where o.result_id = {self.result_id}
@@ -711,7 +711,7 @@ class GwCalculatePriority(GwTask):
         for arc in arcs:
             arc["val_rleak"] = self._fit_to_scale(arc["rleak"], min_rleak, max_rleak)
             arc["val_mleak"] = self._fit_to_scale(arc["mleak"], min_mleak, max_mleak)
-            arc["val_longevity"] = self._fit_to_scale(
+            arc["val_longevity"] = 10 - self._fit_to_scale(
                 arc["longevity"], min_longevity, max_longevity
             )
             #   - flow (how to take in account ficticious flows?)

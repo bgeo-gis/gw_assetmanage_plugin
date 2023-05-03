@@ -12,10 +12,13 @@ author=Nestor Ibáñez, David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís 
 
 # End of mandatory metadata
 
-changelog=Version 1.0.1 (30/03/2023)
+changelog=
+    Version DEV
+    - Fix the handle of geometry type
+    Version 1.0.1 (30/03/2023)
     - Fix feature selection when editing or duplicating a result
     - UI improvements
-Version 1.0.0 (21/03/2023)
+    Version 1.0.0 (21/03/2023)
     - First version
    
 # Tags are comma separated with spaces allowed
