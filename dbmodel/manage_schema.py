@@ -7,64 +7,65 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 
 import psycopg2
-from inspect import getsourcefile
+import logging
 from pathlib import Path
 
-# Connection parameters
-DBNAME = "postgres"
-USER = "postgres"
-PASSWORD = "postgres"
-HOST = "localhost"
-PORT = "5432"
 
-# Giswater schema parameters
-PARENT_SCHEMA = "dev_3_5_031_assetmanage"
-SCHEMA_SRID = "25831"
-LANGUAGE = "es_ES"
+def run_sql_scripts():
+    # Connection parameters
+    DBNAME = "postgres"
+    USER = "postgres"
+    PASSWORD = "postgres"
+    HOST = "localhost"
+    PORT = "5432"
 
-if (
-    not DBNAME
-    or not USER
-    or not PASSWORD
-    or not HOST
-    or not PORT
-    or not PARENT_SCHEMA
-    or not SCHEMA_SRID
-    or not LANGUAGE
-):
-    print("There are some constants that have not been defined.")
-    exit()
+    # Giswater schema parameters
+    PARENT_SCHEMA = "dev_3_5_031_assetmanage"
+    SCHEMA_SRID = "25831"
+    LANGUAGE = "es_ES"
 
-sql_folder = Path(getsourcefile(lambda: 0)).parent
-files = [
-    "ddl.sql",
-    "tablect.sql",
-    "dml.sql",
-    f"i18n/{LANGUAGE}.sql",
-    "sample.sql",
-    "updates/2023-05/ddl.sql",
-    "updates/2023-05/dcl.sql",
-]
+    required_constants = [
+        DBNAME,
+        USER,
+        PASSWORD,
+        HOST,
+        PORT,
+        PARENT_SCHEMA,
+        SCHEMA_SRID,
+        LANGUAGE,
+    ]
 
-conn = psycopg2.connect(
-    dbname=DBNAME, user=USER, password=PASSWORD, host=HOST, port=PORT
-)
-cur = conn.cursor()
+    if not all(required_constants):
+        logging.error("There are some constants that have not been defined.")
+        exit()
 
-try:
-    for file in files:
-        with open(sql_folder / file, encoding="utf8") as f:
-            sql = (
-                f.read()
-                .replace("PARENT_SCHEMA", PARENT_SCHEMA)
-                .replace("SCHEMA_SRID", SCHEMA_SRID)
-            )
-        cur.execute(sql)
-    conn.commit()
-    print("Success!")
-except Exception as e:
-    conn.rollback()
-    print(e)
-finally:
-    cur.close()
-    conn.close()
+    sql_folder = Path(__file__).parent
+    files = [
+        "ddl.sql",
+        "tablect.sql",
+        "dml.sql",
+        f"i18n/{LANGUAGE}.sql",
+        "sample.sql",
+        "updates/2023-05/ddl.sql",
+        "updates/2023-05/dcl.sql",
+    ]
+
+    try:
+        with psycopg2.connect(
+            dbname=DBNAME, user=USER, password=PASSWORD, host=HOST, port=PORT
+        ) as conn, conn.cursor() as cur:
+            for file in files:
+                with open(sql_folder / file, encoding="utf8") as f:
+                    sql = f.read()
+                    sql = sql.replace("PARENT_SCHEMA", PARENT_SCHEMA)
+                    sql = sql.replace("SCHEMA_SRID", SCHEMA_SRID)
+                cur.execute(sql)
+            conn.commit()
+            logging.info("Success!")
+    except Exception as e:
+        logging.error(e)
+
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    run_sql_scripts()
