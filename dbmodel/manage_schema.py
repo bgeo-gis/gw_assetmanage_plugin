@@ -36,7 +36,15 @@ if (
     exit()
 
 sql_folder = Path(getsourcefile(lambda: 0)).parent
-files = ["ddl.sql", "tablect.sql", "dml.sql", f"i18n/{LANGUAGE}.sql", "sample.sql"]
+files = [
+    "ddl.sql",
+    "tablect.sql",
+    "dml.sql",
+    f"i18n/{LANGUAGE}.sql",
+    "sample.sql",
+    "updates/2023-05/ddl.sql",
+    "updates/2023-05/dcl.sql",
+]
 
 conn = psycopg2.connect(
     dbname=DBNAME, user=USER, password=PASSWORD, host=HOST, port=PORT
@@ -45,7 +53,7 @@ cur = conn.cursor()
 
 try:
     for file in files:
-        with open(sql_folder / file, encoding='utf8') as f:
+        with open(sql_folder / file, encoding="utf8") as f:
             sql = (
                 f.read()
                 .replace("PARENT_SCHEMA", PARENT_SCHEMA)
