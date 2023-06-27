@@ -15,6 +15,7 @@ author=Nestor Ibáñez, David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís 
 changelog=
     Version DEV
     - Fix the handle of geometry type
+    - Add id columns to some tables
     Version 1.0.1 (30/03/2023)
     - Fix feature selection when editing or duplicating a result
     - UI improvements
