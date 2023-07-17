@@ -546,6 +546,8 @@ class GwCalculatePriority(GwTask):
                 where result_id = {self.result_id};
             insert into asset.arc_output (arc_id,
                     result_id,
+                    dnom,
+                    matcat_id,
                     val,
                     orderby,
                     expected_year,
@@ -556,6 +558,8 @@ class GwCalculatePriority(GwTask):
                     mandatory)
                 select arc_id,
                     sh.result_id,
+                    a.dnom,
+                    a.matcat_id,
                     val,
                     rank()
                         over (order by coalesce(i.mandatory, false) desc, val desc),
