@@ -13,6 +13,7 @@ from datetime import date, timedelta
 from math import log, log1p, exp
 from pathlib import Path
 
+import pandas as pd
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -790,6 +791,9 @@ class GwCalculatePriority(GwTask):
             arc["replacement_year"] = replacement_year
             arc["cum_cost_constr"] = cum_cost_constr
             arc["cum_length"] = cum_length
+
+        # Save results to a DataFrame
+        self.df = pd.DataFrame(second_iteration)
 
         # IVI calculation
         ivi = {}

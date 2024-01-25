@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 from datetime import date, timedelta
 from functools import partial
+from pathlib import Path
 from time import time
 import configparser
 import os
@@ -20,6 +21,7 @@ from qgis.PyQt.QtWidgets import (
     QAbstractItemView,
     QAction,
     QActionGroup,
+    QFileDialog,
     QHeaderView,
     QTableView,
     QTableWidget,
@@ -937,11 +939,24 @@ class CalculatePriority:
 
     # endregion
 
+    def _save2file(self):
+        if not hasattr(self.thread, "df"):
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(None, tr("Save file"), "", "*.xlsx")
+        fp = Path(file_path)
+
+        self.thread.df.to_excel(file_path)
+
+        message = tr("{filename} successfully saved.")
+        tools_qt.show_info_box(message.format(filename=fp.name))
+
     def _set_signals(self):
         dlg = self.dlg_priority
         dlg.buttonBox.accepted.connect(self._manage_calculate)
         dlg.buttonBox.rejected.connect(partial(tools_gw.close_dialog, dlg))
         dlg.rejected.connect(partial(tools_gw.close_dialog, dlg))
+        dlg.btn_save2file.clicked.connect(self._save2file)
         dlg.btn_add_catalog.clicked.connect(
             partial(self._manage_qtw_row, dlg, dlg.tbl_catalog, "add")
         )
