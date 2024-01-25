@@ -311,6 +311,7 @@ class CalculatePriorityConfig:
             self.show_config_engine = config.getboolean(
                 dialog_type, "show_config_engine"
             )
+            self.show_save2file = config.getboolean(dialog_type, "show_save2file")
 
         except Exception as e:
             print("read_config_file error %s" % e)
@@ -468,6 +469,8 @@ class CalculatePriority:
         dlg.buttonBox.addButton(close)
         dlg.buttonBox.rejected.disconnect()
         dlg.buttonBox.rejected.connect(dlg.reject)
+        if hasattr(self.thread, "df"):
+            dlg.btn_save2file.setEnabled(True)
         dlg.executing = False
         self.timer.stop()
 
@@ -603,6 +606,8 @@ class CalculatePriority:
                 self.dlg_priority.tab_widget.tab_material.setVisible(False)
             if self.config.show_config_engine is not True:
                 self.dlg_priority.tab_widget.tab_engine.setVisible(False)
+        if self.config.show_save2file is not True:
+            self.dlg_priority.btn_save2file.setVisible(False)
 
         # Manage form when is edit
         if self.mode == "edit":
