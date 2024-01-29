@@ -7,6 +7,7 @@ or (at your option) any later version.
 # -*- coding: utf-8 -*-
 import configparser
 import os.path
+import subprocess
 import sys
 import inspect
 from pathlib import Path
@@ -23,6 +24,28 @@ from . import global_vars
 
 from .settings import tools_qgis, tools_os, tools_log, tools_gw, tools_qt, tools_db, gw_global_vars
 
+try:
+    import openpyxl
+    import xlsxwriter
+except ImportError:
+    if tools_qt.show_question(
+        "It appears that certain dependencies required for the AssetManage plugin are not installed. " 
+        "Would you like to proceed with their installation now?"
+    ):
+        subprocess.run(["python", "-m", "ensurepip"])
+        install_dependencies = subprocess.run(
+            ['python', '-m', 'pip', 'install', 'openpyxl==3.1.2', 'xlsxwriter==3.1.9']
+        )
+        if install_dependencies.returncode:
+            tools_qt.show_info_box(
+                "Automatic installation of dependencies was unsuccessful. "
+                "Consult the AssetManage plugin documentation for guidance on manual installation."
+            )
+        else:
+            tools_qt.show_info_box(
+                "The dependencies have been installed successfully. "
+                "Restart QGIS to apply the changes."
+            )
 
 class GWAssetPlugin(QObject):
 
