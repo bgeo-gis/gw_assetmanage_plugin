@@ -167,6 +167,7 @@ class ResultManager(dialog.GwAction):
             dlg.btn_status.setEnabled(False)
             dlg.btn_duplicate.setEnabled(False)
             dlg.btn_edit.setEnabled(False)
+            dlg.btn_corporate.setEnabled(False)
             return
 
         row = selected_list[0].row()
@@ -174,16 +175,19 @@ class ResultManager(dialog.GwAction):
         status = self._value_status[status_i18n]
 
         if status == "FINISHED":
+            dlg.btn_corporate.setEnabled(True)
             dlg.btn_edit.setEnabled(False)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(False)
             dlg.btn_delete.setEnabled(False)
         elif status == "ON PLANNING":
+            dlg.btn_corporate.setEnabled(True)
             dlg.btn_edit.setEnabled(True)
             dlg.btn_duplicate.setEnabled(True)
             dlg.btn_status.setEnabled(True)
             dlg.btn_delete.setEnabled(False)
         else:
+            dlg.btn_corporate.setEnabled(False)
             dlg.btn_edit.setEnabled(False)
             dlg.btn_duplicate.setEnabled(False)
             dlg.btn_status.setEnabled(True)
@@ -386,8 +390,22 @@ class ResultManager(dialog.GwAction):
             plugin_name=global_vars.plugin_name,
         )
 
+    def _set_corporate(self):
+        table = self.dlg_priority_manager.tbl_results
+        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
+        for result_id in selected:
+            tools_db.execute_sql(
+                f"""
+                UPDATE asset.cat_result
+                SET iscorporate = NOT COALESCE(iscorporate, FALSE)
+                WHERE result_id = {result_id}
+                """
+            )
+        table.model().select()
+
     def _set_signals(self):
         dlg = self.dlg_priority_manager
+        dlg.btn_corporate.clicked.connect(self._set_corporate)
         dlg.btn_edit.clicked.connect(self._edit_result)
         dlg.btn_duplicate.clicked.connect(self._duplicate_result)
         dlg.btn_status.clicked.connect(self._open_status_selector)
