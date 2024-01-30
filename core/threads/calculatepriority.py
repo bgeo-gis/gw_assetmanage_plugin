@@ -818,7 +818,7 @@ class GwCalculatePriority(GwTask):
             arc["cum_length"] = cum_length
 
         # Save results to a DataFrame
-        self.df = pd.DataFrame(second_iteration)
+        self.df = pd.DataFrame(second_iteration).reset_index()
         self.df = self.df[
             [
                 "arc_id",
