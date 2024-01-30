@@ -13,6 +13,7 @@ from datetime import date, timedelta
 from math import log, log1p, exp
 from pathlib import Path
 
+import pandas as pd
 from qgis.core import QgsTask
 from qgis.PyQt.QtCore import pyqtSignal
 
@@ -132,11 +133,25 @@ class GwCalculatePriority(GwTask):
             return False
 
     def _calculate_ivi(self, arcs, year, replacements=False):
-        current_value = 0
-        replacement_cost = 0
-        for arc in arcs:
-            replacement_cost += arc["cost_constr"]
+        current_value = self._current_value(arcs, year, replacements)
+        replacement_cost = self._replacement_cost(arcs)
+        return current_value / replacement_cost
 
+    def _copy_input_to_output(self):
+        tools_db.execute_sql(
+            f"""
+            update asset.arc_output o
+            set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
+                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, st_multi(the_geom), code, expl_id
+                    from asset.ext_arc_asset a
+                    where a.arc_id = o.arc_id)
+            where o.result_id = {self.result_id}
+            """
+        )
+
+    def _current_value(self, arcs, year, replacements=False):
+        current_value = 0
+        for arc in arcs:
             if (
                 replacements
                 and "replacement_year" in arc
@@ -153,19 +168,7 @@ class GwCalculatePriority(GwTask):
                 * residual_useful_life
                 / arc["total_expected_useful_life"]
             )
-        return current_value / replacement_cost
-
-    def _copy_input_to_output(self):
-        tools_db.execute_sql(
-            f"""
-            update asset.arc_output o
-            set (sector_id, macrosector_id, presszone_id, pavcat_id, function_type, the_geom, code, expl_id)
-                = (select sector_id, macrosector_id, presszone_id, pavcat_id, function_type, st_multi(the_geom), code, expl_id
-                    from asset.ext_arc_asset a
-                    where a.arc_id = o.arc_id)
-            where o.result_id = {self.result_id}
-            """
-        )
+        return current_value
 
     def _emit_report(self, *args):
         self.report.emit({"info": {"values": [{"message": arg} for arg in args]}})
@@ -314,6 +317,9 @@ class GwCalculatePriority(GwTask):
             txt += "  ".join(line)
             txt += "\n"
         return txt.strip()
+
+    def _replacement_cost(self, arcs):
+        return sum(arc["cost_constr"] for arc in arcs)
 
     def _run_sh(self):
         self._emit_report(tr("Getting auxiliary data from DB") + " (1/5)...")
@@ -666,10 +672,10 @@ class GwCalculatePriority(GwTask):
 
             arc["mleak"] = self.config_material.get_pleak(arc_material)
 
-            cost_by_meter = self.config_catalog.get_cost_constr(arc["arccat_id"])
-            arc["cost_constr"] = cost_by_meter * float(arc["length"])
+            arc["cost_by_meter"] = self.config_catalog.get_cost_constr(arc["arccat_id"])
+            arc["cost_constr"] = arc["cost_by_meter"] * float(arc["length"])
 
-            builtdate = arc["builtdate"] or date(
+            arc["calculated_builtdate"] = arc["builtdate"] or date(
                 self.config_material.get_default_builtdate(arc_material), 1, 1
             )
             if arc["press1"] is None and arc["press2"] is None:
@@ -688,14 +694,21 @@ class GwCalculatePriority(GwTask):
             )
             one_year = timedelta(days=365)
             duration = arc["total_expected_useful_life"] * one_year
-            remaining_years = builtdate + duration - date.today()
+            remaining_years = arc["calculated_builtdate"] + duration - date.today()
             arc["longevity"] = remaining_years / one_year
 
             arc["nrw"] = nrw.get(arc["dma_id"], 0)
 
+            arc["material_compliance"] = self.config_material.get_compliance(
+                arc["matcat_id"]
+            )
+            arc["catalog_compliance"] = self.config_catalog.get_compliance(
+                arc["arccat_id"]
+            )
+
             arc["compliance"] = min(
-                self.config_material.get_compliance(arc["matcat_id"]),
-                self.config_catalog.get_compliance(arc["arccat_id"]),
+                arc["material_compliance"],
+                arc["catalog_compliance"],
             )
 
             arcs.append(arc)
@@ -730,23 +743,41 @@ class GwCalculatePriority(GwTask):
             arc["val_strategic"] = 10 if arc["strategic"] else 0
             arc["val_compliance"] = 10 - arc["compliance"]
 
+            # First iteration weights
+            arc["w1_rleak"] = self.config_engine["rleak_1"]
+            arc["w1_mleak"] = self.config_engine["mleak_1"]
+            arc["w1_longevity"] = self.config_engine["longevity_1"]
+            arc["w1_flow"] = self.config_engine["flow_1"]
+            arc["w1_nrw"] = self.config_engine["nrw_1"]
+            arc["w1_strategic"] = self.config_engine["strategic_1"]
+            arc["w1_compliance"] = self.config_engine["compliance_1"]
+
+            # Second iteration weights
+            arc["w2_rleak"] = self.config_engine["rleak_2"]
+            arc["w2_mleak"] = self.config_engine["mleak_2"]
+            arc["w2_longevity"] = self.config_engine["longevity_2"]
+            arc["w2_flow"] = self.config_engine["flow_2"]
+            arc["w2_nrw"] = self.config_engine["nrw_2"]
+            arc["w2_strategic"] = self.config_engine["strategic_2"]
+            arc["w2_compliance"] = self.config_engine["compliance_2"]
+
             arc["val_1"] = (
-                arc["val_rleak"] * self.config_engine["rleak_1"]
-                + arc["val_mleak"] * self.config_engine["mleak_1"]
-                + arc["val_longevity"] * self.config_engine["longevity_1"]
-                + arc["val_flow"] * self.config_engine["flow_1"]
-                + arc["val_nrw"] * self.config_engine["nrw_1"]
-                + arc["val_strategic"] * self.config_engine["strategic_1"]
-                + arc["val_compliance"] * self.config_engine["compliance_1"]
+                arc["val_rleak"] * arc["w1_rleak"]
+                + arc["val_mleak"] * arc["w1_mleak"]
+                + arc["val_longevity"] * arc["w1_longevity"]
+                + arc["val_flow"] * arc["w1_flow"]
+                + arc["val_nrw"] * arc["w1_nrw"]
+                + arc["val_strategic"] * arc["w1_strategic"]
+                + arc["val_compliance"] * arc["w1_compliance"]
             )
             arc["val_2"] = (
-                arc["val_rleak"] * self.config_engine["rleak_2"]
-                + arc["val_mleak"] * self.config_engine["mleak_2"]
-                + arc["val_longevity"] * self.config_engine["longevity_2"]
-                + arc["val_flow"] * self.config_engine["flow_2"]
-                + arc["val_nrw"] * self.config_engine["nrw_2"]
-                + arc["val_strategic"] * self.config_engine["strategic_2"]
-                + arc["val_compliance"] * self.config_engine["compliance_2"]
+                arc["val_rleak"] * arc["w2_rleak"]
+                + arc["val_mleak"] * arc["w2_mleak"]
+                + arc["val_longevity"] * arc["w2_longevity"]
+                + arc["val_flow"] * arc["w2_flow"]
+                + arc["val_nrw"] * arc["w2_nrw"]
+                + arc["val_strategic"] * arc["w2_strategic"]
+                + arc["val_compliance"] * arc["w2_compliance"]
             )
 
         # First iteration
@@ -786,6 +817,58 @@ class GwCalculatePriority(GwTask):
             arc["cum_cost_constr"] = cum_cost_constr
             arc["cum_length"] = cum_length
 
+        # Save results to a DataFrame
+        self.df = pd.DataFrame(second_iteration).reset_index()
+        self.df = self.df[
+            [
+                "arc_id",
+                "matcat_id",
+                "arccat_id",
+                "dnom",
+                "rleak",
+                "val_rleak",
+                "w1_rleak",
+                "w2_rleak",
+                "mleak",
+                "val_mleak",
+                "w1_mleak",
+                "w2_mleak",
+                "calculated_builtdate",
+                "total_expected_useful_life",
+                "longevity",
+                "val_longevity",
+                "w1_longevity",
+                "w2_longevity",
+                "flow_avg",
+                "val_flow",
+                "w1_flow",
+                "w2_flow",
+                "dma_id",
+                "nrw",
+                "val_nrw",
+                "w1_nrw",
+                "w2_nrw",
+                "material_compliance",
+                "catalog_compliance",
+                "compliance",
+                "val_compliance",
+                "w1_compliance",
+                "w2_compliance",
+                "val_strategic",
+                "w1_strategic",
+                "w2_strategic",
+                "mandatory",
+                "cost_by_meter",
+                "length",
+                "cost_constr",
+                "val_1",
+                "val_2",
+                "cum_cost_constr",
+                "cum_length",
+                "replacement_year",
+            ]
+        ]
+
         # IVI calculation
         ivi = {}
         for year in range(date.today().year, self.target_year + 1):
@@ -804,6 +887,7 @@ class GwCalculatePriority(GwTask):
             filter(
                 lambda x: x,
                 [
+                    self._summary(arcs),
                     self._ivi_report(ivi),
                     self._invalid_arccat_id_report(invalid_arccat_id),
                     self._invalid_material_report(invalid_material),
@@ -1031,3 +1115,46 @@ class GwCalculatePriority(GwTask):
         sql = f"select result_id from asset.cat_result where result_name = '{self.result_name}'"
         result_id = tools_db.get_row(sql, is_admin=True)[0]
         return result_id
+
+    def _summary(self, arcs):
+        title = tr("SUMMARY")
+        investment_header = tr("Investment (€/year):")
+        year_header = tr("Year:")
+        current_network_cost_header = tr("Current network cost (€):")
+        total_replacement_cost_header = tr("Total replacement cost (€):")
+        ivi_header = tr("IVI:")
+        replacement_rate_header = tr("Replacement rate (%/year):")
+
+        current_value = self._current_value(arcs, date.today().year)
+        replacement_cost = self._replacement_cost(arcs)
+        ivi = current_value / replacement_cost
+        replacement_rate = self.result_budget / replacement_cost * 100
+
+        columns = [
+            [
+                investment_header,
+                year_header,
+                current_network_cost_header,
+                total_replacement_cost_header,
+                ivi_header,
+                replacement_rate_header,
+            ],
+            [
+                f"{self.result_budget:.2f}",
+                f"{self.target_year}",
+                f"{current_value:.2f}",
+                f"{replacement_cost:.2f}",
+                f"{ivi:.3f}",
+                f"{replacement_rate:.2f}",
+            ],
+        ]
+        for column in columns:
+            length = max(len(x) for x in column)
+            for index, string in enumerate(column):
+                column[index] = string.ljust(length)
+
+        txt = f"{title}:\n"
+        for line in zip(*columns):
+            txt += "  ".join(line)
+            txt += "\n"
+        return txt.strip()
