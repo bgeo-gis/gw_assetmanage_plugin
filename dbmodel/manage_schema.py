@@ -49,6 +49,8 @@ def run_sql_scripts():
         "updates/2023-05/ddl.sql",
         "updates/2023-05/dcl.sql",
         "updates/2024-01/ddl.sql",
+        "updates/2024-01/gw_trg_asset_cat_mat_arc.sql",
+        "updates/2024-01/gw_trg_asset_cat_mat_arc.sql",
     ]
 
     try:
