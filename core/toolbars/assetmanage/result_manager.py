@@ -32,7 +32,7 @@ from ....settings import (
 )
 from .... import global_vars
 from .priority import CalculatePriority
-from ...utils import open_dialog
+from ...utils import open_dialog, tr
 
 
 class ResultManager(dialog.GwAction):
@@ -392,15 +392,91 @@ class ResultManager(dialog.GwAction):
 
     def _set_corporate(self):
         table = self.dlg_priority_manager.tbl_results
-        selected = [x.data() for x in table.selectedIndexes() if x.column() == 0]
-        for result_id in selected:
+        selected_list = table.selectionModel().selectedRows()
+
+        if len(selected_list) != 1:
+            return
+
+        row_index = selected_list[0].row()
+        row = table.model().record(row_index)
+        result_id = row.value("result_id")
+        iscorporate = row.value("iscorporate")
+
+        if iscorporate:
             tools_db.execute_sql(
                 f"""
                 UPDATE asset.cat_result
-                SET iscorporate = NOT COALESCE(iscorporate, FALSE)
+                SET iscorporate = FALSE
                 WHERE result_id = {result_id}
                 """
             )
+            table.model().select()
+            return
+
+        # Get the exploitations of result_id
+        sql = (
+            f"SELECT DISTINCT expl_id FROM asset.arc_output WHERE result_id={result_id}"
+        )
+        rows = tools_db.get_rows(sql)
+        result_expl = set()
+        if rows:
+            result_expl = {row[0] for row in rows}
+
+        # get the result_ids that arecorporate and it exploitations
+        sql = "SELECT DISTINCT result_id, expl_id FROM asset.v_asset_arc_corporate"
+        rows = tools_db.get_rows(sql)
+        corporate_expl = {}
+        if rows:
+            for result, expl in rows:
+                if result not in corporate_expl:
+                    corporate_expl[result] = {expl}
+                else:
+                    corporate_expl[result].add(expl)
+        print(f"{corporate_expl=}")
+
+        # get result_ids that share exploitations with this
+        conflict_results = []
+        for result, exploitations in corporate_expl.items():
+            if result_expl.isdisjoint(exploitations):
+                continue
+            conflict_results.append(result)
+
+        if not conflict_results:
+            tools_db.execute_sql(
+                f"""
+                UPDATE asset.cat_result
+                SET iscorporate = TRUE
+                WHERE result_id = {result_id}
+                """
+            )
+            table.model().select()
+            return
+
+        conflict_results_str = ", ".join(str(x) for x in conflict_results)
+        message = tr(
+            "To make the result id {result_id} corporate, "
+            "is necessary to make not corporate the following result ids: "
+            "{conflict_ids}."
+        )
+        message += " " + tr("Do you want to proceed?")
+        answer = tools_qt.show_question(
+            message.format(result_id=result_id, conflict_ids=conflict_results_str)
+        )
+
+        if not answer:
+            return
+
+        tools_db.execute_sql(
+            f"""
+            UPDATE asset.cat_result
+            SET iscorporate = FALSE
+            WHERE result_id IN ({conflict_results_str});
+
+            UPDATE asset.cat_result
+            SET iscorporate = TRUE
+            WHERE result_id = {result_id};
+            """
+        )
         table.model().select()
 
     def _set_signals(self):
