@@ -17,6 +17,7 @@ changelog=
     - Add Summary in WM method report
     - Export WM method variables as an Excel file
     - Add triggers to keep material and arc catalogs in sync with Giswater
+    - Add the Corporate Results view
     Version 1.0.3 (17/07/2023)
     - Fix diameter and material on output table in SH method
     Version 1.0.2 (27/06/2023)
