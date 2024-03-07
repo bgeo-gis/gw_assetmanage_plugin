@@ -561,7 +561,10 @@ class GwCalculatePriority(GwTask):
                     total,
                     length,
                     cum_length,
-                    mandatory)
+                    mandatory,
+                    strategic,
+                    rleak,
+                    compliance)
                 select arc_id,
                     sh.result_id,
                     a.dnom,
@@ -577,7 +580,10 @@ class GwCalculatePriority(GwTask):
                     st_length(a.the_geom),
                     sum(st_length(a.the_geom))
                         over (order by coalesce(i.mandatory, false) desc, val desc, arc_id),
-                    mandatory
+                    mandatory,
+                    i.strategic,
+                    rleak,
+                    10 - sh.compliance
                 from asset.arc_engine_sh sh
                 left join asset.arc_input i using (arc_id)
                 left join asset.ext_arc_asset a using (arc_id)
