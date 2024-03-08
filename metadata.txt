@@ -13,11 +13,13 @@ author=Nestor Ibáñez, David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís 
 # End of mandatory metadata
 
 changelog=
-    Version 1.0.4-DEV
+    Version 1.0.4-DEV (08/03/2024)
     - Add Summary in WM method report
     - Export WM method variables as an Excel file
     - Add triggers to keep material and arc catalogs in sync with Giswater
     - Add the Corporate Results view
+    - Fix copy of information to output table in SH method
+    - Priorize same diameter over same material in leak assignation
     Version 1.0.3 (17/07/2023)
     - Fix diameter and material on output table in SH method
     Version 1.0.2 (27/06/2023)
