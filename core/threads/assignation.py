@@ -194,12 +194,12 @@ class GwAssignation(GwTask):
             if any(a["same_material"] and a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_material"] and x["same_diameter"]
                 self.by_material_diameter += 1
-            elif any(a["same_material"] for a in leak_arcs):
-                is_arc_valid = lambda x: x["same_material"]
-                self.by_material += 1
             elif any(a["same_diameter"] for a in leak_arcs):
                 is_arc_valid = lambda x: x["same_diameter"]
                 self.by_diameter += 1
+            elif any(a["same_material"] for a in leak_arcs):
+                is_arc_valid = lambda x: x["same_material"]
+                self.by_material += 1
             else:
                 is_arc_valid = lambda x: True
                 self.any_pipe += 1
