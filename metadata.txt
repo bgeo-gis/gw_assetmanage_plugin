@@ -13,7 +13,7 @@ author=Nestor Ibáñez, David Erill, Barbara Rzepka, Sergi Muñoz, Josep Lluís 
 # End of mandatory metadata
 
 changelog=
-    Version 1.0.4-DEV (08/03/2024)
+    Version 1.0.4 (22/03/2024)
     - Add Summary in WM method report
     - Export WM method variables as an Excel file
     - Add triggers to keep material and arc catalogs in sync with Giswater
