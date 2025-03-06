@@ -25,8 +25,9 @@
 
 - **`calculated_builtdate`:** `builtdate` of the arc, or default `builtdate` for `matcat_id` if missing, based on material configuration.
 - **`total_expected_useful_life`:** Expected useful life based on the configuration of materials. It calculates the maximum longevity for `matcat_id` if pressure is less than 50 meters, minimum longevity if it's more than 75 meters, and medium longevity otherwise.
-- **`longevity`:** Remaining years of useful life, given by `calculated_builtdate` + `total_expected_useful_life` - current year.
-- **`val_longevity`:** 10 minus the min-max normalization of `longevity`. Lower `longevity` values receive higher priority in replacement.
+- **`real_years`:** Actual age of the arc, given by Current year - `calculated_builtdate`.
+- **`longevity`:** Ratio of actual age by the total expected useful life, given by `real_years` / `total_expected_useful_life`.
+- **`val_longevity`:** `val_longevity` = ((`longevity` - minimum longevity) * 10) / (maximum longevity - minimum longevity). Lower `longevity` values receive higher priority in replacement.
 - **`w1_longevity`:** Weight of `val_longevity` in the calculation of `val_1` (first iteration).
 - **`w2_longevity`:** Weight of `val_longevity` in the calculation of `val_2` (second iteration).
 

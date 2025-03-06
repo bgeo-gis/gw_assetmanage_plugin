@@ -701,6 +701,7 @@ class GwCalculatePriority(GwTask):
             one_year = timedelta(days=365)
             duration = arc["total_expected_useful_life"]
             remaining_years = arc["calculated_builtdate"].year + duration - date.today().year
+            # Actual age of the arc
             real_years = date.today().year - arc["calculated_builtdate"].year
             # Calculate the longevity value [real life/ expected useful life]
             arc["longevity"] = real_years / duration
