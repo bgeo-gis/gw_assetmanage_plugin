@@ -84,7 +84,7 @@ def get_giswater_folder(filename_to_find='metadata.txt', get_full_path=False):
         parser.read(filename)
         if not parser.has_section('general'): continue
         if not parser.has_option('general', 'name'): continue
-        if parser['general']['name'] == 'giswater':
+        if parser['general']['name'] == 'Giswater':
             if get_full_path:
                 return os.path.dirname(filename)
             giswater_folder_name = os.path.basename(os.path.dirname(filename))
