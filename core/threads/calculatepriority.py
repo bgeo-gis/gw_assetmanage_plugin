@@ -544,7 +544,7 @@ class GwCalculatePriority(GwTask):
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
             progress = (76 - 72) / len(output_arcs) * 1000 * loop + 72
-            self.setProgress(progress)
+            self.setProgress(int(progress))
 
         tools_db.execute_sql(
             f"""
@@ -964,7 +964,7 @@ class GwCalculatePriority(GwTask):
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
             progress = (70 - 40) / len(second_iteration) * 1000 * loop + 40
-            self.setProgress(progress)
+            self.setProgress(int(progress))
 
         # Saving to asset.arc_output
         index = 0
@@ -1046,7 +1046,7 @@ class GwCalculatePriority(GwTask):
             tools_db.execute_sql(save_arcs_sql)
             loop += 1
             progress = (90 - 70) / len(second_iteration) * 1000 * loop + 70
-            self.setProgress(progress)
+            self.setProgress(int(progress))
 
         self._copy_input_to_output()
 

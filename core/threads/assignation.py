@@ -287,7 +287,7 @@ class GwAssignation(GwTask):
                 arcs[id]["leaks"] = rleak * arcs[id]["length"]
                 arcs[id]["done"] = True
 
-            self.setProgress((90 - 50) / len(arc_list) * index + 50)
+            self.setProgress(int((90 - 50) / len(arc_list) * index + 50))
 
             if self.isCanceled():
                 self._emit_report(self.msg_task_canceled)
