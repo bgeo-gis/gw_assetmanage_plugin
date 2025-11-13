@@ -316,7 +316,7 @@ class AmBreakage(dialog.GwAction):
 
         # Progress bar behavior
         dlg.progressBar.show()
-        t.progressChanged.connect(dlg.progressBar.setValue)
+        t.progressChanged.connect(partial(self._update_progressbar, dlg))
 
         # Button OK behavior
         ok = dlg.buttonBox.StandardButton.Ok
@@ -405,6 +405,9 @@ class AmBreakage(dialog.GwAction):
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
         widget.setText(text)
+
+    def _update_progressbar(self, dlg, value):
+        dlg.progressBar.setValue(int(value))
 
     def _cancel_thread(self, dlg):
         self.thread.cancel()
