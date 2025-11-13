@@ -829,7 +829,7 @@ class CalculatePriority:
         )
 
         # Progress bar behavior
-        t.progressChanged.connect(dlg.progressBar.setValue)
+        t.progressChanged.connect(partial(self._update_progressbar, dlg))
 
         # Button OK behavior
         ok = dlg.buttonBox.StandardButton.Ok
@@ -995,6 +995,9 @@ class CalculatePriority:
         elapsed_time = time() - self.t0
         text = str(timedelta(seconds=round(elapsed_time)))
         widget.setText(text)
+
+    def _update_progressbar(self, dlg, value):
+        dlg.progressBar.setValue(int(value))
 
     def _update_total_weight(self, lyt):
         label = getattr(self.dlg_priority, f"total_{lyt}", None)
